@@ -145,6 +145,75 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/08/Java%E9%9D%A2%E8%AF%95%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Guolong Wang">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王国隆的技术博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/08/Java%E9%9D%A2%E8%AF%95%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98-2/" class="post-title-link" itemprop="url">Java面试常见问题-2</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-05-08 20:15:59" itemprop="dateCreated datePublished" datetime="2020-05-08T20:15:59+08:00">2020-05-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-05-09 09:16:28" itemprop="dateModified" datetime="2020-05-09T09:16:28+08:00">2020-05-09</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="搜索引擎的工作原理"><a href="#搜索引擎的工作原理" class="headerlink" title="搜索引擎的工作原理"></a>搜索引擎的工作原理</h3><p>各个搜索引擎都有叫做“蜘蛛”的机器人，这些机器人负责在网络上收集网站上的各种各样的信息。</p>
+<p>每个网站都有非常多的链接，有的是链接到网站内容页面的，有的是链接到其他网站的，搜索引擎的蜘蛛就会顺着这些链接爬下去，把符合标准的网页搬回自己的数据库，这也就是搜索引擎能给我们提供成千上万个结果的原因了。</p>
+<p>这就完成了第一部分的工作，这又怎么样快速的从搜索引擎中找到我们想要的东西呢？</p>
+<p>第二步就是建立索引，这个就像是书的目录一样。一般来讲，搜索引擎会分析网页的关键词，有关键字的并且出现多次的在结果中就会比较靠前。然后这个网站是不是一个人气高的网站，打开速度快不快等等，各种各样的因素都会影响搜索引擎给网站的评分，从而影响网站在搜索结果中的排名。</p>
+<p>这就是搜索引擎大概的工作原理。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/04/Java%E9%9D%A2%E8%AF%95%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98-1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -176,7 +245,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-05-05 14:22:36" itemprop="dateModified" datetime="2020-05-05T14:22:36+08:00">2020-05-05</time>
+                <time title="Modified: 2020-05-12 17:00:36" itemprop="dateModified" datetime="2020-05-12T17:00:36+08:00">2020-05-12</time>
               </span>
 
           
@@ -190,7 +259,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="String-StringBuilder-StringBuffer区别"><a href="#String-StringBuilder-StringBuffer区别" class="headerlink" title="String, StringBuilder, StringBuffer区别"></a>String, StringBuilder, StringBuffer区别</h2><p>这三个类的主要区别在两个方面：<strong>运算速度</strong>（运算性能或执行效率）和<strong>线程安全性</strong>。</p>
+          <h2 id="1-String-StringBuilder-StringBuffer区别"><a href="#1-String-StringBuilder-StringBuffer区别" class="headerlink" title="1. String, StringBuilder, StringBuffer区别"></a>1. String, StringBuilder, StringBuffer区别</h2><p>这三个类的主要区别在两个方面：<strong>运算速度</strong>（运算性能或执行效率）和<strong>线程安全性</strong>。</p>
 <h4 id="1-运算速度比较（通常情况下）：StringBuilder-gt-StringBuffer-gt-String"><a href="#1-运算速度比较（通常情况下）：StringBuilder-gt-StringBuffer-gt-String" class="headerlink" title="1. 运算速度比较（通常情况下）：StringBuilder &gt; StringBuffer &gt; String"></a>1. <strong>运算速度</strong>比较（通常情况下）：<strong>StringBuilder &gt; StringBuffer &gt; String</strong></h4><p>String是<strong>final</strong>类不能被继承且为字符串常量，而StringBuilder和StringBuffer均为<strong>字符串变量</strong>。String对象一旦创建便<strong>不可更改</strong>，而后两者是<strong>可更改</strong>的，它们只能通过构造函数来建立对象，且对象被建立以后将在内存中分配内存空间，并初始保存一个null，通过append方法向StringBuffer和StringBuilder中赋值。</p>
 <p>Java中对String对象进行的操作实际上是一个不断创建并回收对象的过程，因此在运行速度上很慢。</p>
 <h4 id="2-线程安全性"><a href="#2-线程安全性" class="headerlink" title="2. 线程安全性"></a>2. 线程安全性</h4><p>StringBuilder（<strong>非线程安全</strong>）</p>
@@ -200,7 +269,7 @@
 <h4 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a>3. 总结</h4><p>String：适用于<strong>少量</strong>的字符串操作。</p>
 <p>StringBuilder：适用于<strong>单线程</strong>下在字符串缓冲区进行大量操作。</p>
 <p>StringBuffer：适用于<strong>多线程</strong>下在字符串缓冲区进行大量操作。</p>
-<h2 id="Spring-Bean为什么是单例"><a href="#Spring-Bean为什么是单例" class="headerlink" title="Spring Bean为什么是单例"></a>Spring Bean为什么是单例</h2><h4 id="单例bean与原型bean的区别"><a href="#单例bean与原型bean的区别" class="headerlink" title="单例bean与原型bean的区别"></a>单例bean与原型bean的区别</h4><p><strong>单例：</strong>一个bean被声明为单例时，处理多次请求时spring容器里只实例化一个bean，后续的请求公用这个对象，这个对象存储在一个map中，当有请求时，先在缓存中（map）查找是否存在，存在则使用，不存在才实例化一个对象</p>
+<h2 id="2-Spring-Bean为什么是单例"><a href="#2-Spring-Bean为什么是单例" class="headerlink" title="2. Spring Bean为什么是单例"></a>2. Spring Bean为什么是单例</h2><h4 id="单例bean与原型bean的区别"><a href="#单例bean与原型bean的区别" class="headerlink" title="单例bean与原型bean的区别"></a>单例bean与原型bean的区别</h4><p><strong>单例：</strong>一个bean被声明为单例时，处理多次请求时spring容器里只实例化一个bean，后续的请求公用这个对象，这个对象存储在一个map中，当有请求时，先在缓存中（map）查找是否存在，存在则使用，不存在才实例化一个对象</p>
 <p><strong>原型：</strong>每当有请求来就实例化一个新的bean，没有缓存以及从缓存中查</p>
 <h4 id="单例bean的优势"><a href="#单例bean的优势" class="headerlink" title="单例bean的优势"></a>单例bean的优势</h4><p>由于不会每次都新创建新对象所以有一下几个性能上的优势：</p>
 <p><strong>减少了新生成实例的消耗</strong></p>
@@ -215,28 +284,28 @@
 <p>为了提高性能<br>少创建实例<br>垃圾回收<br>缓存快速获取</p>
 <p>单例有啥劣势？</p>
 <p>如果是有状态的话在并发环境下线程不安全。</p>
-<h2 id="项目中有用到多线程嘛"><a href="#项目中有用到多线程嘛" class="headerlink" title="项目中有用到多线程嘛"></a>项目中有用到多线程嘛</h2><p>用户注册完成送大礼包/积分之类，且积分等也是另一个系统并<strong>比较耗时</strong>；且这类任务即使失败也不是特别重要的。</p>
+<h2 id="3-项目中有用到多线程嘛"><a href="#3-项目中有用到多线程嘛" class="headerlink" title="3. 项目中有用到多线程嘛"></a>3. 项目中有用到多线程嘛</h2><p>用户注册完成送大礼包/积分之类，且积分等也是另一个系统并<strong>比较耗时</strong>；且这类任务即使失败也不是特别重要的。</p>
 <p>后台线程：比如<strong>定期执行</strong>一些特殊任务，如定期更新配置文件，任务调度（如quartz），一些监控用于定期信息采集等。</p>
 <p>特别耗时的操作，如备份数据库，可以开个线程执行备份，然后执行返回，前台不断向后台询问线程执行状态</p>
 <p>场景一:一个业务逻辑有很多次的循环，<strong>每次循环之间没有影响</strong>，比如验证1万条url路径是否存在，正常情况要循环1万次，逐个去验证每一条URL，这样效率会很低，假设验证一条需要1分钟，总共就需要1万分钟，有点恐怖。这时可以用多线程，将1万条URL分成50等份，开50个线程，没个线程只需验证200条，这样所有的线程执行完是远小于1万分钟的。</p>
 <p>场景二:需要知道一个任务的执行进度，比如我们常看到的进度条，实现方式可以是在任务中加入一个整型属性变量(这样不同方法可以共享)，任务执行一定程度就给变量值加1，另外开一个线程按时间间隔不断去访问这个变量，并反馈给用户。</p>
 <p>总之<strong>使用多线程就是为了充分利用cpu的资源，提高程序执行效率</strong>，当你发现一个业务逻辑执行效率特别低，耗时特别长，就可以考虑使用多线程。<strong>不过CPU执行哪个线程的时间和顺序是不确定的</strong>，即使设置了线程的优先级，因此使用多线程的风险也是比较大的，会出现很多预料不到的问题，一定要多熟悉概念，多构造不同的场景去测试才能够掌握!</p>
-<h2 id="HashMap为什么要重写hashCode和equals方法"><a href="#HashMap为什么要重写hashCode和equals方法" class="headerlink" title="HashMap为什么要重写hashCode和equals方法"></a>HashMap为什么要重写hashCode和equals方法</h2><p>HashMap和Hashtable的底层实现都是数组+链表结构实现的</p>
+<h2 id="4-HashMap为什么要重写hashCode和equals方法"><a href="#4-HashMap为什么要重写hashCode和equals方法" class="headerlink" title="4. HashMap为什么要重写hashCode和equals方法"></a>4. HashMap为什么要重写hashCode和equals方法</h2><p>HashMap和Hashtable的底层实现都是数组+链表结构实现的</p>
 <p>使用HashMap，如果key是自定义的类，就必须重写hashcode()和equals()。</p>
 <p>如果你重载了equals，比如说是基于对象的内容实现的，而保留hashCode的实现不变，那么很可能某两个对象明明是“相等”，而hashCode却不一样。</p>
 <p>这样，当你用其中的一个作为键保存到hashMap、hasoTable或hashSet中，再以“相等的”找另一个作为键值去查找他们的时候，则根本找不到。</p>
 <p>对于每一个对象，通过其hashCode()方法可为其生成一个整形值（散列码），该整型值被处理后，将会作为数组下标，存放该对象所对应的Entry（存放该对象及其对应值）。 </p>
 <p>equals()方法则是在HashMap中插入值或查询时会使用到。当HashMap中插入值或查询值对应的散列码与数组中的散列码相等时，则会通过equals方法比较key值是否相等</p>
 <p>所以想以自建对象作为HashMap的key，必须重写该对象继承object的hashCode和equals方法。</p>
-<h2 id="Java集合中为什么要使用设计迭代器"><a href="#Java集合中为什么要使用设计迭代器" class="headerlink" title="Java集合中为什么要使用设计迭代器"></a>Java集合中为什么要使用设计迭代器</h2><p>优点: </p>
-<pre><code>1.可以不了解集合内部的数据结构,就可以直接遍历;
+<h2 id="5-Java集合中为什么要使用设计迭代器"><a href="#5-Java集合中为什么要使用设计迭代器" class="headerlink" title="5. Java集合中为什么要使用设计迭代器"></a>5. Java集合中为什么要使用设计迭代器</h2><p>优点: </p>
+<pre><code>1. 可以不了解集合内部的数据结构,就可以直接遍历;
 
-2.**不暴露内部的数据**,可以直接外部遍历;
+2. **不暴露内部的数据**,可以直接外部遍历;
 
-3.适用性强,基本上的集合都能使用迭代器;</code></pre><h2 id="为什么使用迭代器遍历删除是安全的"><a href="#为什么使用迭代器遍历删除是安全的" class="headerlink" title="为什么使用迭代器遍历删除是安全的"></a>为什么使用迭代器遍历删除是安全的</h2><p>基本上<strong>ArrayList采用size属性来维护自已的状态，而Iterator采用cursor来来维护自已的状态</strong>。</p>
+3. 适用性强,基本上的集合都能使用迭代器;</code></pre><h2 id="6-为什么使用迭代器遍历删除是安全的"><a href="#6-为什么使用迭代器遍历删除是安全的" class="headerlink" title="6. 为什么使用迭代器遍历删除是安全的"></a>6. 为什么使用迭代器遍历删除是安全的</h2><p>基本上<strong>ArrayList采用size属性来维护自已的状态，而Iterator采用cursor来来维护自已的状态</strong>。</p>
 <p>当size出现变化时，cursor并不一定能够得到同步，除非这种变化是Iterator主动导致的。</p>
 <p>当Iterator.remove方法导致ArrayList列表发生变化时，他会更新cursor来同步这一变化。但其他方式导致的ArrayList变化，Iterator是无法感知的。ArrayList自然也不会主动通知Iterator们，那将是一个繁重的工作。Iterator到底还是做了努力：为了防止状态不一致可能引发的无法设想的后果，Iterator会经常做checkForComodification检查，以防有变。如果有变，则以异常抛出，所以就出现了上面的异常。</p>
-<h2 id="Spring事务传播机制"><a href="#Spring事务传播机制" class="headerlink" title="Spring事务传播机制"></a>Spring事务传播机制</h2><ul>
+<h2 id="7-Spring事务传播机制"><a href="#7-Spring事务传播机制" class="headerlink" title="7. Spring事务传播机制"></a>7. Spring事务传播机制</h2><ul>
 <li>@Transactional(propagation=Propagation.REQUIRED)<br>如果有事务, 那么加入事务, 没有的话新建一个(默认情况下)</li>
 <li>@Transactional(propagation=Propagation.NOT_SUPPORTED)<br>容器不为这个方法开启事务</li>
 <li>@Transactional(propagation=Propagation.REQUIRES_NEW)<br>不管是否存在事务,都创建一个新的事务,原来的挂起,新的执行完毕,继续执行老的事务</li>
@@ -643,7 +712,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
