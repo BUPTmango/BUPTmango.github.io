@@ -30,7 +30,7 @@
 <meta property="og:image" content="http://yoursite.com/2020/05/21/Java%E9%9D%A2%E8%AF%95%E9%A2%98%E8%AE%B0%E5%BD%95-1/%E8%AE%BE%E8%AE%A1%E8%A1%A8.png">
 <meta property="og:image" content="http://yoursite.com/2020/05/21/Java%E9%9D%A2%E8%AF%95%E9%A2%98%E8%AE%B0%E5%BD%95-1/%E8%A1%A8%E6%95%B0%E6%8D%AE.png">
 <meta property="article:published_time" content="2020-05-20T16:08:12.781Z">
-<meta property="article:modified_time" content="2020-05-20T23:15:30.486Z">
+<meta property="article:modified_time" content="2020-05-20T23:16:28.464Z">
 <meta property="article:author" content="Guolong Wang">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://yoursite.com/2020/05/21/Java%E9%9D%A2%E8%AF%95%E9%A2%98%E8%AE%B0%E5%BD%95-1/%E8%AE%BE%E8%AE%A1%E8%A1%A8.png">
@@ -177,7 +177,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2020-05-21 00:08:12 / Modified: 07:15:30" itemprop="dateCreated datePublished" datetime="2020-05-21T00:08:12+08:00">2020-05-21</time>
+              <time title="Created: 2020-05-21 00:08:12 / Modified: 07:16:28" itemprop="dateCreated datePublished" datetime="2020-05-21T00:08:12+08:00">2020-05-21</time>
             </span>
 
           
@@ -202,12 +202,14 @@
 <li>每个索引都需要占⽤用磁盘空间，索引越多，需要的磁盘空间就越大</li>
 <li>修改表时，对索引的重构和更新很麻烦</li>
 <li>越多的索引，会使更新表变得很浪费时间<h5 id="尽量使用数据量少的索引"><a href="#尽量使用数据量少的索引" class="headerlink" title="尽量使用数据量少的索引"></a>尽量使用数据量少的索引</h5></li>
-<li>如果索引的值很长，那么查询的速度会受到影响<ul>
+<li>如果索引的值很长，那么查询的速度会受到影响</li>
+<li><ul>
 <li>例如：对一个char(100)类型的字段进行全文检索需要的时间肯定比对char(10)类型的字段需要的时间更多<h5 id="为经常需要排序、分组和联合操作的字段建立索引"><a href="#为经常需要排序、分组和联合操作的字段建立索引" class="headerlink" title="为经常需要排序、分组和联合操作的字段建立索引"></a>为经常需要排序、分组和联合操作的字段建立索引</h5></li>
 </ul>
 </li>
 <li>经常需要order by、group by、distinct和union等操作的字段，排序操作会浪费很多时间。如果为其建立索引，可以有效的避免排序操作<h5 id="尽量使用前缀索引"><a href="#尽量使用前缀索引" class="headerlink" title="尽量使用前缀索引"></a>尽量使用前缀索引</h5></li>
-<li>如果索引字段的值很长，最好使用值的前缀来索引<ul>
+<li>如果索引字段的值很长，最好使用值的前缀来索引</li>
+<li><ul>
 <li>例如：text和blog类型的字段，进行全文检索会浪费时间。如果只检索字段的前面的若干个字符，这样可以提高检索速度<h5 id="删除不再使用或者很少使用的索引"><a href="#删除不再使用或者很少使用的索引" class="headerlink" title="删除不再使用或者很少使用的索引"></a>删除不再使用或者很少使用的索引</h5></li>
 </ul>
 </li>
