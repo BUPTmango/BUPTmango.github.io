@@ -176,7 +176,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-05-29 23:18:54" itemprop="dateModified" datetime="2020-05-29T23:18:54+08:00">2020-05-29</time>
+                <time title="Modified: 2020-05-29 23:21:20" itemprop="dateModified" datetime="2020-05-29T23:21:20+08:00">2020-05-29</time>
               </span>
 
           
@@ -191,7 +191,9 @@
 
       
           <h3 id="根据exercise表写sql语句"><a href="#根据exercise表写sql语句" class="headerlink" title="根据exercise表写sql语句"></a>根据exercise表写sql语句</h3><h5 id="exercise表设计："><a href="#exercise表设计：" class="headerlink" title="exercise表设计："></a>exercise表设计：</h5><img src="/2020/05/21/Java%E9%9D%A2%E8%AF%95%E9%A2%98%E8%AE%B0%E5%BD%95-1/%E8%AE%BE%E8%AE%A1%E8%A1%A8.png" class="" title="设计表">
+
 <h5 id="exercise表数据："><a href="#exercise表数据：" class="headerlink" title="exercise表数据："></a>exercise表数据：</h5><img src="/2020/05/21/Java%E9%9D%A2%E8%AF%95%E9%A2%98%E8%AE%B0%E5%BD%95-1/%E8%A1%A8%E6%95%B0%E6%8D%AE.png" class="" title="表数据">
+
 <h4 id="问题1-查找答对题目最多的前两名用户ID"><a href="#问题1-查找答对题目最多的前两名用户ID" class="headerlink" title="问题1 查找答对题目最多的前两名用户ID"></a>问题1 查找答对题目最多的前两名用户ID</h4><p>SELECT user_id FROM exercise WHERE correct = 1 GROUP BY user_id ORDER BY count(*) DESC LIMIT 2;</p>
 <h4 id="问题2-查找被作答次数前两名的题目ID"><a href="#问题2-查找被作答次数前两名的题目ID" class="headerlink" title="问题2 查找被作答次数前两名的题目ID"></a>问题2 查找被作答次数前两名的题目ID</h4><p>SELECT question_id FROM exercise GROUP BY question_id ORDER BY count(*) DESC LIMIT 2;</p>
 <h3 id="数据表的索引如何设计？"><a href="#数据表的索引如何设计？" class="headerlink" title="数据表的索引如何设计？"></a>数据表的索引如何设计？</h3><h5 id="选择唯一性索引"><a href="#选择唯一性索引" class="headerlink" title="选择唯一性索引"></a>选择唯一性索引</h5><ul>
