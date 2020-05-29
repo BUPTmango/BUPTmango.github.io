@@ -168,10 +168,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2020-05-21 00:08:12 / Modified: 07:18:28" itemprop="dateCreated datePublished" datetime="2020-05-21T00:08:12+08:00">2020-05-21</time>
+              <time title="Created: 2020-05-21 00:08:12" itemprop="dateCreated datePublished" datetime="2020-05-21T00:08:12+08:00">2020-05-21</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-05-29 21:19:05" itemprop="dateModified" datetime="2020-05-29T21:19:05+08:00">2020-05-29</time>
+              </span>
 
           
 
@@ -234,6 +240,9 @@
 <li>内容很少变动，经常被查询，为它多创建几个索引无所谓</li>
 <li>经常性，例行性变动的表而言，则需要谨慎地创建确实必要的索引</li>
 </ul>
+<h3 id="如何保障mysql和redis之间的数据一致性？"><a href="#如何保障mysql和redis之间的数据一致性？" class="headerlink" title="如何保障mysql和redis之间的数据一致性？"></a>如何保障mysql和redis之间的数据一致性？</h3><p><a href="https://zhuanlan.zhihu.com/p/91770135" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/91770135</a></p>
+<p><a href="https://juejin.im/post/5c96fb795188252d5f0fdff2" target="_blank" rel="noopener">https://juejin.im/post/5c96fb795188252d5f0fdff2</a></p>
+<h3 id="实现算法：反转链表"><a href="#实现算法：反转链表" class="headerlink" title="实现算法：反转链表"></a>实现算法：反转链表</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ReverseList</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 递归方法</span></span><br><span class="line"><span class="comment">     * recursive</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> head</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ListNode <span class="title">reverseList_recursive</span><span class="params">(ListNode head)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (head == <span class="keyword">null</span> || head.next == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> head;</span><br><span class="line">        &#125;</span><br><span class="line">        ListNode newHead = reverseList_recursive(head.next);</span><br><span class="line">        <span class="comment">// 反转箭头</span></span><br><span class="line">        head.next.next = head;</span><br><span class="line">        head.next = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">return</span> newHead;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 迭代方法</span></span><br><span class="line"><span class="comment">     * iterative</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> head</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ListNode <span class="title">reverseList_iterative</span><span class="params">(ListNode head)</span> </span>&#123;</span><br><span class="line">        ListNode prev = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">while</span> (head != <span class="keyword">null</span>) &#123;</span><br><span class="line">            ListNode next = head.next;</span><br><span class="line">            head.next = prev;</span><br><span class="line">            prev = head;</span><br><span class="line">            head = next;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> prev;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
       
     </div>
