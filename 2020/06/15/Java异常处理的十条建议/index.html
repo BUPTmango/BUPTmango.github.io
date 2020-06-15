@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="前言Java异常处理的十个建议，希望对大家有帮助~ 一、尽量不要使用e.printStackTrace(),而是使用log打印。反例: 12345try&amp;#123;  &#x2F;&#x2F; do what you want  &amp;#125;catch(Exception e)&amp;#123;  e.printStackTrace();&amp;#125; 正例： 12345try&amp;#123;  &#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java异常处理的十条建议">
+<meta property="og:url" content="http://yoursite.com/2020/06/15/Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%9A%84%E5%8D%81%E6%9D%A1%E5%BB%BA%E8%AE%AE/index.html">
+<meta property="og:site_name" content="王国隆的技术博客">
+<meta property="og:description" content="前言Java异常处理的十个建议，希望对大家有帮助~ 一、尽量不要使用e.printStackTrace(),而是使用log打印。反例: 12345try&amp;#123;  &#x2F;&#x2F; do what you want  &amp;#125;catch(Exception e)&amp;#123;  e.printStackTrace();&amp;#125; 正例： 12345try&amp;#123;  &#x2F;">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/6/14/172b156657087952?w=891&h=253&f=png&s=46752">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/6/14/172b154f01b322e4?w=1030&h=469&f=png&s=558089">
+<meta property="article:published_time" content="2020-06-15T02:37:04.368Z">
+<meta property="article:modified_time" content="2020-06-15T02:40:56.808Z">
+<meta property="article:author" content="Guolong Wang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://user-gold-cdn.xitu.io/2020/6/14/172b156657087952?w=891&h=253&f=png&s=46752">
+
+<link rel="canonical" href="http://yoursite.com/2020/06/15/Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%9A%84%E5%8D%81%E6%9D%A1%E5%BB%BA%E8%AE%AE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Java异常处理的十条建议 | 王国隆的技术博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">王国隆的技术博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/15/Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%9A%84%E5%8D%81%E6%9D%A1%E5%BB%BA%E8%AE%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Guolong Wang">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王国隆的技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java异常处理的十条建议
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-06-15 10:37:04 / Modified: 10:40:56" itemprop="dateCreated datePublished" datetime="2020-06-15T10:37:04+08:00">2020-06-15</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Java异常处理的十个建议，希望对大家有帮助~</p>
+<h3 id="一、尽量不要使用e-printStackTrace-而是使用log打印。"><a href="#一、尽量不要使用e-printStackTrace-而是使用log打印。" class="headerlink" title="一、尽量不要使用e.printStackTrace(),而是使用log打印。"></a>一、尽量不要使用e.printStackTrace(),而是使用log打印。</h3><p><strong>反例:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">try&#123;</span><br><span class="line">  &#x2F;&#x2F; do what you want  </span><br><span class="line">&#125;catch(Exception e)&#123;</span><br><span class="line">  e.printStackTrace();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>正例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">try&#123;</span><br><span class="line">  &#x2F;&#x2F; do what you want  </span><br><span class="line">&#125;catch(Exception e)&#123;</span><br><span class="line">  log.info(&quot;你的程序有异常啦,&#123;&#125;&quot;,e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>理由：</strong></p>
+<ul>
+<li>printStackTrace()打印出的堆栈日志跟业务代码日志是交错混合在一起的，通常排查异常日志不太方便。</li>
+<li>e.printStackTrace()语句产生的字符串记录的是堆栈信息，如果信息太长太多，字符串常量池所在的内存块没有空间了,即内存满了，那么，用户的请求就卡住啦~</li>
+</ul>
+<h3 id="二、catch了异常，但是没有打印出具体的exception，无法更好定位问题"><a href="#二、catch了异常，但是没有打印出具体的exception，无法更好定位问题" class="headerlink" title="二、catch了异常，但是没有打印出具体的exception，无法更好定位问题"></a>二、catch了异常，但是没有打印出具体的exception，无法更好定位问题</h3><p><strong>反例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">try&#123;</span><br><span class="line">  &#x2F;&#x2F; do what you want  </span><br><span class="line">&#125;catch(Exception e)&#123;</span><br><span class="line">  log.info(&quot;你的程序有异常啦&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>正例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">try&#123;</span><br><span class="line">  &#x2F;&#x2F; do what you want  </span><br><span class="line">&#125;catch(Exception e)&#123;</span><br><span class="line">  log.info(&quot;你的程序有异常啦，&#123;&#125;&quot;,e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>理由：</strong></p>
+<ul>
+<li>反例中，并没有把exception出来，到时候排查问题就不好查了啦，到底是SQl写错的异常还是IO异常，还是其他呢？所以应该把exception打印到日志中哦~</li>
+</ul>
+<h3 id="三、不要用一个Exception捕捉所有可能的异常"><a href="#三、不要用一个Exception捕捉所有可能的异常" class="headerlink" title="三、不要用一个Exception捕捉所有可能的异常"></a>三、不要用一个Exception捕捉所有可能的异常</h3><p><strong>反例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public void test()&#123;</span><br><span class="line">    try&#123;</span><br><span class="line">        &#x2F;&#x2F;…抛出 IOException 的代码调用</span><br><span class="line">        &#x2F;&#x2F;…抛出 SQLException 的代码调用</span><br><span class="line">    &#125;catch(Exception e)&#123;</span><br><span class="line">        &#x2F;&#x2F;用基类 Exception 捕捉的所有可能的异常，如果多个层次都这样捕捉，会丢失原始异常的有效信息哦</span><br><span class="line">        log.info(“Exception in test,exception:&#123;&#125;”, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>正例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public void test()&#123;</span><br><span class="line">    try&#123;</span><br><span class="line">        &#x2F;&#x2F;…抛出 IOException 的代码调用</span><br><span class="line">        &#x2F;&#x2F;…抛出 SQLException 的代码调用</span><br><span class="line">    &#125;catch(IOException e)&#123;</span><br><span class="line">        &#x2F;&#x2F;仅仅捕捉 IOException</span><br><span class="line">        log.info(“IOException in test,exception:&#123;&#125;”, e);</span><br><span class="line">    &#125;catch(SQLException e)&#123;</span><br><span class="line">        &#x2F;&#x2F;仅仅捕捉 SQLException</span><br><span class="line">        log.info(“SQLException in test,exception:&#123;&#125;”, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>理由：</p>
+<ul>
+<li>用基类 Exception 捕捉的所有可能的异常，如果多个层次都这样捕捉，会丢失原始异常的有效信息哦</li>
+</ul>
+<h3 id="四、记得使用finally关闭流资源或者直接使用try-with-resource"><a href="#四、记得使用finally关闭流资源或者直接使用try-with-resource" class="headerlink" title="四、记得使用finally关闭流资源或者直接使用try-with-resource"></a>四、记得使用finally关闭流资源或者直接使用try-with-resource</h3><p><strong>反例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">FileInputStream fdIn &#x3D; null;</span><br><span class="line">try &#123;</span><br><span class="line">    fdIn &#x3D; new FileInputStream(new File(&quot;&#x2F;jay.txt&quot;));</span><br><span class="line">    &#x2F;&#x2F;在这里关闭流资源？有没有问题呢？如果发生异常了呢？</span><br><span class="line">    fdIn.close();</span><br><span class="line">&#125; catch (FileNotFoundException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125; catch (IOException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>正例1：</strong></p>
+<p>需要使用finally关闭流资源，如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">FileInputStream fdIn &#x3D; null;</span><br><span class="line">try &#123;</span><br><span class="line">    fdIn &#x3D; new FileInputStream(new File(&quot;&#x2F;jay.txt&quot;));</span><br><span class="line">&#125; catch (FileNotFoundException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125; catch (IOException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;finally &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        if (fdIn !&#x3D; null) &#123;</span><br><span class="line">            fdIn.close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; catch (IOException e) &#123;</span><br><span class="line">        log.error(e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>正例2：</strong></p>
+<p>当然，也可以使用JDK7的新特性try-with-resource来处理，它是Java7提供的一个新功能，它用于自动资源管理。</p>
+<ul>
+<li>资源是指在程序用完了之后必须要关闭的对象。</li>
+<li>try-with-resources保证了每个声明了的资源在语句结束的时候会被关闭</li>
+<li>什么样的对象才能当做资源使用呢？只要实现了java.lang.AutoCloseable接口或者java.io.Closeable接口的对象，都OK。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">try (FileInputStream inputStream &#x3D; new FileInputStream(new File(&quot;jay.txt&quot;)) &#123;</span><br><span class="line">    &#x2F;&#x2F; use resources   </span><br><span class="line">&#125; catch (FileNotFoundException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125; catch (IOException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>理由：</strong></p>
+<ul>
+<li>如果不使用finally或者try-with-resource，当程序发生异常，IO资源流没关闭，那么这个IO资源就会被他一直占着，这样别人就没有办法用了，这就造成资源浪费。</li>
+</ul>
+<h3 id="五、捕获异常与抛出异常必须是完全匹配，或者捕获异常是抛异常的父类"><a href="#五、捕获异常与抛出异常必须是完全匹配，或者捕获异常是抛异常的父类" class="headerlink" title="五、捕获异常与抛出异常必须是完全匹配，或者捕获异常是抛异常的父类"></a>五、捕获异常与抛出异常必须是完全匹配，或者捕获异常是抛异常的父类</h3><p><strong>反例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;BizException 是 Exception 的子类</span><br><span class="line">public class BizException extends Exception &#123;&#125;</span><br><span class="line">&#x2F;&#x2F;抛出父类Exception</span><br><span class="line">public static void test() throws Exception &#123;&#125;</span><br><span class="line"></span><br><span class="line">try &#123;</span><br><span class="line">    test(); &#x2F;&#x2F;编译错误</span><br><span class="line">&#125; catch (BizException e) &#123; &#x2F;&#x2F;捕获异常子类是没法匹配的哦</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>正例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;抛出子类Exception</span><br><span class="line">public static void test() throws BizException &#123;&#125;</span><br><span class="line"></span><br><span class="line">try &#123;</span><br><span class="line">    test();</span><br><span class="line">&#125; catch (Exception e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="六、捕获到的异常，不能忽略它，至少打点日志吧"><a href="#六、捕获到的异常，不能忽略它，至少打点日志吧" class="headerlink" title="六、捕获到的异常，不能忽略它，至少打点日志吧"></a>六、捕获到的异常，不能忽略它，至少打点日志吧</h3><p><strong>反例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public static void testIgnoreException() throws Exception &#123;</span><br><span class="line">    try &#123;       </span><br><span class="line">        &#x2F;&#x2F; 搞事情</span><br><span class="line">    &#125; catch (Exception e) &#123;     &#x2F;&#x2F;一般不会有这个异常</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>正例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public static void testIgnoreException() &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        &#x2F;&#x2F; 搞事情</span><br><span class="line">    &#125; catch (Exception e) &#123;     &#x2F;&#x2F;一般不会有这个异常</span><br><span class="line">        log.error(&quot;这个异常不应该在这里出现的,&#123;&#125;&quot;,e); </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>理由：</strong></p>
+<ul>
+<li>虽然一个正常情况都不会发生的异常，但是如果你捕获到它，就不要忽略呀，至少打个日志吧~</li>
+</ul>
+<h3 id="七、注意异常对你的代码层次结构的侵染（早发现早处理）"><a href="#七、注意异常对你的代码层次结构的侵染（早发现早处理）" class="headerlink" title="七、注意异常对你的代码层次结构的侵染（早发现早处理）"></a>七、注意异常对你的代码层次结构的侵染（早发现早处理）</h3><p><strong>反例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public UserInfo queryUserInfoByUserId(Long userid) throw SQLException &#123;</span><br><span class="line">    &#x2F;&#x2F;根据用户Id查询数据库</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>正例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public UserInfo queryUserInfoByUserId(Long userid) &#123;</span><br><span class="line">    try&#123;</span><br><span class="line">        &#x2F;&#x2F;根据用户Id查询数据库</span><br><span class="line">    &#125;catch(SQLException e)&#123;</span><br><span class="line">        log.error(&quot;查询数据库异常啦，&#123;&#125;&quot;,e);</span><br><span class="line">    &#125;finally&#123;</span><br><span class="line">        &#x2F;&#x2F;关闭连接，清理资源</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>理由：</strong></p>
+<ul>
+<li>我们的项目，一般都会把代码分 Action、Service、Dao 等不同的层次结构，如果你是DAO层处理的异常，尽早处理吧，如果往上 throw SQLException，上层代码就还是要try catch处理啦，这就污染了你的代码~</li>
+</ul>
+<h3 id="八、自定义封装异常，不要丢弃原始异常的信息Throwable-cause"><a href="#八、自定义封装异常，不要丢弃原始异常的信息Throwable-cause" class="headerlink" title="八、自定义封装异常，不要丢弃原始异常的信息Throwable cause"></a>八、自定义封装异常，不要丢弃原始异常的信息Throwable cause</h3><p>我们常常会想要在捕获一个异常后抛出另一个异常，并且希望把原始异常的信息保存下来，这被称为异常链。公司的框架提供统一异常处理就用到异常链，我们自定义封装异常，不要丢弃原始异常的信息，否则排查问题就头疼啦</p>
+<p><strong>反例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">public class TestChainException &#123;</span><br><span class="line">    public void readFile() throws MyException&#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            InputStream is &#x3D; new FileInputStream(&quot;jay.txt&quot;);</span><br><span class="line">            Scanner in &#x3D; new Scanner(is);</span><br><span class="line">            while (in.hasNext()) &#123;</span><br><span class="line">                System.out.println(in.next());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (FileNotFoundException e) &#123;</span><br><span class="line">            &#x2F;&#x2F;e 保存异常信息</span><br><span class="line">            throw new MyException(&quot;文件在哪里呢&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    public void invokeReadFile() throws MyException&#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            readFile();</span><br><span class="line">        &#125; catch (MyException e) &#123;</span><br><span class="line">            &#x2F;&#x2F;e 保存异常信息</span><br><span class="line">            throw new MyException(&quot;文件找不到&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        TestChainException t &#x3D; new TestChainException();</span><br><span class="line">        try &#123;</span><br><span class="line">            t.invokeReadFile();</span><br><span class="line">        &#125; catch (MyException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;MyException 构造器</span><br><span class="line">public MyException(String message) &#123;</span><br><span class="line">        super(message);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下，没有了Throwable cause，不好排查是什么异常了啦<br><img src="https://user-gold-cdn.xitu.io/2020/6/14/172b156657087952?w=891&h=253&f=png&s=46752" alt=""></p>
+<p><strong>正例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public class TestChainException &#123;</span><br><span class="line">    public void readFile() throws MyException&#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            InputStream is &#x3D; new FileInputStream(&quot;jay.txt&quot;);</span><br><span class="line">            Scanner in &#x3D; new Scanner(is);</span><br><span class="line">            while (in.hasNext()) &#123;</span><br><span class="line">                System.out.println(in.next());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (FileNotFoundException e) &#123;</span><br><span class="line">            &#x2F;&#x2F;e 保存异常信息</span><br><span class="line">            throw new MyException(&quot;文件在哪里呢&quot;, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    public void invokeReadFile() throws MyException&#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            readFile();</span><br><span class="line">        &#125; catch (MyException e) &#123;</span><br><span class="line">            &#x2F;&#x2F;e 保存异常信息</span><br><span class="line">            throw new MyException(&quot;文件找不到&quot;, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        TestChainException t &#x3D; new TestChainException();</span><br><span class="line">        try &#123;</span><br><span class="line">            t.invokeReadFile();</span><br><span class="line">        &#125; catch (MyException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;MyException 构造器</span><br><span class="line">public MyException(String message, Throwable cause) &#123;</span><br><span class="line">        super(message, cause);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://user-gold-cdn.xitu.io/2020/6/14/172b154f01b322e4?w=1030&h=469&f=png&s=558089" alt=""></p>
+<h3 id="九、运行时异常RuntimeException-，不应该通过catch-的方式来处理，而是先预检查，比如：NullPointerException处理"><a href="#九、运行时异常RuntimeException-，不应该通过catch-的方式来处理，而是先预检查，比如：NullPointerException处理" class="headerlink" title="九、运行时异常RuntimeException ，不应该通过catch 的方式来处理，而是先预检查，比如：NullPointerException处理"></a>九、运行时异常RuntimeException ，不应该通过catch 的方式来处理，而是先预检查，比如：NullPointerException处理</h3><p><strong>反例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">try &#123;</span><br><span class="line">  obj.method() </span><br><span class="line">&#125; catch (NullPointerException e) &#123;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>正例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if (obj !&#x3D; null)&#123;</span><br><span class="line">   ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="十、注意异常匹配的顺序，优先捕获具体的异常"><a href="#十、注意异常匹配的顺序，优先捕获具体的异常" class="headerlink" title="十、注意异常匹配的顺序，优先捕获具体的异常"></a>十、注意异常匹配的顺序，优先捕获具体的异常</h3><p>注意异常的匹配顺序，因为只有第一个匹配到异常的catch块才会被执行。如果你希望看到，是NumberFormatException异常，就抛出NumberFormatException，如果是IllegalArgumentException就抛出IllegalArgumentException。</p>
+<p><strong>反例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">try &#123;</span><br><span class="line">    doSomething(&quot;test exception&quot;);</span><br><span class="line">&#125; catch (IllegalArgumentException e) &#123;       </span><br><span class="line">    log.error(e);</span><br><span class="line">&#125; catch (NumberFormatException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>正例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">try &#123;</span><br><span class="line">    doSomething(&quot;test exception&quot;);</span><br><span class="line">&#125; catch (NumberFormatException e) &#123;       </span><br><span class="line">    log.error(e);</span><br><span class="line">&#125; catch (IllegalArgumentException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>理由：</p>
+<ul>
+<li>因为NumberFormatException是IllegalArgumentException 的子类，反例中，不管是哪个异常，都会匹配到IllegalArgumentException，就不会再往下执行啦，因此不知道是否是NumberFormatException。所以需要优先捕获具体的异常，把NumberFormatException放前面~</li>
+</ul>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.im/post/5ee45107f265da770952788f" target="_blank" rel="noopener">https://juejin.im/post/5ee45107f265da770952788f</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/06/SpringBoot%E5%AE%9E%E7%8E%B0%E9%80%9A%E8%BF%87url%E4%B8%8B%E8%BD%BDpdf%E5%88%B0%E6%9C%AC%E5%9C%B0/" rel="prev" title="SpringBoot实现通过url下载pdf到本地">
+      <i class="fa fa-chevron-left"></i> SpringBoot实现通过url下载pdf到本地
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、尽量不要使用e-printStackTrace-而是使用log打印。"><span class="nav-number">1.1.</span> <span class="nav-text">一、尽量不要使用e.printStackTrace(),而是使用log打印。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、catch了异常，但是没有打印出具体的exception，无法更好定位问题"><span class="nav-number">1.2.</span> <span class="nav-text">二、catch了异常，但是没有打印出具体的exception，无法更好定位问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、不要用一个Exception捕捉所有可能的异常"><span class="nav-number">1.3.</span> <span class="nav-text">三、不要用一个Exception捕捉所有可能的异常</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四、记得使用finally关闭流资源或者直接使用try-with-resource"><span class="nav-number">1.4.</span> <span class="nav-text">四、记得使用finally关闭流资源或者直接使用try-with-resource</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#五、捕获异常与抛出异常必须是完全匹配，或者捕获异常是抛异常的父类"><span class="nav-number">1.5.</span> <span class="nav-text">五、捕获异常与抛出异常必须是完全匹配，或者捕获异常是抛异常的父类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#六、捕获到的异常，不能忽略它，至少打点日志吧"><span class="nav-number">1.6.</span> <span class="nav-text">六、捕获到的异常，不能忽略它，至少打点日志吧</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#七、注意异常对你的代码层次结构的侵染（早发现早处理）"><span class="nav-number">1.7.</span> <span class="nav-text">七、注意异常对你的代码层次结构的侵染（早发现早处理）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#八、自定义封装异常，不要丢弃原始异常的信息Throwable-cause"><span class="nav-number">1.8.</span> <span class="nav-text">八、自定义封装异常，不要丢弃原始异常的信息Throwable cause</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#九、运行时异常RuntimeException-，不应该通过catch-的方式来处理，而是先预检查，比如：NullPointerException处理"><span class="nav-number">1.9.</span> <span class="nav-text">九、运行时异常RuntimeException ，不应该通过catch 的方式来处理，而是先预检查，比如：NullPointerException处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#十、注意异常匹配的顺序，优先捕获具体的异常"><span class="nav-number">1.10.</span> <span class="nav-text">十、注意异常匹配的顺序，优先捕获具体的异常</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">1.11.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Guolong Wang</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guolong Wang</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
