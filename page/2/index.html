@@ -20,32 +20,28 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="http无状态和session由于HTTP协议是无状态的协议，所以服务端需要记录用户的状态时，就需要用某种机制来识具体的用户，这个机制就是Session. 典型的场景比如购物车，当你点击下单按钮时，由于HTTP协议无状态，所以并不知道是哪个用户操作的，所以服务端要为特定的用户创建了特定的Session，用用于标识这个用户，并且跟踪用户，这样才知道购物车里面有几本书。 这个Session是保存在服务">
-<meta property="og:type" content="article">
-<meta property="og:title" content="cookie和session的区别">
-<meta property="og:url" content="http://yoursite.com/2020/04/30/cookie%E5%92%8Csession%E7%9A%84%E5%8C%BA%E5%88%AB/index.html">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="王国隆的技术博客">
+<meta property="og:url" content="http://yoursite.com/page/2/index.html">
 <meta property="og:site_name" content="王国隆的技术博客">
-<meta property="og:description" content="http无状态和session由于HTTP协议是无状态的协议，所以服务端需要记录用户的状态时，就需要用某种机制来识具体的用户，这个机制就是Session. 典型的场景比如购物车，当你点击下单按钮时，由于HTTP协议无状态，所以并不知道是哪个用户操作的，所以服务端要为特定的用户创建了特定的Session，用用于标识这个用户，并且跟踪用户，这样才知道购物车里面有几本书。 这个Session是保存在服务">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2020-04-30T09:36:40.668Z">
-<meta property="article:modified_time" content="2020-04-30T09:53:30.858Z">
 <meta property="article:author" content="Guolong Wang">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://yoursite.com/2020/04/30/cookie%E5%92%8Csession%E7%9A%84%E5%8C%BA%E5%88%AB/">
+<link rel="canonical" href="http://yoursite.com/page/2/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : false,
-    isPost : true,
+    isHome : true,
+    isPost : false,
     lang   : 'en'
   };
 </script>
 
-  <title>cookie和session的区别 | 王国隆的技术博客</title>
+  <title>王国隆的技术博客</title>
   
 
 
@@ -143,14 +139,13 @@
         <div class="content-wrap">
           
 
-          <div class="content post posts-expand">
+          <div class="content index posts-expand">
             
-
-    
+      
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/30/cookie%E5%92%8Csession%E7%9A%84%E5%8C%BA%E5%88%AB/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -162,9 +157,10 @@
       <meta itemprop="name" content="王国隆的技术博客">
     </span>
       <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          cookie和session的区别
-        </h1>
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/" class="post-title-link" itemprop="url">如何通俗易懂的理解翻墙</a>
+        </h2>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -172,10 +168,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2020-04-30 17:36:40 / Modified: 17:53:30" itemprop="dateCreated datePublished" datetime="2020-04-30T17:36:40+08:00">2020-04-30</time>
+              <time title="Created: 2020-04-29 22:57:46" itemprop="dateCreated datePublished" datetime="2020-04-29T22:57:46+08:00">2020-04-29</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-04-30 09:38:13" itemprop="dateModified" datetime="2020-04-30T09:38:13+08:00">2020-04-30</time>
+              </span>
 
           
 
@@ -188,47 +190,65 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="http无状态和session"><a href="#http无状态和session" class="headerlink" title="http无状态和session"></a>http无状态和session</h2><p>由于HTTP协议是<strong>无状态</strong>的协议，所以服务端需要记录用户的状态时，就需要用某种机制来识具体的用户，这个机制就是Session.</p>
-<p>典型的场景比如购物车，当你点击下单按钮时，由于HTTP协议无状态，所以并不知道是哪个用户操作的，所以服务端要为特定的用户创建了特定的Session，用用于标识这个用户，并且跟踪用户，这样才知道购物车里面有几本书。</p>
-<p>这个Session是保存在服务端的，有一个唯一标识。在服务端保存Session的方法很多，内存、数据库、文件都有。</p>
-<p>集群的时候也要考虑Session的转移，在大型的网站，一般会有专门的Session服务器集群，用来保存用户会话，这个时候Session信息都是放在内存的，使用一些缓存服务比如Memcached之类的来放Session。</p>
-<h2 id="cookie"><a href="#cookie" class="headerlink" title="cookie"></a>cookie</h2><p>思考一下服务端如何识别特定的客户？这个时候Cookie就登场了。每次HTTP请求的时候，客户端都会发送相应的Cookie信息到服务端。</p>
-<p>实际上大多数的应用都是用 Cookie 来实现Session跟踪的，第一次创建Session的时候，服务端会在HTTP协议中告诉客户端，需要在 Cookie 里面记录一个Session ID，以后每次请求把这个会话ID发送到服务器，我就知道你是谁了。</p>
-<p>有人问，如果客户端的浏览器禁用了Cookie怎么办？一般这种情况下，会使用一种叫做URL重写的技术来进行会话跟踪，即每次HTTP交互，URL后面都会被附加上一个诸如 sid=xxxxx 这样的参数，服务端据此来识别用户。</p>
-<p>Cookie其实还可以用在一些方便用户的场景下，设想你某次登陆过一个网站，下次登录的时候不想再次输入账号了，怎么办？这个信息可以写到Cookie里面，访问网站的时候，网站页面的脚本可以读取这个信息，就自动帮你把用户名给填了，能够方便一下用户。这也是Cookie名称的由来，给用户的一点甜头。</p>
-<h2 id="cookie和session"><a href="#cookie和session" class="headerlink" title="cookie和session"></a>cookie和session</h2><p>所以，总结一下：<em>Session是在服务端保存的一个数据结构，用来跟踪用户的状态，这个数据可以保存在集群、数据库、文件中；Cookie是客户端保存用户信息的一种机制，用来记录用户的一些信息，也是实现Session的一种方式</em>。</p>
-<p>cookie和session的<strong>共同之处</strong>在于：cookie和session都是用来<strong>跟踪浏览器用户身份</strong>的会话方式。</p>
-<p>cookie 和session的<strong>区别</strong>是：cookie数据保存在<strong>客户端</strong>，session数据保存在<strong>服务器端</strong>。</p>
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://www.imooc.com/article/3369" target="_blank" rel="noopener">https://www.imooc.com/article/3369</a><br><a href="https://www.zhihu.com/question/19786827/answer/28752144" target="_blank" rel="noopener">https://www.zhihu.com/question/19786827/answer/28752144</a></p>
+          <p><strong>为了更好的理解翻墙，首先先了解一下互联网是怎么工作的：</strong></p>
+<h2 id="互联网怎么工作的"><a href="#互联网怎么工作的" class="headerlink" title="互联网怎么工作的"></a>互联网怎么工作的</h2><p>假如没有互联网，我们家里有两台电脑，这两台电脑需要互相发送文件，那我们需要用网线把他们连起来，就可以互相传输文件了</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/two_computers.png" class="" title="two computers">
 
+<p>假如我们又增加了三台电脑，一共有五台电脑，那么我们就把他们一对一的连接起来，每台电脑都需要4个网线接口，就组成了一个局域网。</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/five_computers.png" class="" title="five computers">
+
+<p>但是如果我们继续增加电脑，就会发现这种一对一的连接方式就会非常复杂了，所以这个时候就增加了一个控制中心，这个控制中心就是我们熟悉的<strong>路由器</strong>。</p>
+<p>每台电脑只需要连接路由器，然后路由器统一协调这些电脑之前的传输问题</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/router.png" class="" title="router">
+
+<p>然后我们再往大了想，如果我们想给同学家发文件，也就是一个局域网向另外一个局域网发送文件，我们就只需要把两家的路由器连上就可以发送文件了。</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/two_routers.png" class="" title="two routers">
+
+<p>继续往下想就会发现开始的问题，各个局域网的路由器进行一对一的连接变得异常复杂。</p>
+<p>所以我们就新增了一个控制中心<strong>ISP</strong>，也就是我们说的互联网服务供应商，我们可以把它想象成更大号的路由器。</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/ISP.png" class="" title="two ISP">
+
+<p>这里家里的路由器只需要连接我们这个区域的ISP。</p>
+<p>各个区域的ISP进行连接，这样我们的互联网就形成了。</p>
+<h2 id="翻墙的原理"><a href="#翻墙的原理" class="headerlink" title="翻墙的原理"></a>翻墙的原理</h2><p>先说一下现象，我们访问部分网站，比如google的时候就会出现下面的现象：</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/page_not_found.png" class="" title="page not found">
+
+<p>我们输入一个网址访问一个网站，其实就是通过DNS找到网址对应的IP地址，然后访问网站的服务器，从网站服务器获取相应信息</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/DNS.png" class="" title="DNS">
+
+<p>举个例子：</p>
+<p>比如小明通过百度经常访问大姐姐小姐姐的视频网站，然后百度就把这个情况向爸爸反映了，小明的爸爸为了小明的健康，就<strong>让DNS服务器不再查询大姐姐小姐姐网站的IP地址</strong>，这样小明就打不开网站了。</p>
+<p>但是小明通过<strong>修改电脑host</strong>的方式，再一次成功的访问了网站，小明爸爸一气之下在网络传输中增加了一个关卡，告诉关卡看见数据包有大姐姐小姐姐字样的都不能通过，小明就又打不开网站了。</p>
+<p>然后网站就给<strong>数据包加密</strong>，本来数据包上写的是大姐姐小姐姐，加密之后写的是办公用品，小明又一次打开了网站。小明爸爸又告诉关卡，只要是这个网站的IP地址都不能通过，所以小明又打不开网站了。</p>
+<p>然后小明想了一个办法，<strong>把发送出去的数据包先进行完全的加密，通过关卡之后先传到另外一个服务器上，让这个服务器把数据包解密，然后让这个服务器去访问大姐姐小姐姐的网站，收到网站的数据包之后，服务器再进行完全的加密，通过关卡之后再解密，</strong>这样小明就再一次打开了网站。</p>
+<h2 id="VPN翻墙原理"><a href="#VPN翻墙原理" class="headerlink" title="VPN翻墙原理"></a>VPN翻墙原理</h2><p>有些网站我们是没有办法打开的，这个是因为这中间有一个<strong>长城防火墙</strong>(GFW)，这个防火墙的作用就是检查这些数据包。</p>
+<p>比如我们打开一个网站，DNS服务器就会告诉我们电脑，没有查到这个网址所对应的IP地址或者是长城防火墙发现这些数据包是被屏蔽网站的IP地址，就会把数据包拦下，这个就是我们没办法访问被屏蔽网站的原因。</p>
+<p>为了能访问这些被屏蔽的网站，我们就用到了VPN。</p>
+<p>当我们打开VPN之后，VPN就会在电脑上<strong>虚拟出一个IP地址</strong>。当电脑要传输数据包的时候，这个即将传输的数据包和没有开VPN的时候一样，先用盒子装好，然后写上寄件人和收件人的IP地址。</p>
+<p>之后这个数据包会交给电脑的VPN，VPN就会对这个数据包进行加密，相当于又给数据包套了一个盒子，然后这个盒子的寄件人地址写的是刚才虚拟出来的IP地址，收件人地址写的是VPN服务器的IP地址，然后这个数据包就可以发送出去了。</p>
+<p>因为<strong>这个数据包的目的地并不是被屏蔽网站的IP地址，而且数据包也加过密</strong>，防火墙自然也检测不出什么问题。</p>
+<p>当数据包到了VPN的服务器之后，就会对数据包解密，再把里面的数据传给网站的服务器，网站服务器再传数据包给VPN服务器，VPN服务器把数据加密之后，又传回给我们，这个就是VPN的工作原理。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://www.youtube.com/watch?v=EUKmF_IKttc" target="_blank" rel="noopener">https://www.youtube.com/watch?v=EUKmF_IKttc</a><br><a href="https://www.youtube.com/watch?v=ZT-q6mJ-e3g" target="_blank" rel="noopener">https://www.youtube.com/watch?v=ZT-q6mJ-e3g</a></p>
+
+      
     </div>
 
     
     
     
-
       <footer class="post-footer">
-
-        
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/" rel="prev" title="如何通俗易懂的理解翻墙">
-      <i class="fa fa-chevron-left"></i> 如何通俗易懂的理解翻墙
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/05/03/Spring%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5%E5%8D%95%E4%BE%8B%E5%92%8C%E5%A4%9A%E4%BE%8B%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9/" rel="next" title="Spring自动注入单例和多例如何选择">
-      Spring自动注入单例和多例如何选择 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
+        <div class="post-eof"></div>
       </footer>
-    
   </article>
   
   
   
+
+
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+  </nav>
 
 
 
@@ -280,7 +300,6 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#http无状态和session"><span class="nav-number">1.</span> <span class="nav-text">http无状态和session</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cookie"><span class="nav-number">2.</span> <span class="nav-text">cookie</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cookie和session"><span class="nav-number">3.</span> <span class="nav-text">cookie和session</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">3.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

@@ -145,6 +145,76 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/21/Java%E4%BD%BF%E7%94%A8easyexcel%E6%93%8D%E4%BD%9Cexcel/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Guolong Wang">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王国隆的技术博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/06/21/Java%E4%BD%BF%E7%94%A8easyexcel%E6%93%8D%E4%BD%9Cexcel/" class="post-title-link" itemprop="url">Java使用easyexcel操作excel</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-06-21 12:46:28 / Modified: 13:03:59" itemprop="dateCreated datePublished" datetime="2020-06-21T12:46:28+08:00">2020-06-21</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在工作中，使用excel表格处理数据是很常见的操作，本文就来讲解下如何使用开源轮子实现下载、导入、导出的功能。</p>
+<p>在之前，很多Java程序员都喜欢使用POI的类库来操作excel,但是非常的不方便，不仅代码写的很臃肿，还要处理各种office版本兼容问题，最怕的就是使用不当很容易造成内存溢出，因此今天给大家推荐阿里的一款开源项目 <strong>easyexcel</strong>。</p>
+<h3 id="项目介绍"><a href="#项目介绍" class="headerlink" title="项目介绍"></a>项目介绍</h3><p>easyexcel是一款快速、简单避免OOM的java处理Excel工具</p>
+<p>github地址:<a href="https://github.com/alibaba/easyexcel" target="_blank" rel="noopener">https://github.com/alibaba/easyexcel</a></p>
+<p>Start:15.2k</p>
+<p>看了下，两天前项目团队还有在完善代码，可见项目还是挺活跃的</p>
+<h3 id="项目集成"><a href="#项目集成" class="headerlink" title="项目集成"></a>项目集成</h3><p>使用idea开发工具简单创建了一个easyexcel-demo项目，加入了web模块以及easyexcel maven依赖，依赖如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- https:&#x2F;&#x2F;mvnrepository.com&#x2F;artifact&#x2F;com.alibaba&#x2F;easyexcel --&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;com.alibaba&lt;&#x2F;groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;easyexcel&lt;&#x2F;artifactId&gt;</span><br><span class="line">    &lt;version&gt;2.2.4&lt;&#x2F;version&gt;</span><br><span class="line">&lt;&#x2F;dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<p>好了，我们就开始写功能了。</p>
+<h3 id="1、实现已有Excel模板下载"><a href="#1、实现已有Excel模板下载" class="headerlink" title="1、实现已有Excel模板下载"></a>1、实现已有Excel模板下载</h3><p>很多系统有数据批量导入的场景，因为在页面上批量加数据时间成本太大了，但是一般导入的时候得按照一定的格式改，所以一般好的产品会先让用户下载一个带有格式的文档，然后按照格式写好以后上传导入，我们来实现这个功能吧！</p>
+<h4 id="创建模板文件"><a href="#创建模板文件" class="headerlink" title="创建模板文件"></a>创建模板文件</h4><p>首先我们创建一个模板文件，内容如图:</p>
+<img src="/2020/06/21/Java%E4%BD%BF%E7%94%A8easyexcel%E6%93%8D%E4%BD%9Cexcel/excel_format.png" class="" title="excel表格样式">
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/15/Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%9A%84%E5%8D%81%E6%9D%A1%E5%BB%BA%E8%AE%AE/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1048,111 +1118,11 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/" class="post-title-link" itemprop="url">如何通俗易懂的理解翻墙</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-04-29 22:57:46" itemprop="dateCreated datePublished" datetime="2020-04-29T22:57:46+08:00">2020-04-29</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-30 09:38:13" itemprop="dateModified" datetime="2020-04-30T09:38:13+08:00">2020-04-30</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><strong>为了更好的理解翻墙，首先先了解一下互联网是怎么工作的：</strong></p>
-<h2 id="互联网怎么工作的"><a href="#互联网怎么工作的" class="headerlink" title="互联网怎么工作的"></a>互联网怎么工作的</h2><p>假如没有互联网，我们家里有两台电脑，这两台电脑需要互相发送文件，那我们需要用网线把他们连起来，就可以互相传输文件了</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/two_computers.png" class="" title="two computers">
-
-<p>假如我们又增加了三台电脑，一共有五台电脑，那么我们就把他们一对一的连接起来，每台电脑都需要4个网线接口，就组成了一个局域网。</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/five_computers.png" class="" title="five computers">
-
-<p>但是如果我们继续增加电脑，就会发现这种一对一的连接方式就会非常复杂了，所以这个时候就增加了一个控制中心，这个控制中心就是我们熟悉的<strong>路由器</strong>。</p>
-<p>每台电脑只需要连接路由器，然后路由器统一协调这些电脑之前的传输问题</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/router.png" class="" title="router">
-
-<p>然后我们再往大了想，如果我们想给同学家发文件，也就是一个局域网向另外一个局域网发送文件，我们就只需要把两家的路由器连上就可以发送文件了。</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/two_routers.png" class="" title="two routers">
-
-<p>继续往下想就会发现开始的问题，各个局域网的路由器进行一对一的连接变得异常复杂。</p>
-<p>所以我们就新增了一个控制中心<strong>ISP</strong>，也就是我们说的互联网服务供应商，我们可以把它想象成更大号的路由器。</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/ISP.png" class="" title="two ISP">
-
-<p>这里家里的路由器只需要连接我们这个区域的ISP。</p>
-<p>各个区域的ISP进行连接，这样我们的互联网就形成了。</p>
-<h2 id="翻墙的原理"><a href="#翻墙的原理" class="headerlink" title="翻墙的原理"></a>翻墙的原理</h2><p>先说一下现象，我们访问部分网站，比如google的时候就会出现下面的现象：</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/page_not_found.png" class="" title="page not found">
-
-<p>我们输入一个网址访问一个网站，其实就是通过DNS找到网址对应的IP地址，然后访问网站的服务器，从网站服务器获取相应信息</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/DNS.png" class="" title="DNS">
-
-<p>举个例子：</p>
-<p>比如小明通过百度经常访问大姐姐小姐姐的视频网站，然后百度就把这个情况向爸爸反映了，小明的爸爸为了小明的健康，就<strong>让DNS服务器不再查询大姐姐小姐姐网站的IP地址</strong>，这样小明就打不开网站了。</p>
-<p>但是小明通过<strong>修改电脑host</strong>的方式，再一次成功的访问了网站，小明爸爸一气之下在网络传输中增加了一个关卡，告诉关卡看见数据包有大姐姐小姐姐字样的都不能通过，小明就又打不开网站了。</p>
-<p>然后网站就给<strong>数据包加密</strong>，本来数据包上写的是大姐姐小姐姐，加密之后写的是办公用品，小明又一次打开了网站。小明爸爸又告诉关卡，只要是这个网站的IP地址都不能通过，所以小明又打不开网站了。</p>
-<p>然后小明想了一个办法，<strong>把发送出去的数据包先进行完全的加密，通过关卡之后先传到另外一个服务器上，让这个服务器把数据包解密，然后让这个服务器去访问大姐姐小姐姐的网站，收到网站的数据包之后，服务器再进行完全的加密，通过关卡之后再解密，</strong>这样小明就再一次打开了网站。</p>
-<h2 id="VPN翻墙原理"><a href="#VPN翻墙原理" class="headerlink" title="VPN翻墙原理"></a>VPN翻墙原理</h2><p>有些网站我们是没有办法打开的，这个是因为这中间有一个<strong>长城防火墙</strong>(GFW)，这个防火墙的作用就是检查这些数据包。</p>
-<p>比如我们打开一个网站，DNS服务器就会告诉我们电脑，没有查到这个网址所对应的IP地址或者是长城防火墙发现这些数据包是被屏蔽网站的IP地址，就会把数据包拦下，这个就是我们没办法访问被屏蔽网站的原因。</p>
-<p>为了能访问这些被屏蔽的网站，我们就用到了VPN。</p>
-<p>当我们打开VPN之后，VPN就会在电脑上<strong>虚拟出一个IP地址</strong>。当电脑要传输数据包的时候，这个即将传输的数据包和没有开VPN的时候一样，先用盒子装好，然后写上寄件人和收件人的IP地址。</p>
-<p>之后这个数据包会交给电脑的VPN，VPN就会对这个数据包进行加密，相当于又给数据包套了一个盒子，然后这个盒子的寄件人地址写的是刚才虚拟出来的IP地址，收件人地址写的是VPN服务器的IP地址，然后这个数据包就可以发送出去了。</p>
-<p>因为<strong>这个数据包的目的地并不是被屏蔽网站的IP地址，而且数据包也加过密</strong>，防火墙自然也检测不出什么问题。</p>
-<p>当数据包到了VPN的服务器之后，就会对数据包解密，再把里面的数据传给网站的服务器，网站服务器再传数据包给VPN服务器，VPN服务器把数据加密之后，又传回给我们，这个就是VPN的工作原理。</p>
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://www.youtube.com/watch?v=EUKmF_IKttc" target="_blank" rel="noopener">https://www.youtube.com/watch?v=EUKmF_IKttc</a><br><a href="https://www.youtube.com/watch?v=ZT-q6mJ-e3g" target="_blank" rel="noopener">https://www.youtube.com/watch?v=ZT-q6mJ-e3g</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+  </nav>
 
 
 
@@ -1217,7 +1187,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-count">11</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
