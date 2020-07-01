@@ -145,6 +145,90 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/07/01/Java%E4%BD%BF%E7%94%A8iTextPDF%E7%94%9F%E6%88%90PDF%E6%96%87%E4%BB%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Guolong Wang">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王国隆的技术博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/07/01/Java%E4%BD%BF%E7%94%A8iTextPDF%E7%94%9F%E6%88%90PDF%E6%96%87%E4%BB%B6/" class="post-title-link" itemprop="url">Java使用iTextPDF生成PDF文件</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-07-01 17:31:03 / Modified: 17:44:30" itemprop="dateCreated datePublished" datetime="2020-07-01T17:31:03+08:00">2020-07-01</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="iText介绍和说明"><a href="#iText介绍和说明" class="headerlink" title="iText介绍和说明"></a>iText介绍和说明</h2><p>因为项目需要生成PDF文件，所以去找了一下能够生成PDF的Java工具，看到了iText可以说好评如潮。</p>
+<p>如果你想通过java操作PDF文件，那么 iText 绝对是你的首选。</p>
+<h2 id="引入依赖"><a href="#引入依赖" class="headerlink" title="引入依赖"></a>引入依赖</h2><p>这里使用的是iText5</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;com.itextpdf&lt;&#x2F;groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;itextpdf&lt;&#x2F;artifactId&gt;</span><br><span class="line">    &lt;version&gt;5.5.10&lt;&#x2F;version&gt;</span><br><span class="line">&lt;&#x2F;dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;com.itextpdf&lt;&#x2F;groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;itext-asian&lt;&#x2F;artifactId&gt;</span><br><span class="line">    &lt;version&gt;5.2.0&lt;&#x2F;version&gt;</span><br><span class="line">&lt;&#x2F;dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用步骤简单介绍"><a href="#使用步骤简单介绍" class="headerlink" title="使用步骤简单介绍"></a>使用步骤简单介绍</h2><p>快速入手iText拢共需要5步：</p>
+<ol>
+<li><p>创建文档实例 Document</p>
+</li>
+<li><p>获取PdfWriter实例 （需要指定Document实例 和pdf 生成的磁盘路径）</p>
+</li>
+<li><p>打开文档</p>
+</li>
+<li><p>添加段落内容</p>
+</li>
+<li><p>关闭操作文档实例 （操作完成后必须执行文档关闭操作）</p>
+</li>
+</ol>
+<h2 id="创建工具类"><a href="#创建工具类" class="headerlink" title="创建工具类"></a>创建工具类</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PdfUtil</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 标准字体</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Font NORMALFONT;</span><br><span class="line">    <span class="comment">// 加粗字体</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Font BOLDFONT;</span><br><span class="line">    <span class="comment">//固定高</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">float</span> fixedHeight = <span class="number">27f</span>;</span><br><span class="line">    <span class="comment">//间距</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> spacing = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            BaseFont bfChinese = BaseFont.createFont(<span class="string">"STSong-Light"</span>, <span class="string">"UniGB-UCS2-H"</span>, BaseFont.NOT_EMBEDDED);</span><br><span class="line">            NORMALFONT = <span class="keyword">new</span> Font(bfChinese, <span class="number">10</span>, Font.NORMAL);</span><br><span class="line">            BOLDFONT = <span class="keyword">new</span> Font(bfChinese, <span class="number">14</span>, Font.BOLD);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Document <span class="title">createDocument</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//生成pdf</span></span><br><span class="line">        Document document = <span class="keyword">new</span> Document();</span><br><span class="line">        <span class="comment">// 页面大小</span></span><br><span class="line">        Rectangle rectangle = <span class="keyword">new</span> Rectangle(PageSize.A4);</span><br><span class="line">        <span class="comment">// 页面背景颜色</span></span><br><span class="line">        rectangle.setBackgroundColor(BaseColor.WHITE);</span><br><span class="line">        document.setPageSize(rectangle);</span><br><span class="line">        <span class="comment">// 页边距 左，右，上，下</span></span><br><span class="line">        document.setMargins(<span class="number">20</span>, <span class="number">20</span>, <span class="number">20</span>, <span class="number">20</span>);</span><br><span class="line">        <span class="keyword">return</span> document;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> text 段落内容</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Paragraph <span class="title">createParagraph</span><span class="params">(String text, Font font)</span> </span>&#123;</span><br><span class="line">        Paragraph elements = <span class="keyword">new</span> Paragraph(text, font);</span><br><span class="line">        elements.setSpacingBefore(<span class="number">5</span>);</span><br><span class="line">        elements.setSpacingAfter(<span class="number">5</span>);</span><br><span class="line">        elements.setSpacingAfter(spacing);</span><br><span class="line">        <span class="keyword">return</span> elements;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Font <span class="title">createFont</span><span class="params">(<span class="keyword">int</span> fontNumber, <span class="keyword">int</span> fontSize, BaseColor fontColor)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//中文字体 ----不然中文会乱码</span></span><br><span class="line">        BaseFont bf = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            bf = BaseFont.createFont(<span class="string">"STSong-Light"</span>, <span class="string">"UniGB-UCS2-H"</span>, BaseFont.NOT_EMBEDDED);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Font(bf, fontNumber, fontSize, fontColor);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Font(bf, Font.DEFAULTSIZE, Font.NORMAL, BaseColor.BLACK);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 隐藏表格边框线</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> cell 单元格</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">disableBorderSide</span><span class="params">(PdfPCell cell)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (cell != <span class="keyword">null</span>) &#123;</span><br><span class="line">            cell.disableBorderSide(<span class="number">1</span>);</span><br><span class="line">            cell.disableBorderSide(<span class="number">2</span>);</span><br><span class="line">            cell.disableBorderSide(<span class="number">4</span>);</span><br><span class="line">            cell.disableBorderSide(<span class="number">8</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 创建居中得单元格</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> PdfPCell <span class="title">createCenterPdfPCell</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        PdfPCell cell = <span class="keyword">new</span> PdfPCell();</span><br><span class="line">        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);</span><br><span class="line">        cell.setHorizontalAlignment(Element.ALIGN_CENTER);</span><br><span class="line">        cell.setFixedHeight(fixedHeight);</span><br><span class="line">        <span class="keyword">return</span> cell;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 创建指定文字得单元格</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> text</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> PdfPCell <span class="title">createCenterPdfPCell</span><span class="params">(String text, <span class="keyword">int</span> rowSpan, <span class="keyword">int</span> colSpan, Font font)</span> </span>&#123;</span><br><span class="line">        PdfPCell cell = <span class="keyword">new</span> PdfPCell(<span class="keyword">new</span> Paragraph(text, font));</span><br><span class="line">        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);</span><br><span class="line">        cell.setHorizontalAlignment(Element.ALIGN_LEFT);</span><br><span class="line">        cell.setFixedHeight(fixedHeight);</span><br><span class="line">        cell.setRowspan(rowSpan);</span><br><span class="line">        cell.setColspan(colSpan);</span><br><span class="line">        <span class="keyword">return</span> cell;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> len 表格列数</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> PdfPTable <span class="title">createPdfPTable</span><span class="params">(<span class="keyword">int</span> len)</span> </span>&#123;</span><br><span class="line">        PdfPTable pdfPTable = <span class="keyword">new</span> PdfPTable(len);</span><br><span class="line">        pdfPTable.setSpacingBefore(<span class="number">5</span>);</span><br><span class="line">        pdfPTable.setHorizontalAlignment(Element.ALIGN_CENTER);</span><br><span class="line">        <span class="keyword">return</span> pdfPTable;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="创建controller进行测试"><a href="#创建controller进行测试" class="headerlink" title="创建controller进行测试"></a>创建controller进行测试</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Wang Guolong</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@version</span> 1.0</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2020/6/28 3:17 下午</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/pdf"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PdfController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/generate"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Response <span class="title">generatePDF</span><span class="params">(HttpServletResponse response)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        String filename = <span class="string">"测试pdf"</span>;</span><br><span class="line">        <span class="comment">// 设置下载格式为pdf</span></span><br><span class="line">        response.setContentType(<span class="string">"application/x-download"</span>);</span><br><span class="line">        response.addHeader(<span class="string">"Content-Disposition"</span>, <span class="string">"attachment;filename="</span> + URLEncoder.encode(filename, <span class="string">"UTF-8"</span>) + <span class="string">".pdf"</span>);</span><br><span class="line">        OutputStream os = <span class="keyword">new</span> BufferedOutputStream(response.getOutputStream());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 1. Document document = new Document();</span></span><br><span class="line">        Document document = PdfUtil.createDocument();</span><br><span class="line">        <span class="comment">// 2. 获取writer</span></span><br><span class="line">        PdfWriter.getInstance(document, os);</span><br><span class="line">        <span class="comment">// 3. open()</span></span><br><span class="line">        document.open();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//设置字体</span></span><br><span class="line">        Font blackFont = PdfUtil.createFont(<span class="number">10</span>, Font.NORMAL, BaseColor.BLACK);</span><br><span class="line">        Font blueFont = PdfUtil.createFont(<span class="number">10</span>, Font.NORMAL, BaseColor.BLUE);</span><br><span class="line">        Font bigFont = PdfUtil.createFont(<span class="number">14</span>, Font.NORMAL, BaseColor.BLACK);</span><br><span class="line">        Font littleFont = PdfUtil.createFont(<span class="number">10</span>, Font.NORMAL, BaseColor.BLACK);</span><br><span class="line"></span><br><span class="line">        Paragraph title = PdfUtil.createParagraph(<span class="string">"测试pdf"</span>, bigFont);</span><br><span class="line">        title.setAlignment(Element.ALIGN_CENTER);</span><br><span class="line">        <span class="comment">// 4. 添加段落内容</span></span><br><span class="line">        document.add(title);</span><br><span class="line">        <span class="comment">// 5. close()</span></span><br><span class="line">        document.close();</span><br><span class="line">        os.close();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Response().setContent(<span class="string">"success"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h2><p>下载页面：</p>
+<img src="/2020/07/01/Java%E4%BD%BF%E7%94%A8iTextPDF%E7%94%9F%E6%88%90PDF%E6%96%87%E4%BB%B6/download_interface.png" class="" title="download_interface">
+
+<p>下载的文件效果：</p>
+<img src="/2020/07/01/Java%E4%BD%BF%E7%94%A8iTextPDF%E7%94%9F%E6%88%90PDF%E6%96%87%E4%BB%B6/download_file.png" class="" title="download_file">
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/30/Spring%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1-Scheduled%E6%B3%A8%E8%A7%A3%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1197,124 +1281,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/04/Java%E9%9D%A2%E8%AF%95%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98-1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/04/Java%E9%9D%A2%E8%AF%95%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98-1/" class="post-title-link" itemprop="url">Java面试常见问题-1</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-05-04 21:56:26" itemprop="dateCreated datePublished" datetime="2020-05-04T21:56:26+08:00">2020-05-04</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-05-12 17:00:36" itemprop="dateModified" datetime="2020-05-12T17:00:36+08:00">2020-05-12</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="1-String-StringBuilder-StringBuffer区别"><a href="#1-String-StringBuilder-StringBuffer区别" class="headerlink" title="1. String, StringBuilder, StringBuffer区别"></a>1. String, StringBuilder, StringBuffer区别</h2><p>这三个类的主要区别在两个方面：<strong>运算速度</strong>（运算性能或执行效率）和<strong>线程安全性</strong>。</p>
-<h4 id="1-运算速度比较（通常情况下）：StringBuilder-gt-StringBuffer-gt-String"><a href="#1-运算速度比较（通常情况下）：StringBuilder-gt-StringBuffer-gt-String" class="headerlink" title="1. 运算速度比较（通常情况下）：StringBuilder &gt; StringBuffer &gt; String"></a>1. <strong>运算速度</strong>比较（通常情况下）：<strong>StringBuilder &gt; StringBuffer &gt; String</strong></h4><p>String是<strong>final</strong>类不能被继承且为字符串常量，而StringBuilder和StringBuffer均为<strong>字符串变量</strong>。String对象一旦创建便<strong>不可更改</strong>，而后两者是<strong>可更改</strong>的，它们只能通过构造函数来建立对象，且对象被建立以后将在内存中分配内存空间，并初始保存一个null，通过append方法向StringBuffer和StringBuilder中赋值。</p>
-<p>Java中对String对象进行的操作实际上是一个不断创建并回收对象的过程，因此在运行速度上很慢。</p>
-<h4 id="2-线程安全性"><a href="#2-线程安全性" class="headerlink" title="2. 线程安全性"></a>2. 线程安全性</h4><p>StringBuilder（<strong>非线程安全</strong>）</p>
-<p>而StringBuilder的方法没有该关键字修饰，所以不能保证线程安全性。</p>
-<p>StringBuffer（<strong>线程安全的</strong>）</p>
-<p>StringBuffer中大部分方法由<strong>synchronized</strong>关键字修饰，在必要时可对方法进行同步，因此任意特定实例上的所有操作就好像是以串行顺序发生的，该顺序与所涉及的每个线程进行的方法调用顺序一致，所以是线程安全的。</p>
-<h4 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a>3. 总结</h4><p>String：适用于<strong>少量</strong>的字符串操作。</p>
-<p>StringBuilder：适用于<strong>单线程</strong>下在字符串缓冲区进行大量操作。</p>
-<p>StringBuffer：适用于<strong>多线程</strong>下在字符串缓冲区进行大量操作。</p>
-<h2 id="2-Spring-Bean为什么是单例"><a href="#2-Spring-Bean为什么是单例" class="headerlink" title="2. Spring Bean为什么是单例"></a>2. Spring Bean为什么是单例</h2><h4 id="单例bean与原型bean的区别"><a href="#单例bean与原型bean的区别" class="headerlink" title="单例bean与原型bean的区别"></a>单例bean与原型bean的区别</h4><p><strong>单例：</strong>一个bean被声明为单例时，处理多次请求时spring容器里只实例化一个bean，后续的请求公用这个对象，这个对象存储在一个map中，当有请求时，先在缓存中（map）查找是否存在，存在则使用，不存在才实例化一个对象</p>
-<p><strong>原型：</strong>每当有请求来就实例化一个新的bean，没有缓存以及从缓存中查</p>
-<h4 id="单例bean的优势"><a href="#单例bean的优势" class="headerlink" title="单例bean的优势"></a>单例bean的优势</h4><p>由于不会每次都新创建新对象所以有一下几个性能上的优势：</p>
-<p><strong>减少了新生成实例的消耗</strong></p>
-<p>新生成实例消耗包括两方面，第一，spring会通过反射或者cglib来生成bean实例这都是耗性能的操作，其次给对象分配内存也会涉及复杂算法。</p>
-<p><strong>减少jvm垃圾回收</strong></p>
-<p>由于不会给每个请求都新生成bean实例，所以自然回收的对象少了。</p>
-<p><strong>可以快速获取到bean</strong></p>
-<p>因为单例的获取bean操作除了第一次生成之外其余的都是从缓存里获取的所以很快。</p>
-<h4 id="单例bean的劣势"><a href="#单例bean的劣势" class="headerlink" title="单例bean的劣势"></a>单例bean的劣势</h4><p>单例的bean一个很大的劣势就是他不能做到线程安全，由于所有请求都共享一个bean实例，所以这个bean要是有状态的一个bean的话可能在并发场景下出现问题，而原型的bean则不会有这样问题（但也有例外，比如他被单例bean依赖），因为给每个请求都新创建实例。</p>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>面试题：Spring 为啥把bean默认设计成单例？</p>
-<p>答案：</p>
-<p>为了提高性能<br>少创建实例<br>垃圾回收<br>缓存快速获取</p>
-<p>单例有啥劣势？</p>
-<p>如果是有状态的话在并发环境下线程不安全。</p>
-<h2 id="3-项目中有用到多线程嘛"><a href="#3-项目中有用到多线程嘛" class="headerlink" title="3. 项目中有用到多线程嘛"></a>3. 项目中有用到多线程嘛</h2><p>用户注册完成送大礼包/积分之类，且积分等也是另一个系统并<strong>比较耗时</strong>；且这类任务即使失败也不是特别重要的。</p>
-<p>后台线程：比如<strong>定期执行</strong>一些特殊任务，如定期更新配置文件，任务调度（如quartz），一些监控用于定期信息采集等。</p>
-<p>特别耗时的操作，如备份数据库，可以开个线程执行备份，然后执行返回，前台不断向后台询问线程执行状态</p>
-<p>场景一:一个业务逻辑有很多次的循环，<strong>每次循环之间没有影响</strong>，比如验证1万条url路径是否存在，正常情况要循环1万次，逐个去验证每一条URL，这样效率会很低，假设验证一条需要1分钟，总共就需要1万分钟，有点恐怖。这时可以用多线程，将1万条URL分成50等份，开50个线程，没个线程只需验证200条，这样所有的线程执行完是远小于1万分钟的。</p>
-<p>场景二:需要知道一个任务的执行进度，比如我们常看到的进度条，实现方式可以是在任务中加入一个整型属性变量(这样不同方法可以共享)，任务执行一定程度就给变量值加1，另外开一个线程按时间间隔不断去访问这个变量，并反馈给用户。</p>
-<p>总之<strong>使用多线程就是为了充分利用cpu的资源，提高程序执行效率</strong>，当你发现一个业务逻辑执行效率特别低，耗时特别长，就可以考虑使用多线程。<strong>不过CPU执行哪个线程的时间和顺序是不确定的</strong>，即使设置了线程的优先级，因此使用多线程的风险也是比较大的，会出现很多预料不到的问题，一定要多熟悉概念，多构造不同的场景去测试才能够掌握!</p>
-<h2 id="4-HashMap为什么要重写hashCode和equals方法"><a href="#4-HashMap为什么要重写hashCode和equals方法" class="headerlink" title="4. HashMap为什么要重写hashCode和equals方法"></a>4. HashMap为什么要重写hashCode和equals方法</h2><p>HashMap和Hashtable的底层实现都是数组+链表结构实现的</p>
-<p>使用HashMap，如果key是自定义的类，就必须重写hashcode()和equals()。</p>
-<p>如果你重载了equals，比如说是基于对象的内容实现的，而保留hashCode的实现不变，那么很可能某两个对象明明是“相等”，而hashCode却不一样。</p>
-<p>这样，当你用其中的一个作为键保存到hashMap、hasoTable或hashSet中，再以“相等的”找另一个作为键值去查找他们的时候，则根本找不到。</p>
-<p>对于每一个对象，通过其hashCode()方法可为其生成一个整形值（散列码），该整型值被处理后，将会作为数组下标，存放该对象所对应的Entry（存放该对象及其对应值）。 </p>
-<p>equals()方法则是在HashMap中插入值或查询时会使用到。当HashMap中插入值或查询值对应的散列码与数组中的散列码相等时，则会通过equals方法比较key值是否相等</p>
-<p>所以想以自建对象作为HashMap的key，必须重写该对象继承object的hashCode和equals方法。</p>
-<h2 id="5-Java集合中为什么要使用设计迭代器"><a href="#5-Java集合中为什么要使用设计迭代器" class="headerlink" title="5. Java集合中为什么要使用设计迭代器"></a>5. Java集合中为什么要使用设计迭代器</h2><p>优点: </p>
-<pre><code>1. 可以不了解集合内部的数据结构,就可以直接遍历;
-
-2. **不暴露内部的数据**,可以直接外部遍历;
-
-3. 适用性强,基本上的集合都能使用迭代器;</code></pre><h2 id="6-为什么使用迭代器遍历删除是安全的"><a href="#6-为什么使用迭代器遍历删除是安全的" class="headerlink" title="6. 为什么使用迭代器遍历删除是安全的"></a>6. 为什么使用迭代器遍历删除是安全的</h2><p>基本上<strong>ArrayList采用size属性来维护自已的状态，而Iterator采用cursor来来维护自已的状态</strong>。</p>
-<p>当size出现变化时，cursor并不一定能够得到同步，除非这种变化是Iterator主动导致的。</p>
-<p>当Iterator.remove方法导致ArrayList列表发生变化时，他会更新cursor来同步这一变化。但其他方式导致的ArrayList变化，Iterator是无法感知的。ArrayList自然也不会主动通知Iterator们，那将是一个繁重的工作。Iterator到底还是做了努力：为了防止状态不一致可能引发的无法设想的后果，Iterator会经常做checkForComodification检查，以防有变。如果有变，则以异常抛出，所以就出现了上面的异常。</p>
-<h2 id="7-Spring事务传播机制"><a href="#7-Spring事务传播机制" class="headerlink" title="7. Spring事务传播机制"></a>7. Spring事务传播机制</h2><ul>
-<li>@Transactional(propagation=Propagation.REQUIRED)<br>如果有事务, 那么加入事务, 没有的话新建一个(默认情况下)</li>
-<li>@Transactional(propagation=Propagation.NOT_SUPPORTED)<br>容器不为这个方法开启事务</li>
-<li>@Transactional(propagation=Propagation.REQUIRES_NEW)<br>不管是否存在事务,都创建一个新的事务,原来的挂起,新的执行完毕,继续执行老的事务</li>
-<li>@Transactional(propagation=Propagation.MANDATORY)<br>必须在一个已有的事务中执行,否则抛出异常</li>
-<li>@Transactional(propagation=Propagation.NEVER)<br>必须在一个没有的事务中执行,否则抛出异常(与Propagation.MANDATORY相反)</li>
-<li>@Transactional(propagation=Propagation.SUPPORTS)<br>如果其他bean调用这个方法,在其他bean中声明事务,那就用事务.如果其他bean没有声明事务,那就不用事务.</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1384,7 +1350,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-count">15</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
