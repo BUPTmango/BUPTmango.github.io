@@ -17,38 +17,38 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+    var CONFIG = {"hostname":"www.wangguolong.top","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
   <meta name="description" content="一、条件断点循环中经常用到这个技巧，比如：遍历1个大List的过程中，想让断点停在某个特定值。   参考上图，在断点的位置，右击断点旁边的小红点，会出来一个界面，在Condition这里填入断点条件即可，这样调试时，就会自动停在i&#x3D;10的位置   二、回到”上一步”该技巧最适合特别复杂的方法套方法的场景，好不容易跑起来，一不小心手一抖，断点过去了，想回过头看看刚才的变量值，如果不知道该技巧，只能再">
 <meta property="og:type" content="article">
 <meta property="og:title" content="IntelliJ-IDEA-高级调试技巧">
-<meta property="og:url" content="http://yoursite.com/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/index.html">
+<meta property="og:url" content="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/index.html">
 <meta property="og:site_name" content="王国隆的技术博客">
 <meta property="og:description" content="一、条件断点循环中经常用到这个技巧，比如：遍历1个大List的过程中，想让断点停在某个特定值。   参考上图，在断点的位置，右击断点旁边的小红点，会出来一个界面，在Condition这里填入断点条件即可，这样调试时，就会自动停在i&#x3D;10的位置   二、回到”上一步”该技巧最适合特别复杂的方法套方法的场景，好不容易跑起来，一不小心手一抖，断点过去了，想回过头看看刚才的变量值，如果不知道该技巧，只能再">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://yoursite.com/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/condition.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/condition_result.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/back.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/back_result.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/thread.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/thread2.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/suspend.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/sus_result.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/choose.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/remote.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/remote_test.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/change.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/input.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/return.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/set_value.png">
+<meta property="og:image" content="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/condition.png">
+<meta property="og:image" content="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/condition_result.png">
+<meta property="og:image" content="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/back.png">
+<meta property="og:image" content="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/back_result.png">
+<meta property="og:image" content="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/thread.png">
+<meta property="og:image" content="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/thread2.png">
+<meta property="og:image" content="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/suspend.png">
+<meta property="og:image" content="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/sus_result.png">
+<meta property="og:image" content="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/choose.png">
+<meta property="og:image" content="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/remote.png">
+<meta property="og:image" content="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/remote_test.png">
+<meta property="og:image" content="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/change.png">
+<meta property="og:image" content="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/input.png">
+<meta property="og:image" content="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/return.png">
+<meta property="og:image" content="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/set_value.png">
 <meta property="article:published_time" content="2020-06-24T10:00:22.611Z">
 <meta property="article:modified_time" content="2020-06-24T10:30:13.139Z">
 <meta property="article:author" content="Guolong Wang">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://yoursite.com/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/condition.png">
+<meta name="twitter:image" content="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/condition.png">
 
-<link rel="canonical" href="http://yoursite.com/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/">
+<link rel="canonical" href="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/">
 
 
 <script id="page-configurations">
@@ -166,7 +166,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/">
+    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
