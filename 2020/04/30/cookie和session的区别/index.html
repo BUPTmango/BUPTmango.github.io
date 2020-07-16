@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"www.wangguolong.top","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="http无状态和session由于HTTP协议是无状态的协议，所以服务端需要记录用户的状态时，就需要用某种机制来识具体的用户，这个机制就是Session. 典型的场景比如购物车，当你点击下单按钮时，由于HTTP协议无状态，所以并不知道是哪个用户操作的，所以服务端要为特定的用户创建了特定的Session，用用于标识这个用户，并且跟踪用户，这样才知道购物车里面有几本书。 这个Session是保存在服务">
+  <meta name="description" content="http无状态和session由于HTTP协议是无状态的协议，所以服务端需要记录用户的状态时，就需要用某种机制来识具体的用户，这个机制就是Session.">
 <meta property="og:type" content="article">
 <meta property="og:title" content="cookie和session的区别">
 <meta property="og:url" content="http://www.wangguolong.top/2020/04/30/cookie%E5%92%8Csession%E7%9A%84%E5%8C%BA%E5%88%AB/index.html">
 <meta property="og:site_name" content="王国隆的技术博客">
-<meta property="og:description" content="http无状态和session由于HTTP协议是无状态的协议，所以服务端需要记录用户的状态时，就需要用某种机制来识具体的用户，这个机制就是Session. 典型的场景比如购物车，当你点击下单按钮时，由于HTTP协议无状态，所以并不知道是哪个用户操作的，所以服务端要为特定的用户创建了特定的Session，用用于标识这个用户，并且跟踪用户，这样才知道购物车里面有几本书。 这个Session是保存在服务">
+<meta property="og:description" content="http无状态和session由于HTTP协议是无状态的协议，所以服务端需要记录用户的状态时，就需要用某种机制来识具体的用户，这个机制就是Session.">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-04-30T09:36:40.668Z">
-<meta property="article:modified_time" content="2020-04-30T09:53:30.858Z">
+<meta property="article:modified_time" content="2020-07-16T04:55:11.082Z">
 <meta property="article:author" content="Guolong Wang">
 <meta name="twitter:card" content="summary">
 
@@ -172,10 +172,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2020-04-30 17:36:40 / Modified: 17:53:30" itemprop="dateCreated datePublished" datetime="2020-04-30T17:36:40+08:00">2020-04-30</time>
+              <time title="Created: 2020-04-30 17:36:40" itemprop="dateCreated datePublished" datetime="2020-04-30T17:36:40+08:00">2020-04-30</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-07-16 12:55:11" itemprop="dateModified" datetime="2020-07-16T12:55:11+08:00">2020-07-16</time>
+              </span>
 
           
 
@@ -189,6 +195,8 @@
 
       
         <h2 id="http无状态和session"><a href="#http无状态和session" class="headerlink" title="http无状态和session"></a>http无状态和session</h2><p>由于HTTP协议是<strong>无状态</strong>的协议，所以服务端需要记录用户的状态时，就需要用某种机制来识具体的用户，这个机制就是Session.</p>
+<a id="more"></a>
+
 <p>典型的场景比如购物车，当你点击下单按钮时，由于HTTP协议无状态，所以并不知道是哪个用户操作的，所以服务端要为特定的用户创建了特定的Session，用用于标识这个用户，并且跟踪用户，这样才知道购物车里面有几本书。</p>
 <p>这个Session是保存在服务端的，有一个唯一标识。在服务端保存Session的方法很多，内存、数据库、文件都有。</p>
 <p>集群的时候也要考虑Session的转移，在大型的网站，一般会有专门的Session服务器集群，用来保存用户会话，这个时候Session信息都是放在内存的，使用一些缓存服务比如Memcached之类的来放Session。</p>
