@@ -28,7 +28,7 @@
 <meta property="og:description" content="1. String, StringBuilder, StringBuffer区别这三个类的主要区别在两个方面：运算速度（运算性能或执行效率）和线程安全性。 1. 运算速度比较（通常情况下）：StringBuilder &gt; StringBuffer &gt; String">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-05-04T13:56:26.978Z">
-<meta property="article:modified_time" content="2020-07-16T04:58:13.524Z">
+<meta property="article:modified_time" content="2020-07-17T08:34:54.889Z">
 <meta property="article:author" content="Guolong Wang">
 <meta name="twitter:card" content="summary">
 
@@ -209,7 +209,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 12:58:13" itemprop="dateModified" datetime="2020-07-16T12:58:13+08:00">2020-07-16</time>
+                <time title="修改时间：2020-07-17 16:34:54" itemprop="dateModified" datetime="2020-07-17T16:34:54+08:00">2020-07-17</time>
               </span>
 
           
@@ -223,18 +223,18 @@
     <div class="post-body" itemprop="articleBody">
       
         <h2 id="1-String-StringBuilder-StringBuffer区别"><a href="#1-String-StringBuilder-StringBuffer区别" class="headerlink" title="1. String, StringBuilder, StringBuffer区别"></a>1. String, StringBuilder, StringBuffer区别</h2><p>这三个类的主要区别在两个方面：<strong>运算速度</strong>（运算性能或执行效率）和<strong>线程安全性</strong>。</p>
-<h4 id="1-运算速度比较（通常情况下）：StringBuilder-gt-StringBuffer-gt-String"><a href="#1-运算速度比较（通常情况下）：StringBuilder-gt-StringBuffer-gt-String" class="headerlink" title="1. 运算速度比较（通常情况下）：StringBuilder &gt; StringBuffer &gt; String"></a>1. <strong>运算速度</strong>比较（通常情况下）：<strong>StringBuilder &gt; StringBuffer &gt; String</strong></h4><a id="more"></a>
+<h3 id="1-运算速度比较（通常情况下）：StringBuilder-gt-StringBuffer-gt-String"><a href="#1-运算速度比较（通常情况下）：StringBuilder-gt-StringBuffer-gt-String" class="headerlink" title="1. 运算速度比较（通常情况下）：StringBuilder &gt; StringBuffer &gt; String"></a>1. <strong>运算速度</strong>比较（通常情况下）：<strong>StringBuilder &gt; StringBuffer &gt; String</strong></h3><a id="more"></a>
 
 <p>String是<strong>final</strong>类不能被继承且为字符串常量，而StringBuilder和StringBuffer均为<strong>字符串变量</strong>。String对象一旦创建便<strong>不可更改</strong>，而后两者是<strong>可更改</strong>的，它们只能通过构造函数来建立对象，且对象被建立以后将在内存中分配内存空间，并初始保存一个null，通过append方法向StringBuffer和StringBuilder中赋值。</p>
 <p>Java中对String对象进行的操作实际上是一个不断创建并回收对象的过程，因此在运行速度上很慢。</p>
-<h4 id="2-线程安全性"><a href="#2-线程安全性" class="headerlink" title="2. 线程安全性"></a>2. 线程安全性</h4><p>StringBuilder（<strong>非线程安全</strong>）</p>
+<h3 id="2-线程安全性"><a href="#2-线程安全性" class="headerlink" title="2. 线程安全性"></a>2. 线程安全性</h3><p>StringBuilder（<strong>非线程安全</strong>）</p>
 <p>而StringBuilder的方法没有该关键字修饰，所以不能保证线程安全性。</p>
 <p>StringBuffer（<strong>线程安全的</strong>）</p>
 <p>StringBuffer中大部分方法由<strong>synchronized</strong>关键字修饰，在必要时可对方法进行同步，因此任意特定实例上的所有操作就好像是以串行顺序发生的，该顺序与所涉及的每个线程进行的方法调用顺序一致，所以是线程安全的。</p>
-<h4 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a>3. 总结</h4><p>String：适用于<strong>少量</strong>的字符串操作。</p>
+<h3 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a>3. 总结</h3><p>String：适用于<strong>少量</strong>的字符串操作。</p>
 <p>StringBuilder：适用于<strong>单线程</strong>下在字符串缓冲区进行大量操作。</p>
 <p>StringBuffer：适用于<strong>多线程</strong>下在字符串缓冲区进行大量操作。</p>
-<h2 id="2-Spring-Bean为什么是单例"><a href="#2-Spring-Bean为什么是单例" class="headerlink" title="2. Spring Bean为什么是单例"></a>2. Spring Bean为什么是单例</h2><h4 id="单例bean与原型bean的区别"><a href="#单例bean与原型bean的区别" class="headerlink" title="单例bean与原型bean的区别"></a>单例bean与原型bean的区别</h4><p><strong>单例：</strong>一个bean被声明为单例时，处理多次请求时spring容器里只实例化一个bean，后续的请求公用这个对象，这个对象存储在一个map中，当有请求时，先在缓存中（map）查找是否存在，存在则使用，不存在才实例化一个对象</p>
+<h2 id="2-Spring-Bean为什么是单例"><a href="#2-Spring-Bean为什么是单例" class="headerlink" title="2. Spring Bean为什么是单例"></a>2. Spring Bean为什么是单例</h2><h3 id="单例bean与原型bean的区别"><a href="#单例bean与原型bean的区别" class="headerlink" title="单例bean与原型bean的区别"></a>单例bean与原型bean的区别</h3><p><strong>单例：</strong>一个bean被声明为单例时，处理多次请求时spring容器里只实例化一个bean，后续的请求公用这个对象，这个对象存储在一个map中，当有请求时，先在缓存中（map）查找是否存在，存在则使用，不存在才实例化一个对象</p>
 <p><strong>原型：</strong>每当有请求来就实例化一个新的bean，没有缓存以及从缓存中查</p>
 <h4 id="单例bean的优势"><a href="#单例bean的优势" class="headerlink" title="单例bean的优势"></a>单例bean的优势</h4><p>由于不会每次都新创建新对象所以有一下几个性能上的优势：</p>
 <p><strong>减少了新生成实例的消耗</strong></p>
@@ -243,8 +243,8 @@
 <p>由于不会给每个请求都新生成bean实例，所以自然回收的对象少了。</p>
 <p><strong>可以快速获取到bean</strong></p>
 <p>因为单例的获取bean操作除了第一次生成之外其余的都是从缓存里获取的所以很快。</p>
-<h4 id="单例bean的劣势"><a href="#单例bean的劣势" class="headerlink" title="单例bean的劣势"></a>单例bean的劣势</h4><p>单例的bean一个很大的劣势就是他不能做到线程安全，由于所有请求都共享一个bean实例，所以这个bean要是有状态的一个bean的话可能在并发场景下出现问题，而原型的bean则不会有这样问题（但也有例外，比如他被单例bean依赖），因为给每个请求都新创建实例。</p>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>面试题：Spring 为啥把bean默认设计成单例？</p>
+<h3 id="单例bean的劣势"><a href="#单例bean的劣势" class="headerlink" title="单例bean的劣势"></a>单例bean的劣势</h3><p>单例的bean一个很大的劣势就是他不能做到线程安全，由于所有请求都共享一个bean实例，所以这个bean要是有状态的一个bean的话可能在并发场景下出现问题，而原型的bean则不会有这样问题（但也有例外，比如他被单例bean依赖），因为给每个请求都新创建实例。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>面试题：Spring 为啥把bean默认设计成单例？</p>
 <p>答案：</p>
 <p>为了提高性能<br>少创建实例<br>垃圾回收<br>缓存快速获取</p>
 <p>单例有啥劣势？</p>
@@ -369,7 +369,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-String-StringBuilder-StringBuffer区别"><span class="nav-number">1.</span> <span class="nav-text">1. String, StringBuilder, StringBuffer区别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-运算速度比较（通常情况下）：StringBuilder-gt-StringBuffer-gt-String"><span class="nav-number">1.0.1.</span> <span class="nav-text">1. 运算速度比较（通常情况下）：StringBuilder &gt; StringBuffer &gt; String</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-线程安全性"><span class="nav-number">1.0.2.</span> <span class="nav-text">2. 线程安全性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-总结"><span class="nav-number">1.0.3.</span> <span class="nav-text">3. 总结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Spring-Bean为什么是单例"><span class="nav-number">2.</span> <span class="nav-text">2. Spring Bean为什么是单例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#单例bean与原型bean的区别"><span class="nav-number">2.0.1.</span> <span class="nav-text">单例bean与原型bean的区别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#单例bean的优势"><span class="nav-number">2.0.2.</span> <span class="nav-text">单例bean的优势</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#单例bean的劣势"><span class="nav-number">2.0.3.</span> <span class="nav-text">单例bean的劣势</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结"><span class="nav-number">2.0.4.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-项目中有用到多线程嘛"><span class="nav-number">3.</span> <span class="nav-text">3. 项目中有用到多线程嘛</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-HashMap为什么要重写hashCode和equals方法"><span class="nav-number">4.</span> <span class="nav-text">4. HashMap为什么要重写hashCode和equals方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Java集合中为什么要使用设计迭代器"><span class="nav-number">5.</span> <span class="nav-text">5. Java集合中为什么要使用设计迭代器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-为什么使用迭代器遍历删除是安全的"><span class="nav-number">6.</span> <span class="nav-text">6. 为什么使用迭代器遍历删除是安全的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-Spring事务传播机制"><span class="nav-number">7.</span> <span class="nav-text">7. Spring事务传播机制</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-String-StringBuilder-StringBuffer区别"><span class="nav-number">1.</span> <span class="nav-text">1. String, StringBuilder, StringBuffer区别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-运算速度比较（通常情况下）：StringBuilder-gt-StringBuffer-gt-String"><span class="nav-number">1.1.</span> <span class="nav-text">1. 运算速度比较（通常情况下）：StringBuilder &gt; StringBuffer &gt; String</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-线程安全性"><span class="nav-number">1.2.</span> <span class="nav-text">2. 线程安全性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-总结"><span class="nav-number">1.3.</span> <span class="nav-text">3. 总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Spring-Bean为什么是单例"><span class="nav-number">2.</span> <span class="nav-text">2. Spring Bean为什么是单例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#单例bean与原型bean的区别"><span class="nav-number">2.1.</span> <span class="nav-text">单例bean与原型bean的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#单例bean的优势"><span class="nav-number">2.1.1.</span> <span class="nav-text">单例bean的优势</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#单例bean的劣势"><span class="nav-number">2.2.</span> <span class="nav-text">单例bean的劣势</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">2.3.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-项目中有用到多线程嘛"><span class="nav-number">3.</span> <span class="nav-text">3. 项目中有用到多线程嘛</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-HashMap为什么要重写hashCode和equals方法"><span class="nav-number">4.</span> <span class="nav-text">4. HashMap为什么要重写hashCode和equals方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Java集合中为什么要使用设计迭代器"><span class="nav-number">5.</span> <span class="nav-text">5. Java集合中为什么要使用设计迭代器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-为什么使用迭代器遍历删除是安全的"><span class="nav-number">6.</span> <span class="nav-text">6. 为什么使用迭代器遍历删除是安全的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-Spring事务传播机制"><span class="nav-number">7.</span> <span class="nav-text">7. Spring事务传播机制</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
