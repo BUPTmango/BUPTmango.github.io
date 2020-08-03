@@ -20,30 +20,32 @@
     var CONFIG = {"hostname":"www.wangguolong.top","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="爱玩，爱技术">
-<meta property="og:type" content="website">
-<meta property="og:title" content="王国隆的技术博客">
-<meta property="og:url" content="http://www.wangguolong.top/index.html">
+  <meta name="description" content="介绍公司最近有一个竞技场项目，里面有一个单词小游戏。 游戏大概就是随机生成一个5*5的棋盘，上面有单词的字母，通过滑动连出正确的单词。 棋盘生成算法思路首先随机选个一个起点，从这个点开始铺单词。 分别选取上下左右四个方向作为下一个字母的摆放位置，不能触边也不能走重复路，直到平铺完所有的单词。 如果在棋盘能平铺下单词的情况下，找不到路径，就从四个角作为起点，必能找到路径。 代码12345678910">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java编写单词小游戏">
+<meta property="og:url" content="http://www.wangguolong.top/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/index.html">
 <meta property="og:site_name" content="王国隆的技术博客">
-<meta property="og:description" content="爱玩，爱技术">
+<meta property="og:description" content="介绍公司最近有一个竞技场项目，里面有一个单词小游戏。 游戏大概就是随机生成一个5*5的棋盘，上面有单词的字母，通过滑动连出正确的单词。 棋盘生成算法思路首先随机选个一个起点，从这个点开始铺单词。 分别选取上下左右四个方向作为下一个字母的摆放位置，不能触边也不能走重复路，直到平铺完所有的单词。 如果在棋盘能平铺下单词的情况下，找不到路径，就从四个角作为起点，必能找到路径。 代码12345678910">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-03T06:11:27.624Z">
+<meta property="article:modified_time" content="2020-08-03T06:18:58.562Z">
 <meta property="article:author" content="Guolong Wang">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://www.wangguolong.top/">
+<link rel="canonical" href="http://www.wangguolong.top/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>王国隆的技术博客</title>
+  <title>Java编写单词小游戏 | 王国隆的技术博客</title>
   
 
 
@@ -170,9 +172,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
+
+    
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
@@ -188,10 +191,9 @@
       <meta itemprop="name" content="王国隆的技术博客">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/" class="post-title-link" itemprop="url">Java编写单词小游戏</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          Java编写单词小游戏
+        </h1>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -205,6 +207,13 @@
             </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
 
         </div>
       </header>
@@ -214,13 +223,12 @@
     
     <div class="post-body" itemprop="articleBody">
       
-          <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>公司最近有一个竞技场项目，里面有一个单词小游戏。</p>
+        <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>公司最近有一个竞技场项目，里面有一个单词小游戏。</p>
 <p>游戏大概就是随机生成一个5*5的棋盘，上面有单词的字母，通过滑动连出正确的单词。</p>
 <h2 id="棋盘生成算法"><a href="#棋盘生成算法" class="headerlink" title="棋盘生成算法"></a>棋盘生成算法</h2><h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>首先随机选个一个起点，从这个点开始铺单词。</p>
 <p>分别选取上下左右四个方向作为下一个字母的摆放位置，不能触边也不能走重复路，直到平铺完所有的单词。</p>
 <p>如果在棋盘能平铺下单词的情况下，找不到路径，就从四个角作为起点，必能找到路径。</p>
 <h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Wang Guolong</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@version</span> 1.0</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2020/7/31 5:50 下午</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GenerateWordBoard</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">char</span>[][] board;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        GenerateWordBoard g = <span class="keyword">new</span> GenerateWordBoard();</span><br><span class="line">        g.generateCharBoard(<span class="string">"vocabulary"</span>, <span class="number">5</span>, <span class="number">5</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">generateCharBoard</span><span class="params">(String word, <span class="keyword">int</span> m, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 单词为空 直接返回</span></span><br><span class="line">        <span class="keyword">if</span> (word.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 单词长度大于棋盘 铺不下 直接返回</span></span><br><span class="line">        <span class="keyword">if</span> (word.length() &gt; m * n) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 初始化棋盘 全为*</span></span><br><span class="line">        initBoard(m, n);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">char</span>[] wordChar = word.toCharArray();</span><br><span class="line">        <span class="comment">// 随机选取一个位置开始</span></span><br><span class="line">        Random random = <span class="keyword">new</span> Random();</span><br><span class="line">        <span class="keyword">int</span> randomX = random.nextInt(m);</span><br><span class="line">        <span class="keyword">int</span> randomY = random.nextInt(n);</span><br><span class="line">        <span class="comment">// 开始从随机位置dfs铺单词 从index 0 开始</span></span><br><span class="line">        <span class="keyword">boolean</span> result = generateDfs(board, wordChar, randomX, randomY, <span class="number">0</span>);</span><br><span class="line">        <span class="comment">// 如果没有找到路线 那么从四个角开始 必能找到一条路</span></span><br><span class="line">        <span class="keyword">if</span> (!result) &#123;</span><br><span class="line">            List&lt;<span class="keyword">int</span>[]&gt; starts = Arrays.asList(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, <span class="number">0</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, n - <span class="number">1</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;m - <span class="number">1</span>, <span class="number">0</span>&#125;,</span><br><span class="line">                    <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;m - <span class="number">1</span>, n - <span class="number">1</span>&#125;);</span><br><span class="line">            <span class="comment">// 随机四个角的一个</span></span><br><span class="line">            Collections.shuffle(starts);</span><br><span class="line">            <span class="comment">// 初始化棋盘</span></span><br><span class="line">            initBoard(m, n);</span><br><span class="line">            <span class="comment">// dfs铺单词</span></span><br><span class="line">            generateDfs(board, wordChar, starts.get(<span class="number">0</span>)[<span class="number">0</span>], starts.get(<span class="number">0</span>)[<span class="number">1</span>], <span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 查看结果</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; board.length; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; board[<span class="number">0</span>].length; j++) &#123;</span><br><span class="line">                System.out.print(board[i][j] + <span class="string">"  "</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initBoard</span><span class="params">(<span class="keyword">int</span> m, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 初始化</span></span><br><span class="line">        board = <span class="keyword">new</span> <span class="keyword">char</span>[m][n];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; board.length; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; board[<span class="number">0</span>].length; j++) &#123;</span><br><span class="line">                board[i][j] = <span class="string">'*'</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 返回true则为找到一条路 返回false为死路</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">generateDfs</span><span class="params">(<span class="keyword">char</span>[][] board, <span class="keyword">char</span>[] wordChar, <span class="keyword">int</span> i, <span class="keyword">int</span> j, <span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 碰到边 或者碰到已经走过的位置 不能走了 死路</span></span><br><span class="line">        <span class="keyword">if</span> (i &gt;= board.length || i &lt; <span class="number">0</span> || j &gt;= board[<span class="number">0</span>].length || j &lt; <span class="number">0</span> || board[i][j] == <span class="string">'/'</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 摆放一个字母</span></span><br><span class="line">        board[i][j] = wordChar[index];</span><br><span class="line"></span><br><span class="line">        <span class="comment">//如果已经达到单词长度则直接返回 找到一条路</span></span><br><span class="line">        <span class="keyword">if</span> (index == wordChar.length - <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 记录当前矩阵元素</span></span><br><span class="line">        <span class="keyword">char</span> tmp = board[i][j];</span><br><span class="line">        <span class="comment">// 修改为/ 表示已经访问过</span></span><br><span class="line">        board[i][j] = <span class="string">'/'</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 向上下左右四个方向开启递归</span></span><br><span class="line">        <span class="comment">// 查看能走几个方向 随机选择一个</span></span><br><span class="line">        List&lt;<span class="keyword">int</span>[]&gt; directions = Arrays.asList(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;-<span class="number">1</span>, <span class="number">0</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">1</span>, <span class="number">0</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, -<span class="number">1</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, <span class="number">1</span>&#125;);</span><br><span class="line">        Collections.shuffle(directions);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> res = <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; directions.size(); k++) &#123;</span><br><span class="line">            <span class="keyword">int</span> di = i + directions.get(k)[<span class="number">0</span>], dj = j + directions.get(k)[<span class="number">1</span>];</span><br><span class="line">            <span class="keyword">boolean</span> partialRes = generateDfs(board, wordChar, di, dj, index + <span class="number">1</span>);</span><br><span class="line">            <span class="keyword">if</span> (k == <span class="number">0</span>) &#123;</span><br><span class="line">                res = partialRes;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                res = res || partialRes;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 如果res为true 说明找到一条路 就不再遍历了 还原后返回true</span></span><br><span class="line">            <span class="keyword">if</span> (res) &#123;</span><br><span class="line">                <span class="comment">// 还原矩阵元素</span></span><br><span class="line">                board[i][j] = tmp;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 还原矩阵元素</span></span><br><span class="line">        board[i][j] = tmp;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
     </div>
 
     
@@ -229,717 +237,34 @@
 
     <div>
   
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
 </div>
+
+  
+</div>
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/07/14/ControllerAdvice%E5%92%8CErrorController%E7%9A%84%E7%94%A8%E6%B3%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/07/14/ControllerAdvice%E5%92%8CErrorController%E7%9A%84%E7%94%A8%E6%B3%95/" class="post-title-link" itemprop="url">ControllerAdvice和ErrorController的用法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-07-14 13:58:43" itemprop="dateCreated datePublished" datetime="2020-07-14T13:58:43+08:00">2020-07-14</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 12:54:48" itemprop="dateModified" datetime="2020-07-16T12:54:48+08:00">2020-07-16</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>在Java中异常可以分为Error和Exception，<strong>@ControllerAdvice</strong>用来处理系统中的<strong>Exception</strong>，<strong>Error</strong>Controller处理系统中的<strong>Error</strong>。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/07/14/ControllerAdvice%E5%92%8CErrorController%E7%9A%84%E7%94%A8%E6%B3%95/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
-    </div>
 
-    
-    
-    
 
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/07/10/Jackson%E7%9A%84%E4%BD%BF%E7%94%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/07/10/Jackson%E7%9A%84%E4%BD%BF%E7%94%A8/" class="post-title-link" itemprop="url">Jackson的使用</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-07-10 13:59:55" itemprop="dateCreated datePublished" datetime="2020-07-10T13:59:55+08:00">2020-07-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 12:58:04" itemprop="dateModified" datetime="2020-07-16T12:58:04+08:00">2020-07-16</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>最近公司的竞技场项目中使用了jackson来进行java对象和json的相互转换</p>
-<p>下面来介绍一下jackson的简单使用</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/07/10/Jackson%E7%9A%84%E4%BD%BF%E7%94%A8/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/14/ControllerAdvice%E5%92%8CErrorController%E7%9A%84%E7%94%A8%E6%B3%95/" rel="prev" title="ControllerAdvice和ErrorController的用法">
+      <i class="fa fa-chevron-left"></i> ControllerAdvice和ErrorController的用法
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-
-    
-    
-    
-
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
       </footer>
+    
   </article>
   
   
   
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/07/04/MySQL%E4%BC%98%E5%8C%96%E6%8F%90%E9%AB%98%E7%AC%94%E8%AE%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/07/04/MySQL%E4%BC%98%E5%8C%96%E6%8F%90%E9%AB%98%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">MySQL优化提高笔记</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-07-04 10:59:25" itemprop="dateCreated datePublished" datetime="2020-07-04T10:59:25+08:00">2020-07-04</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-17 16:24:39" itemprop="dateModified" datetime="2020-07-17T16:24:39+08:00">2020-07-17</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>对于mysql的优化是一个综合性的技术，sql的优化只是其中的一种，其中主要包括</p>
-<p>表的设计合理化(符合3大范式)。</p>
-<p>添加索引(index) [普通索引、主键索引、唯一索引unique、全文索引]。</p>
-<p>分表技术(水平分割、垂直分割)。</p>
-<p>读写[写: update/delete/add]分离。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/07/04/MySQL%E4%BC%98%E5%8C%96%E6%8F%90%E9%AB%98%E7%AC%94%E8%AE%B0/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/07/02/SpringBoot%E6%95%B4%E5%90%88Redis%E5%B9%B6%E7%94%A8Redis%E5%AE%9E%E7%8E%B0%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/07/02/SpringBoot%E6%95%B4%E5%90%88Redis%E5%B9%B6%E7%94%A8Redis%E5%AE%9E%E7%8E%B0%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/" class="post-title-link" itemprop="url">SpringBoot整合Redis并用Redis实现定时任务</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-07-02 13:25:40" itemprop="dateCreated datePublished" datetime="2020-07-02T13:25:40+08:00">2020-07-02</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 13:00:42" itemprop="dateModified" datetime="2020-07-16T13:00:42+08:00">2020-07-16</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>Redis是一种可基于内存也可基于持久话的日志型、key-value数据库。因为性能高，存储数据类型丰富等优势常被用作数据缓存。</p>
-<p>下面介绍Redis集成到SpringBoot2.2.4和Redis定时任务的实现。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/07/02/SpringBoot%E6%95%B4%E5%90%88Redis%E5%B9%B6%E7%94%A8Redis%E5%AE%9E%E7%8E%B0%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/07/01/Java%E4%BD%BF%E7%94%A8iTextPDF%E7%94%9F%E6%88%90PDF%E6%96%87%E4%BB%B6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/07/01/Java%E4%BD%BF%E7%94%A8iTextPDF%E7%94%9F%E6%88%90PDF%E6%96%87%E4%BB%B6/" class="post-title-link" itemprop="url">Java使用iTextPDF生成PDF文件</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-07-01 17:31:03" itemprop="dateCreated datePublished" datetime="2020-07-01T17:31:03+08:00">2020-07-01</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 12:58:50" itemprop="dateModified" datetime="2020-07-16T12:58:50+08:00">2020-07-16</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h2 id="iText介绍和说明"><a href="#iText介绍和说明" class="headerlink" title="iText介绍和说明"></a>iText介绍和说明</h2><p>因为项目需要生成PDF文件，所以去找了一下能够生成PDF的Java工具，看到了iText可以说好评如潮。</p>
-<p>如果你想通过java操作PDF文件，那么 iText 绝对是你的首选。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/07/01/Java%E4%BD%BF%E7%94%A8iTextPDF%E7%94%9F%E6%88%90PDF%E6%96%87%E4%BB%B6/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/06/30/Spring%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1-Scheduled%E6%B3%A8%E8%A7%A3%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/06/30/Spring%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1-Scheduled%E6%B3%A8%E8%A7%A3%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F/" class="post-title-link" itemprop="url">Spring定时任务-Scheduled注解使用方式</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-06-30 14:17:24" itemprop="dateCreated datePublished" datetime="2020-06-30T14:17:24+08:00">2020-06-30</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 13:00:10" itemprop="dateModified" datetime="2020-07-16T13:00:10+08:00">2020-07-16</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>使用@Scheduled cron表达式标注任务方法</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">testTask</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Logger logger = LoggerFactory.getLogger(testTask<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Scheduled</span>(cron = <span class="string">"0/5 * * * * ?"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTask</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        logger.info(Thread.currentThread().getName()+<span class="string">"===task run"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/06/30/Spring%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1-Scheduled%E6%B3%A8%E8%A7%A3%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/" class="post-title-link" itemprop="url">IntelliJ-IDEA-高级调试技巧</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-06-24 18:00:22" itemprop="dateCreated datePublished" datetime="2020-06-24T18:00:22+08:00">2020-06-24</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 12:57:56" itemprop="dateModified" datetime="2020-07-16T12:57:56+08:00">2020-07-16</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h2 id="一、条件断点"><a href="#一、条件断点" class="headerlink" title="一、条件断点"></a>一、条件断点</h2><p>循环中经常用到这个技巧，比如：遍历1个大List的过程中，想让断点停在某个特定值。</p>
-<img src="/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/condition.png" class="" title="condition">
-
-<p>参考上图，在断点的位置，右击断点旁边的小红点，会出来一个界面，在Condition这里填入断点条件即可，这样调试时，就会自动停在i=10的位置</p>
-<img src="/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/condition_result.png" class="" title="condition_result">
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/06/24/IntelliJ-IDEA-%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/06/23/%E5%A6%82%E4%BD%95%E8%AE%B0%E5%BF%86Spring-Bean%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/06/23/%E5%A6%82%E4%BD%95%E8%AE%B0%E5%BF%86Spring-Bean%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/" class="post-title-link" itemprop="url">如何记忆Spring-Bean的生命周期</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-06-23 17:41:53" itemprop="dateCreated datePublished" datetime="2020-06-23T17:41:53+08:00">2020-06-23</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 12:54:17" itemprop="dateModified" datetime="2020-07-16T12:54:17+08:00">2020-07-16</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h2 id="1-引言"><a href="#1-引言" class="headerlink" title="1. 引言"></a>1. 引言</h2><p>“请你描述下 Spring Bean 的生命周期？”，这是面试官考察 Spring 的常用问题，可见是 Spring 中很重要的知识点。</p>
-<img src="/2020/06/23/%E5%A6%82%E4%BD%95%E8%AE%B0%E5%BF%86Spring-Bean%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/total_process.png" class="" title="总体流程图">
-
-<p>其实要记忆该过程，还是需要我们先去理解，本文将从以下两方面去帮助理解 Bean 的生命周期：</p>
-<ul>
-<li><p>生命周期的概要流程：对 Bean 的生命周期进行概括，并且结合代码来理解；</p>
-</li>
-<li><p>扩展点的作用：详细介绍 Bean 生命周期中所涉及到的扩展点的作用。</p>
-</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/06/23/%E5%A6%82%E4%BD%95%E8%AE%B0%E5%BF%86Spring-Bean%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/06/21/Java%E4%BD%BF%E7%94%A8easyexcel%E6%93%8D%E4%BD%9Cexcel/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/06/21/Java%E4%BD%BF%E7%94%A8easyexcel%E6%93%8D%E4%BD%9Cexcel/" class="post-title-link" itemprop="url">Java使用easyexcel操作excel</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-06-21 12:46:28" itemprop="dateCreated datePublished" datetime="2020-06-21T12:46:28+08:00">2020-06-21</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 12:58:44" itemprop="dateModified" datetime="2020-07-16T12:58:44+08:00">2020-07-16</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在工作中，使用excel表格处理数据是很常见的操作，本文就来讲解下如何使用开源轮子实现下载、导入、导出的功能。</p>
-<p>在之前，很多Java程序员都喜欢使用POI的类库来操作excel,但是非常的不方便，不仅代码写的很臃肿，还要处理各种office版本兼容问题，最怕的就是使用不当很容易造成内存溢出，因此今天给大家推荐阿里的一款开源项目 <strong>easyexcel</strong>。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/06/21/Java%E4%BD%BF%E7%94%A8easyexcel%E6%93%8D%E4%BD%9Cexcel/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-
-  
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
-  </nav>
 
 
 
@@ -991,6 +316,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#棋盘生成算法"><span class="nav-number">2.</span> <span class="nav-text">棋盘生成算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#思路"><span class="nav-number">2.1.</span> <span class="nav-text">思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码"><span class="nav-number">2.2.</span> <span class="nav-text">代码</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
