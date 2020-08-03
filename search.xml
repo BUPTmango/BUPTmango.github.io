@@ -1,84 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Jackson的使用</title>
-    <url>/2020/07/10/Jackson%E7%9A%84%E4%BD%BF%E7%94%A8/</url>
-    <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>最近公司的竞技场项目中使用了jackson来进行java对象和json的相互转换</p>
-<p>下面来介绍一下jackson的简单使用</p>
-<a id="more"></a>
-
-<h2 id="引入依赖"><a href="#引入依赖" class="headerlink" title="引入依赖"></a>引入依赖</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;com.fasterxml.jackson.core&lt;&#x2F;groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;jackson-core&lt;&#x2F;artifactId&gt;</span><br><span class="line">    &lt;version&gt;2.9.6&lt;&#x2F;version&gt;</span><br><span class="line">&lt;&#x2F;dependency&gt;</span><br></pre></td></tr></table></figure>
-
-<h2 id="简单使用"><a href="#简单使用" class="headerlink" title="简单使用"></a>简单使用</h2><h3 id="第1步：创建ObjectMapper对象"><a href="#第1步：创建ObjectMapper对象" class="headerlink" title="第1步：创建ObjectMapper对象"></a>第1步：创建ObjectMapper对象</h3><p>创建ObjectMapper对象。它是一个可重复使用的对象。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">ObjectMapper mapper = <span class="keyword">new</span> ObjectMapper();</span><br></pre></td></tr></table></figure>
-
-<h3 id="第2步：反序列化JSON到对象"><a href="#第2步：反序列化JSON到对象" class="headerlink" title="第2步：反序列化JSON到对象"></a>第2步：反序列化JSON到对象</h3><p>从JSON对象使用readValue()方法来获取。通过JSON字符串和对象类型作为参数JSON字符串/来源。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//Object to JSON Conversion</span></span><br><span class="line">Student student = mapper.readValue(jsonString, Student<span class="class">.<span class="keyword">class</span>)</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="第3步：序列化对象到JSON"><a href="#第3步：序列化对象到JSON" class="headerlink" title="第3步：序列化对象到JSON"></a>第3步：序列化对象到JSON</h3><p>使用writeValueAsString()方法来获取对象的JSON字符串表示。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//Object to JSON Conversion		</span></span><br><span class="line">jsonString = mapper.writeValueAsString(student);</span><br></pre></td></tr></table></figure>
-
-<h2 id="信息配置-对mapper的设置"><a href="#信息配置-对mapper的设置" class="headerlink" title="信息配置 对mapper的设置"></a>信息配置 对mapper的设置</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//在反序列化时忽略在 json 中存在但 Java 对象不存在的属性</span></span><br><span class="line">mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,</span><br><span class="line">   <span class="keyword">false</span>);</span><br><span class="line"><span class="comment">//在序列化时日期格式默认为 yyyy-MM-dd'T'HH:mm:ss.SSSZ</span></span><br><span class="line">mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,<span class="keyword">false</span>)</span><br><span class="line"><span class="comment">//在序列化时忽略值为 null 的属性</span></span><br><span class="line">mapper.setSerializationInclusion(Include.NON_NULL);</span><br><span class="line"><span class="comment">//忽略值为默认值的属性</span></span><br><span class="line">mapper.setDefaultPropertyInclusion(Include.NON_DEFAULT);</span><br></pre></td></tr></table></figure>
-
-<h2 id="Jackson的注解的使用"><a href="#Jackson的注解的使用" class="headerlink" title="Jackson的注解的使用"></a>Jackson的注解的使用</h2><p>Jackson的常用注解</p>
-<table>
-<thead>
-<tr>
-<th>注解</th>
-<th>用法</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>@JsonProperty</td>
-<td>用于属性，把属性的名称序列化时转换为另外一个名称。示例： @JsonProperty(“birth_ d ate”) private Date birthDate;</td>
-</tr>
-<tr>
-<td>@JsonFormat</td>
-<td>用于属性或者方法，把属性的格式序列化时转换成指定的格式。示例： @JsonFormat(timezone = “GMT+8”, pattern = “yyyy-MM-dd HH:mm” public Date getBirthDate()</td>
-</tr>
-<tr>
-<td>@JsonPropertyOrder</td>
-<td>用于类， 指定属性在序列化时 json 中的顺序 ， 示例： @JsonPropertyOrder({ “birth_Date”, “name” }) public class Person</td>
-</tr>
-<tr>
-<td>@JsonCreator</td>
-<td>用于构造方法，和 @JsonProperty 配合使用，适用有参数的构造方法。 示例： @JsonCreator public Person(@JsonProperty(“name”)String name) {…}</td>
-</tr>
-<tr>
-<td>@JsonAnySetter</td>
-<td>用于属性或者方法，设置未反序列化的属性名和值作为键值存储到 map 中 @JsonAnySetter public void set(String key, Object value) { map.put(key, value); }</td>
-</tr>
-<tr>
-<td>@JsonIgnoreProperties</td>
-<td>此注解是类注解，作用是json序列化时将java bean中的一些属性忽略掉，序列化和反序列化都受影响。 写法将此标签加在model 类的类名上 ，可以多个属性也可以单个属性</td>
-</tr>
-<tr>
-<td>@JsonIgnore</td>
-<td>用于属性或者方法上（最好是属性上），作用和上面的@JsonIgnoreProperties一样。</td>
-</tr>
-<tr>
-<td>@JsonSerialize</td>
-<td>用于属性或者getter方法上，用于在序列化时嵌入我们自定义的代码，比如序列化一个double时在其后面限制两位小数点。</td>
-</tr>
-<tr>
-<td>@JsonDeserialize</td>
-<td>用于属性或者setter方法上，用于在反序列化时可以嵌入我们自定义的代码，类似于上面的@JsonSerialize</td>
-</tr>
-<tr>
-<td>@Transient</td>
-<td>如果一个属性并非数据库表的字段映射，就务必将其标示为@Transient，否则ORM框架默认其注解为@Basic；</td>
-</tr>
-</tbody></table>
-<p>注： @JsonIgnore vs @Transient -difference?</p>
-<img src="/2020/07/10/Jackson%E7%9A%84%E4%BD%BF%E7%94%A8/jack.png" class="" title="@JsonIgnore vs @Transient">
-
-<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://www.yiibai.com/jackson" target="_blank" rel="noopener">https://www.yiibai.com/jackson</a></p>
-<p><a href="https://developer.ibm.com/zh/articles/jackson-advanced-application/" target="_blank" rel="noopener">https://developer.ibm.com/zh/articles/jackson-advanced-application/</a></p>
-<p><a href="https://blog.csdn.net/u012373815/article/details/52266609" target="_blank" rel="noopener">https://blog.csdn.net/u012373815/article/details/52266609</a></p>
-<p><a href="https://stackoverflow.com/questions/29762328/jsonignore-vs-transient-difference/29762521#29762521?newreg=585c962710714560b6c3079b4b37850a" target="_blank" rel="noopener">https://stackoverflow.com/questions/29762328/jsonignore-vs-transient-difference/29762521#29762521?newreg=585c962710714560b6c3079b4b37850a</a></p>
-]]></content>
-  </entry>
-  <entry>
     <title>ControllerAdvice和ErrorController的用法</title>
     <url>/2020/07/14/ControllerAdvice%E5%92%8CErrorController%E7%9A%84%E7%94%A8%E6%B3%95/</url>
     <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>在Java中异常可以分为Error和Exception，<strong>@ControllerAdvice</strong>用来处理系统中的<strong>Exception</strong>，<strong>Error</strong>Controller处理系统中的<strong>Error</strong>。</p>
@@ -154,6 +76,84 @@
 
 <p>善用上述调试技巧，相当大家撸起代码来会更有感觉，祝大家端午节愉快！</p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://www.cnblogs.com/jun1019/p/9741224.html" target="_blank" rel="noopener">https://www.cnblogs.com/jun1019/p/9741224.html</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Jackson的使用</title>
+    <url>/2020/07/10/Jackson%E7%9A%84%E4%BD%BF%E7%94%A8/</url>
+    <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>最近公司的竞技场项目中使用了jackson来进行java对象和json的相互转换</p>
+<p>下面来介绍一下jackson的简单使用</p>
+<a id="more"></a>
+
+<h2 id="引入依赖"><a href="#引入依赖" class="headerlink" title="引入依赖"></a>引入依赖</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;com.fasterxml.jackson.core&lt;&#x2F;groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;jackson-core&lt;&#x2F;artifactId&gt;</span><br><span class="line">    &lt;version&gt;2.9.6&lt;&#x2F;version&gt;</span><br><span class="line">&lt;&#x2F;dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="简单使用"><a href="#简单使用" class="headerlink" title="简单使用"></a>简单使用</h2><h3 id="第1步：创建ObjectMapper对象"><a href="#第1步：创建ObjectMapper对象" class="headerlink" title="第1步：创建ObjectMapper对象"></a>第1步：创建ObjectMapper对象</h3><p>创建ObjectMapper对象。它是一个可重复使用的对象。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">ObjectMapper mapper = <span class="keyword">new</span> ObjectMapper();</span><br></pre></td></tr></table></figure>
+
+<h3 id="第2步：反序列化JSON到对象"><a href="#第2步：反序列化JSON到对象" class="headerlink" title="第2步：反序列化JSON到对象"></a>第2步：反序列化JSON到对象</h3><p>从JSON对象使用readValue()方法来获取。通过JSON字符串和对象类型作为参数JSON字符串/来源。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//Object to JSON Conversion</span></span><br><span class="line">Student student = mapper.readValue(jsonString, Student<span class="class">.<span class="keyword">class</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="第3步：序列化对象到JSON"><a href="#第3步：序列化对象到JSON" class="headerlink" title="第3步：序列化对象到JSON"></a>第3步：序列化对象到JSON</h3><p>使用writeValueAsString()方法来获取对象的JSON字符串表示。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//Object to JSON Conversion		</span></span><br><span class="line">jsonString = mapper.writeValueAsString(student);</span><br></pre></td></tr></table></figure>
+
+<h2 id="信息配置-对mapper的设置"><a href="#信息配置-对mapper的设置" class="headerlink" title="信息配置 对mapper的设置"></a>信息配置 对mapper的设置</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//在反序列化时忽略在 json 中存在但 Java 对象不存在的属性</span></span><br><span class="line">mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,</span><br><span class="line">   <span class="keyword">false</span>);</span><br><span class="line"><span class="comment">//在序列化时日期格式默认为 yyyy-MM-dd'T'HH:mm:ss.SSSZ</span></span><br><span class="line">mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,<span class="keyword">false</span>)</span><br><span class="line"><span class="comment">//在序列化时忽略值为 null 的属性</span></span><br><span class="line">mapper.setSerializationInclusion(Include.NON_NULL);</span><br><span class="line"><span class="comment">//忽略值为默认值的属性</span></span><br><span class="line">mapper.setDefaultPropertyInclusion(Include.NON_DEFAULT);</span><br></pre></td></tr></table></figure>
+
+<h2 id="Jackson的注解的使用"><a href="#Jackson的注解的使用" class="headerlink" title="Jackson的注解的使用"></a>Jackson的注解的使用</h2><p>Jackson的常用注解</p>
+<table>
+<thead>
+<tr>
+<th>注解</th>
+<th>用法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>@JsonProperty</td>
+<td>用于属性，把属性的名称序列化时转换为另外一个名称。示例： @JsonProperty(“birth_ d ate”) private Date birthDate;</td>
+</tr>
+<tr>
+<td>@JsonFormat</td>
+<td>用于属性或者方法，把属性的格式序列化时转换成指定的格式。示例： @JsonFormat(timezone = “GMT+8”, pattern = “yyyy-MM-dd HH:mm” public Date getBirthDate()</td>
+</tr>
+<tr>
+<td>@JsonPropertyOrder</td>
+<td>用于类， 指定属性在序列化时 json 中的顺序 ， 示例： @JsonPropertyOrder({ “birth_Date”, “name” }) public class Person</td>
+</tr>
+<tr>
+<td>@JsonCreator</td>
+<td>用于构造方法，和 @JsonProperty 配合使用，适用有参数的构造方法。 示例： @JsonCreator public Person(@JsonProperty(“name”)String name) {…}</td>
+</tr>
+<tr>
+<td>@JsonAnySetter</td>
+<td>用于属性或者方法，设置未反序列化的属性名和值作为键值存储到 map 中 @JsonAnySetter public void set(String key, Object value) { map.put(key, value); }</td>
+</tr>
+<tr>
+<td>@JsonIgnoreProperties</td>
+<td>此注解是类注解，作用是json序列化时将java bean中的一些属性忽略掉，序列化和反序列化都受影响。 写法将此标签加在model 类的类名上 ，可以多个属性也可以单个属性</td>
+</tr>
+<tr>
+<td>@JsonIgnore</td>
+<td>用于属性或者方法上（最好是属性上），作用和上面的@JsonIgnoreProperties一样。</td>
+</tr>
+<tr>
+<td>@JsonSerialize</td>
+<td>用于属性或者getter方法上，用于在序列化时嵌入我们自定义的代码，比如序列化一个double时在其后面限制两位小数点。</td>
+</tr>
+<tr>
+<td>@JsonDeserialize</td>
+<td>用于属性或者setter方法上，用于在反序列化时可以嵌入我们自定义的代码，类似于上面的@JsonSerialize</td>
+</tr>
+<tr>
+<td>@Transient</td>
+<td>如果一个属性并非数据库表的字段映射，就务必将其标示为@Transient，否则ORM框架默认其注解为@Basic；</td>
+</tr>
+</tbody></table>
+<p>注： @JsonIgnore vs @Transient -difference?</p>
+<img src="/2020/07/10/Jackson%E7%9A%84%E4%BD%BF%E7%94%A8/jack.png" class="" title="@JsonIgnore vs @Transient">
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://www.yiibai.com/jackson" target="_blank" rel="noopener">https://www.yiibai.com/jackson</a></p>
+<p><a href="https://developer.ibm.com/zh/articles/jackson-advanced-application/" target="_blank" rel="noopener">https://developer.ibm.com/zh/articles/jackson-advanced-application/</a></p>
+<p><a href="https://blog.csdn.net/u012373815/article/details/52266609" target="_blank" rel="noopener">https://blog.csdn.net/u012373815/article/details/52266609</a></p>
+<p><a href="https://stackoverflow.com/questions/29762328/jsonignore-vs-transient-difference/29762521#29762521?newreg=585c962710714560b6c3079b4b37850a" target="_blank" rel="noopener">https://stackoverflow.com/questions/29762328/jsonignore-vs-transient-difference/29762521#29762521?newreg=585c962710714560b6c3079b4b37850a</a></p>
 ]]></content>
   </entry>
   <entry>
@@ -238,6 +238,30 @@
 
 <p>下载的文件效果：</p>
 <img src="/2020/07/01/Java%E4%BD%BF%E7%94%A8iTextPDF%E7%94%9F%E6%88%90PDF%E6%96%87%E4%BB%B6/download_file.png" class="" title="download_file">]]></content>
+  </entry>
+  <entry>
+    <title>Java自定义注解</title>
+    <url>/2020/05/03/Java%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B3%A8%E8%A7%A3/</url>
+    <content><![CDATA[<p>最近看项目代码的时候看到了前辈们的写的自定义注解，决定深入的学习一下自定义注解相关的知识。</p>
+<h2 id="1-注解知识介绍"><a href="#1-注解知识介绍" class="headerlink" title="1 注解知识介绍"></a>1 注解知识介绍</h2><h3 id="1-1-注解的定义"><a href="#1-1-注解的定义" class="headerlink" title="1.1 注解的定义"></a>1.1 注解的定义</h3><p>一般在项目中声明在annotation包中，声明用@interface表示</p>
+<a id="more"></a>
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> BussinessLog &#123;</span><br><span class="line">	.........</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="1-2-元注解介绍"><a href="#1-2-元注解介绍" class="headerlink" title="1.2 元注解介绍"></a>1.2 元注解介绍</h3><p>元注解的作用就是负责注解其他注解。<br>常见的有四种注解：</p>
+<h4 id="1-2-1-Inherited"><a href="#1-2-1-Inherited" class="headerlink" title="1.2.1 @Inherited"></a>1.2.1 @Inherited</h4><p> @Inherited 元注解是一个标记注解，@Inherited阐述了某个被标注的类型是被继承的。<br> 比如，注解 Test 被 @Inherited 修饰，之后类 A 被 Test 注解，类 B 继承 A,类 B 也拥有 Test 这个注解。</p>
+<h4 id="1-2-2-Retention"><a href="#1-2-2-Retention" class="headerlink" title="1.2.2 @Retention"></a>1.2.2 @Retention</h4><p> 用来说明该注解类的生命周期。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.SOURCE) </span><br><span class="line"> <span class="comment">//注解只在源码阶段保留，在编译器完整编译之后，它将被丢弃忽视</span></span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.CLASS) </span><br><span class="line"> <span class="comment">//默认，注解只被保留到编译进行的时候，它并不会被加载到 JVM 中</span></span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)  </span><br><span class="line"> <span class="comment">//注解可以保留到程序运行的时候，它会被加载进入到 JVM 中，所以在程序运行时可以获取到它们，大部分的注解都是 RUNTIME 的生命周期。</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-2-3-Target"><a href="#1-2-3-Target" class="headerlink" title="1.2.3 @Target"></a>1.2.3 @Target</h4><p> 表明注解的作用目标</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Target</span>(ElementType.TYPE)                          <span class="comment">// 接口、类、枚举、注解</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.FIELD)                         <span class="comment">// 字段、枚举的常量</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.METHOD)                        <span class="comment">// 方法</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.PARAMETER)                     <span class="comment">// 方法参数</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.CONSTRUCTOR)                   <span class="comment">// 构造函数</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.LOCAL_VARIABLE)                <span class="comment">// 局部变量</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.ANNOTATION_TYPE)               <span class="comment">// 注解</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.PACKAGE)                       <span class="comment">// 包</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-2-4-Document"><a href="#1-2-4-Document" class="headerlink" title="1.2.4 @Document"></a>1.2.4 @Document</h4><p>@Documented 是一个简单的标记注解，表示是否将注解信息添加在 Java 文档，即 Javadoc 中。</p>
+<h3 id="1-3-注解的属性"><a href="#1-3-注解的属性" class="headerlink" title="1.3 注解的属性"></a>1.3 注解的属性</h3><p>可以查看@RequestMapping的源码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Target</span>(&#123;ElementType.METHOD, ElementType.TYPE&#125;)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Mapping</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> RequestMapping &#123;</span><br><span class="line">    <span class="function">String <span class="title">name</span><span class="params">()</span> <span class="keyword">default</span> ""</span>;</span><br><span class="line">    <span class="meta">@AliasFor</span>(<span class="string">"path"</span>)</span><br><span class="line">    String[] value() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">    <span class="meta">@AliasFor</span>(<span class="string">"value"</span>)</span><br><span class="line">    String[] path() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">    RequestMethod[] method() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">    String[] params() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">    String[] headers() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">    String[] consumes() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">    String[] produces() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注解的属性也叫做成员变量。注解只有<strong>成员变量</strong>，没有方法。注解的成员变量在注解的定义中以无形参的方法形式来声明，其方法名定义了该成员变量的名字，其返回值定义了该成员变量的类型。<br>注解可以有默认值，需要用 <strong>default</strong> 关键字指定</p>
+<h2 id="2-自定义注解示例"><a href="#2-自定义注解示例" class="headerlink" title="2 自定义注解示例"></a>2 自定义注解示例</h2><p>自定义@permission注解</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 权限注解 用于检查权限 规定访问权限</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@example</span> <span class="doctag">@Permission</span>(&#123;role1,role2&#125;)</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@example</span> <span class="doctag">@Permission</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Inherited</span></span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Target</span>(&#123;ElementType.METHOD&#125;)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Permission &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * &lt;p&gt;角色英文名称&lt;/p&gt;</span></span><br><span class="line"><span class="comment">     * &lt;p&gt;使用注解时加上这个值表示限制只有某个角色的才可以访问对应的资源&lt;/p&gt;</span></span><br><span class="line"><span class="comment">     * &lt;p&gt;常用在某些资源限制只有超级管理员角色才可访问&lt;/p&gt;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    String[] value() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="3-注解的使用"><a href="#3-注解的使用" class="headerlink" title="3 注解的使用"></a>3 注解的使用</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Permission</span>(Const.ADMIN_NAME)</span><br><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/edit"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Tip <span class="title">edit</span><span class="params">(BindingResult result)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (result.hasErrors()) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> GunsException(ExceptionEnum.REQUEST_NULL);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">this</span>.menuService.updateById(menu);</span><br><span class="line">    <span class="keyword">return</span> SUCCESS_TIP;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
   </entry>
   <entry>
     <title>Java异常处理的十条建议</title>
@@ -343,40 +367,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>Java编写单词小游戏</title>
-    <url>/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/</url>
-    <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>公司最近有一个竞技场项目，里面有一个单词小游戏。</p>
-<p>游戏大概就是随机生成一个5*5的棋盘，上面有单词的字母，通过滑动连出正确的单词。</p>
-<h2 id="棋盘生成算法"><a href="#棋盘生成算法" class="headerlink" title="棋盘生成算法"></a>棋盘生成算法</h2><h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>首先随机选个一个起点，从这个点开始铺单词。</p>
-<p>分别选取上下左右四个方向作为下一个字母的摆放位置，不能触边也不能走重复路，直到平铺完所有的单词。</p>
-<p>如果在棋盘能平铺下单词的情况下，找不到路径，就从四个角作为起点，必能找到路径。</p>
-<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Wang Guolong</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@version</span> 1.0</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2020/7/31 5:50 下午</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GenerateWordBoard</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">char</span>[][] board;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        GenerateWordBoard g = <span class="keyword">new</span> GenerateWordBoard();</span><br><span class="line">        g.generateCharBoard(<span class="string">"vocabulary"</span>, <span class="number">5</span>, <span class="number">5</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">generateCharBoard</span><span class="params">(String word, <span class="keyword">int</span> m, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 单词为空 直接返回</span></span><br><span class="line">        <span class="keyword">if</span> (word.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 单词长度大于棋盘 铺不下 直接返回</span></span><br><span class="line">        <span class="keyword">if</span> (word.length() &gt; m * n) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 初始化棋盘 全为*</span></span><br><span class="line">        initBoard(m, n);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">char</span>[] wordChar = word.toCharArray();</span><br><span class="line">        <span class="comment">// 随机选取一个位置开始</span></span><br><span class="line">        Random random = <span class="keyword">new</span> Random();</span><br><span class="line">        <span class="keyword">int</span> randomX = random.nextInt(m);</span><br><span class="line">        <span class="keyword">int</span> randomY = random.nextInt(n);</span><br><span class="line">        <span class="comment">// 开始从随机位置dfs铺单词 从index 0 开始</span></span><br><span class="line">        <span class="keyword">boolean</span> result = generateDfs(board, wordChar, randomX, randomY, <span class="number">0</span>);</span><br><span class="line">        <span class="comment">// 如果没有找到路线 那么从四个角开始 必能找到一条路</span></span><br><span class="line">        <span class="keyword">if</span> (!result) &#123;</span><br><span class="line">            List&lt;<span class="keyword">int</span>[]&gt; starts = Arrays.asList(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, <span class="number">0</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, n - <span class="number">1</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;m - <span class="number">1</span>, <span class="number">0</span>&#125;,</span><br><span class="line">                    <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;m - <span class="number">1</span>, n - <span class="number">1</span>&#125;);</span><br><span class="line">            <span class="comment">// 随机四个角的一个</span></span><br><span class="line">            Collections.shuffle(starts);</span><br><span class="line">            <span class="comment">// 初始化棋盘</span></span><br><span class="line">            initBoard(m, n);</span><br><span class="line">            <span class="comment">// dfs铺单词</span></span><br><span class="line">            generateDfs(board, wordChar, starts.get(<span class="number">0</span>)[<span class="number">0</span>], starts.get(<span class="number">0</span>)[<span class="number">1</span>], <span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 查看结果</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; board.length; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; board[<span class="number">0</span>].length; j++) &#123;</span><br><span class="line">                System.out.print(board[i][j] + <span class="string">"  "</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initBoard</span><span class="params">(<span class="keyword">int</span> m, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 初始化</span></span><br><span class="line">        board = <span class="keyword">new</span> <span class="keyword">char</span>[m][n];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; board.length; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; board[<span class="number">0</span>].length; j++) &#123;</span><br><span class="line">                board[i][j] = <span class="string">'*'</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 返回true则为找到一条路 返回false为死路</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">generateDfs</span><span class="params">(<span class="keyword">char</span>[][] board, <span class="keyword">char</span>[] wordChar, <span class="keyword">int</span> i, <span class="keyword">int</span> j, <span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 碰到边 或者碰到已经走过的位置 不能走了 死路</span></span><br><span class="line">        <span class="keyword">if</span> (i &gt;= board.length || i &lt; <span class="number">0</span> || j &gt;= board[<span class="number">0</span>].length || j &lt; <span class="number">0</span> || board[i][j] == <span class="string">'/'</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 摆放一个字母</span></span><br><span class="line">        board[i][j] = wordChar[index];</span><br><span class="line"></span><br><span class="line">        <span class="comment">//如果已经达到单词长度则直接返回 找到一条路</span></span><br><span class="line">        <span class="keyword">if</span> (index == wordChar.length - <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 记录当前矩阵元素</span></span><br><span class="line">        <span class="keyword">char</span> tmp = board[i][j];</span><br><span class="line">        <span class="comment">// 修改为/ 表示已经访问过</span></span><br><span class="line">        board[i][j] = <span class="string">'/'</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 向上下左右四个方向开启递归</span></span><br><span class="line">        <span class="comment">// 查看能走几个方向 随机选择一个</span></span><br><span class="line">        List&lt;<span class="keyword">int</span>[]&gt; directions = Arrays.asList(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;-<span class="number">1</span>, <span class="number">0</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">1</span>, <span class="number">0</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, -<span class="number">1</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, <span class="number">1</span>&#125;);</span><br><span class="line">        Collections.shuffle(directions);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> res = <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; directions.size(); k++) &#123;</span><br><span class="line">            <span class="keyword">int</span> di = i + directions.get(k)[<span class="number">0</span>], dj = j + directions.get(k)[<span class="number">1</span>];</span><br><span class="line">            <span class="keyword">boolean</span> partialRes = generateDfs(board, wordChar, di, dj, index + <span class="number">1</span>);</span><br><span class="line">            <span class="keyword">if</span> (k == <span class="number">0</span>) &#123;</span><br><span class="line">                res = partialRes;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                res = res || partialRes;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 如果res为true 说明找到一条路 就不再遍历了 还原后返回true</span></span><br><span class="line">            <span class="keyword">if</span> (res) &#123;</span><br><span class="line">                <span class="comment">// 还原矩阵元素</span></span><br><span class="line">                board[i][j] = tmp;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 还原矩阵元素</span></span><br><span class="line">        board[i][j] = tmp;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
-  </entry>
-  <entry>
-    <title>Java自定义注解</title>
-    <url>/2020/05/03/Java%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B3%A8%E8%A7%A3/</url>
-    <content><![CDATA[<p>最近看项目代码的时候看到了前辈们的写的自定义注解，决定深入的学习一下自定义注解相关的知识。</p>
-<h2 id="1-注解知识介绍"><a href="#1-注解知识介绍" class="headerlink" title="1 注解知识介绍"></a>1 注解知识介绍</h2><h3 id="1-1-注解的定义"><a href="#1-1-注解的定义" class="headerlink" title="1.1 注解的定义"></a>1.1 注解的定义</h3><p>一般在项目中声明在annotation包中，声明用@interface表示</p>
-<a id="more"></a>
-
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> BussinessLog &#123;</span><br><span class="line">	.........</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="1-2-元注解介绍"><a href="#1-2-元注解介绍" class="headerlink" title="1.2 元注解介绍"></a>1.2 元注解介绍</h3><p>元注解的作用就是负责注解其他注解。<br>常见的有四种注解：</p>
-<h4 id="1-2-1-Inherited"><a href="#1-2-1-Inherited" class="headerlink" title="1.2.1 @Inherited"></a>1.2.1 @Inherited</h4><p> @Inherited 元注解是一个标记注解，@Inherited阐述了某个被标注的类型是被继承的。<br> 比如，注解 Test 被 @Inherited 修饰，之后类 A 被 Test 注解，类 B 继承 A,类 B 也拥有 Test 这个注解。</p>
-<h4 id="1-2-2-Retention"><a href="#1-2-2-Retention" class="headerlink" title="1.2.2 @Retention"></a>1.2.2 @Retention</h4><p> 用来说明该注解类的生命周期。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.SOURCE) </span><br><span class="line"> <span class="comment">//注解只在源码阶段保留，在编译器完整编译之后，它将被丢弃忽视</span></span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.CLASS) </span><br><span class="line"> <span class="comment">//默认，注解只被保留到编译进行的时候，它并不会被加载到 JVM 中</span></span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)  </span><br><span class="line"> <span class="comment">//注解可以保留到程序运行的时候，它会被加载进入到 JVM 中，所以在程序运行时可以获取到它们，大部分的注解都是 RUNTIME 的生命周期。</span></span><br></pre></td></tr></table></figure>
-<h4 id="1-2-3-Target"><a href="#1-2-3-Target" class="headerlink" title="1.2.3 @Target"></a>1.2.3 @Target</h4><p> 表明注解的作用目标</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Target</span>(ElementType.TYPE)                          <span class="comment">// 接口、类、枚举、注解</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.FIELD)                         <span class="comment">// 字段、枚举的常量</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.METHOD)                        <span class="comment">// 方法</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.PARAMETER)                     <span class="comment">// 方法参数</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.CONSTRUCTOR)                   <span class="comment">// 构造函数</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.LOCAL_VARIABLE)                <span class="comment">// 局部变量</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.ANNOTATION_TYPE)               <span class="comment">// 注解</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.PACKAGE)                       <span class="comment">// 包</span></span><br></pre></td></tr></table></figure>
-<h4 id="1-2-4-Document"><a href="#1-2-4-Document" class="headerlink" title="1.2.4 @Document"></a>1.2.4 @Document</h4><p>@Documented 是一个简单的标记注解，表示是否将注解信息添加在 Java 文档，即 Javadoc 中。</p>
-<h3 id="1-3-注解的属性"><a href="#1-3-注解的属性" class="headerlink" title="1.3 注解的属性"></a>1.3 注解的属性</h3><p>可以查看@RequestMapping的源码：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Target</span>(&#123;ElementType.METHOD, ElementType.TYPE&#125;)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Mapping</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> RequestMapping &#123;</span><br><span class="line">    <span class="function">String <span class="title">name</span><span class="params">()</span> <span class="keyword">default</span> ""</span>;</span><br><span class="line">    <span class="meta">@AliasFor</span>(<span class="string">"path"</span>)</span><br><span class="line">    String[] value() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">    <span class="meta">@AliasFor</span>(<span class="string">"value"</span>)</span><br><span class="line">    String[] path() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">    RequestMethod[] method() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">    String[] params() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">    String[] headers() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">    String[] consumes() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">    String[] produces() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>注解的属性也叫做成员变量。注解只有<strong>成员变量</strong>，没有方法。注解的成员变量在注解的定义中以无形参的方法形式来声明，其方法名定义了该成员变量的名字，其返回值定义了该成员变量的类型。<br>注解可以有默认值，需要用 <strong>default</strong> 关键字指定</p>
-<h2 id="2-自定义注解示例"><a href="#2-自定义注解示例" class="headerlink" title="2 自定义注解示例"></a>2 自定义注解示例</h2><p>自定义@permission注解</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 权限注解 用于检查权限 规定访问权限</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@example</span> <span class="doctag">@Permission</span>(&#123;role1,role2&#125;)</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@example</span> <span class="doctag">@Permission</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Inherited</span></span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Target</span>(&#123;ElementType.METHOD&#125;)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Permission &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * &lt;p&gt;角色英文名称&lt;/p&gt;</span></span><br><span class="line"><span class="comment">     * &lt;p&gt;使用注解时加上这个值表示限制只有某个角色的才可以访问对应的资源&lt;/p&gt;</span></span><br><span class="line"><span class="comment">     * &lt;p&gt;常用在某些资源限制只有超级管理员角色才可访问&lt;/p&gt;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    String[] value() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="3-注解的使用"><a href="#3-注解的使用" class="headerlink" title="3 注解的使用"></a>3 注解的使用</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Permission</span>(Const.ADMIN_NAME)</span><br><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/edit"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Tip <span class="title">edit</span><span class="params">(BindingResult result)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (result.hasErrors()) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> GunsException(ExceptionEnum.REQUEST_NULL);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">this</span>.menuService.updateById(menu);</span><br><span class="line">    <span class="keyword">return</span> SUCCESS_TIP;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-]]></content>
-  </entry>
-  <entry>
     <title>Java面试常见问题-1</title>
     <url>/2020/05/04/Java%E9%9D%A2%E8%AF%95%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98-1/</url>
     <content><![CDATA[<h2 id="1-String-StringBuilder-StringBuffer区别"><a href="#1-String-StringBuilder-StringBuffer区别" class="headerlink" title="1. String, StringBuilder, StringBuffer区别"></a>1. String, StringBuilder, StringBuffer区别</h2><p>这三个类的主要区别在两个方面：<strong>运算速度</strong>（运算性能或执行效率）和<strong>线程安全性</strong>。</p>
@@ -436,6 +426,18 @@
 <li>@Transactional(propagation=Propagation.SUPPORTS)<br>如果其他bean调用这个方法,在其他bean中声明事务,那就用事务.如果其他bean没有声明事务,那就不用事务.</li>
 </ul>
 ]]></content>
+  </entry>
+  <entry>
+    <title>Java编写单词小游戏</title>
+    <url>/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/</url>
+    <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>公司最近有一个竞技场项目，里面有一个单词小游戏。</p>
+<p>游戏大概就是随机生成一个5*5的棋盘，上面有单词的字母，通过滑动连出正确的单词。</p>
+<a id="more"></a>
+
+<h2 id="棋盘生成算法"><a href="#棋盘生成算法" class="headerlink" title="棋盘生成算法"></a>棋盘生成算法</h2><h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>首先随机选个一个起点，从这个点开始铺单词。</p>
+<p>分别选取上下左右四个方向作为下一个字母的摆放位置，不能触边也不能走重复路，直到平铺完所有的单词。</p>
+<p>如果在棋盘能平铺下单词的情况下，找不到路径，就从四个角作为起点，必能找到路径。</p>
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Wang Guolong</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@version</span> 1.0</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2020/7/31 5:50 下午</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GenerateWordBoard</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">char</span>[][] board;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        GenerateWordBoard g = <span class="keyword">new</span> GenerateWordBoard();</span><br><span class="line">        g.generateCharBoard(<span class="string">"vocabulary"</span>, <span class="number">5</span>, <span class="number">5</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">generateCharBoard</span><span class="params">(String word, <span class="keyword">int</span> m, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 单词为空 直接返回</span></span><br><span class="line">        <span class="keyword">if</span> (word.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 单词长度大于棋盘 铺不下 直接返回</span></span><br><span class="line">        <span class="keyword">if</span> (word.length() &gt; m * n) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 初始化棋盘 全为*</span></span><br><span class="line">        initBoard(m, n);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">char</span>[] wordChar = word.toCharArray();</span><br><span class="line">        <span class="comment">// 随机选取一个位置开始</span></span><br><span class="line">        Random random = <span class="keyword">new</span> Random();</span><br><span class="line">        <span class="keyword">int</span> randomX = random.nextInt(m);</span><br><span class="line">        <span class="keyword">int</span> randomY = random.nextInt(n);</span><br><span class="line">        <span class="comment">// 开始从随机位置dfs铺单词 从index 0 开始</span></span><br><span class="line">        <span class="keyword">boolean</span> result = generateDfs(board, wordChar, randomX, randomY, <span class="number">0</span>);</span><br><span class="line">        <span class="comment">// 如果没有找到路线 那么从四个角开始 必能找到一条路</span></span><br><span class="line">        <span class="keyword">if</span> (!result) &#123;</span><br><span class="line">            List&lt;<span class="keyword">int</span>[]&gt; starts = Arrays.asList(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, <span class="number">0</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, n - <span class="number">1</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;m - <span class="number">1</span>, <span class="number">0</span>&#125;,</span><br><span class="line">                    <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;m - <span class="number">1</span>, n - <span class="number">1</span>&#125;);</span><br><span class="line">            <span class="comment">// 随机四个角的一个</span></span><br><span class="line">            Collections.shuffle(starts);</span><br><span class="line">            <span class="comment">// 初始化棋盘</span></span><br><span class="line">            initBoard(m, n);</span><br><span class="line">            <span class="comment">// dfs铺单词</span></span><br><span class="line">            generateDfs(board, wordChar, starts.get(<span class="number">0</span>)[<span class="number">0</span>], starts.get(<span class="number">0</span>)[<span class="number">1</span>], <span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 查看结果</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; board.length; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; board[<span class="number">0</span>].length; j++) &#123;</span><br><span class="line">                System.out.print(board[i][j] + <span class="string">"  "</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initBoard</span><span class="params">(<span class="keyword">int</span> m, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 初始化</span></span><br><span class="line">        board = <span class="keyword">new</span> <span class="keyword">char</span>[m][n];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; board.length; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; board[<span class="number">0</span>].length; j++) &#123;</span><br><span class="line">                board[i][j] = <span class="string">'*'</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 返回true则为找到一条路 返回false为死路</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">generateDfs</span><span class="params">(<span class="keyword">char</span>[][] board, <span class="keyword">char</span>[] wordChar, <span class="keyword">int</span> i, <span class="keyword">int</span> j, <span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 碰到边 或者碰到已经走过的位置 不能走了 死路</span></span><br><span class="line">        <span class="keyword">if</span> (i &gt;= board.length || i &lt; <span class="number">0</span> || j &gt;= board[<span class="number">0</span>].length || j &lt; <span class="number">0</span> || board[i][j] == <span class="string">'/'</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 摆放一个字母</span></span><br><span class="line">        board[i][j] = wordChar[index];</span><br><span class="line"></span><br><span class="line">        <span class="comment">//如果已经达到单词长度则直接返回 找到一条路</span></span><br><span class="line">        <span class="keyword">if</span> (index == wordChar.length - <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 记录当前矩阵元素</span></span><br><span class="line">        <span class="keyword">char</span> tmp = board[i][j];</span><br><span class="line">        <span class="comment">// 修改为/ 表示已经访问过</span></span><br><span class="line">        board[i][j] = <span class="string">'/'</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 向上下左右四个方向开启递归</span></span><br><span class="line">        <span class="comment">// 查看能走几个方向 随机选择一个</span></span><br><span class="line">        List&lt;<span class="keyword">int</span>[]&gt; directions = Arrays.asList(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;-<span class="number">1</span>, <span class="number">0</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">1</span>, <span class="number">0</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, -<span class="number">1</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, <span class="number">1</span>&#125;);</span><br><span class="line">        Collections.shuffle(directions);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> res = <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; directions.size(); k++) &#123;</span><br><span class="line">            <span class="keyword">int</span> di = i + directions.get(k)[<span class="number">0</span>], dj = j + directions.get(k)[<span class="number">1</span>];</span><br><span class="line">            <span class="keyword">boolean</span> partialRes = generateDfs(board, wordChar, di, dj, index + <span class="number">1</span>);</span><br><span class="line">            <span class="keyword">if</span> (k == <span class="number">0</span>) &#123;</span><br><span class="line">                res = partialRes;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                res = res || partialRes;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 如果res为true 说明找到一条路 就不再遍历了 还原后返回true</span></span><br><span class="line">            <span class="keyword">if</span> (res) &#123;</span><br><span class="line">                <span class="comment">// 还原矩阵元素</span></span><br><span class="line">                board[i][j] = tmp;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 还原矩阵元素</span></span><br><span class="line">        board[i][j] = tmp;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
   </entry>
   <entry>
     <title>Java面试常见问题-2</title>
@@ -761,6 +763,20 @@
 ]]></content>
   </entry>
   <entry>
+    <title>SpringBoot实现通过url下载pdf到本地</title>
+    <url>/2020/06/06/SpringBoot%E5%AE%9E%E7%8E%B0%E9%80%9A%E8%BF%87url%E4%B8%8B%E8%BD%BDpdf%E5%88%B0%E6%9C%AC%E5%9C%B0/</url>
+    <content><![CDATA[<p>最近有需求是点击下载按钮后下载指定url的pdf文件到本地</p>
+<p>下面通过<strong>SpringBoot</strong>来实现一下：</p>
+<a id="more"></a>
+
+<h4 id="思路就是："><a href="#思路就是：" class="headerlink" title="思路就是："></a><strong>思路</strong>就是：</h4><ol>
+<li>解析url，建立连接获取输入流</li>
+<li>copy输入流到输出流中，进行相关设置并返回</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@GetMapping</span>(<span class="string">"/download"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">download</span><span class="params">(@RequestParam(<span class="string">"url"</span>)</span> String urlStr, HttpServletResponse response) <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        URL url = <span class="keyword">new</span> URL(urlStr);</span><br><span class="line">        HttpURLConnection conn = (HttpURLConnection)url.openConnection();</span><br><span class="line">        <span class="comment">//设置超时间为5秒</span></span><br><span class="line"><span class="comment">//        conn.setConnectTimeout(5*1000);</span></span><br><span class="line">        <span class="comment">//防止屏蔽程序抓取而返回403错误</span></span><br><span class="line">        conn.setRequestProperty(<span class="string">"User-Agent"</span>, <span class="string">"Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)"</span>);</span><br><span class="line">        <span class="keyword">try</span>(InputStream inputStream = conn.getInputStream();</span><br><span class="line">            OutputStream outputStream = response.getOutputStream();) &#123;</span><br><span class="line">            response.setContentType(<span class="string">"application/x-download"</span>);</span><br><span class="line">            response.addHeader(<span class="string">"Content-Disposition"</span>, <span class="string">"attachment;filename=test.pdf"</span>);</span><br><span class="line">            <span class="comment">// 将输入流拷贝到输出流中</span></span><br><span class="line">            IOUtils.copy(inputStream, outputStream);</span><br><span class="line">            outputStream.flush();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+  </entry>
+  <entry>
     <title>SpringBoot整合Redis并用Redis实现定时任务</title>
     <url>/2020/07/02/SpringBoot%E6%95%B4%E5%90%88Redis%E5%B9%B6%E7%94%A8Redis%E5%AE%9E%E7%8E%B0%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/</url>
     <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>Redis是一种可基于内存也可基于持久话的日志型、key-value数据库。因为性能高，存储数据类型丰富等优势常被用作数据缓存。</p>
@@ -798,39 +814,6 @@
 
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://segmentfault.com/a/1190000020906185" target="_blank" rel="noopener">https://segmentfault.com/a/1190000020906185</a></p>
 <p><a href="https://www.zhangjava.com/%E4%BD%BF%E7%94%A8Redis%E5%AE%8C%E6%88%90%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/" target="_blank" rel="noopener">https://www.zhangjava.com/%E4%BD%BF%E7%94%A8Redis%E5%AE%8C%E6%88%90%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>SpringBoot实现通过url下载pdf到本地</title>
-    <url>/2020/06/06/SpringBoot%E5%AE%9E%E7%8E%B0%E9%80%9A%E8%BF%87url%E4%B8%8B%E8%BD%BDpdf%E5%88%B0%E6%9C%AC%E5%9C%B0/</url>
-    <content><![CDATA[<p>最近有需求是点击下载按钮后下载指定url的pdf文件到本地</p>
-<p>下面通过<strong>SpringBoot</strong>来实现一下：</p>
-<a id="more"></a>
-
-<h4 id="思路就是："><a href="#思路就是：" class="headerlink" title="思路就是："></a><strong>思路</strong>就是：</h4><ol>
-<li>解析url，建立连接获取输入流</li>
-<li>copy输入流到输出流中，进行相关设置并返回</li>
-</ol>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@GetMapping</span>(<span class="string">"/download"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">download</span><span class="params">(@RequestParam(<span class="string">"url"</span>)</span> String urlStr, HttpServletResponse response) <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        URL url = <span class="keyword">new</span> URL(urlStr);</span><br><span class="line">        HttpURLConnection conn = (HttpURLConnection)url.openConnection();</span><br><span class="line">        <span class="comment">//设置超时间为5秒</span></span><br><span class="line"><span class="comment">//        conn.setConnectTimeout(5*1000);</span></span><br><span class="line">        <span class="comment">//防止屏蔽程序抓取而返回403错误</span></span><br><span class="line">        conn.setRequestProperty(<span class="string">"User-Agent"</span>, <span class="string">"Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)"</span>);</span><br><span class="line">        <span class="keyword">try</span>(InputStream inputStream = conn.getInputStream();</span><br><span class="line">            OutputStream outputStream = response.getOutputStream();) &#123;</span><br><span class="line">            response.setContentType(<span class="string">"application/x-download"</span>);</span><br><span class="line">            response.addHeader(<span class="string">"Content-Disposition"</span>, <span class="string">"attachment;filename=test.pdf"</span>);</span><br><span class="line">            <span class="comment">// 将输入流拷贝到输出流中</span></span><br><span class="line">            IOUtils.copy(inputStream, outputStream);</span><br><span class="line">            outputStream.flush();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-]]></content>
-  </entry>
-  <entry>
-    <title>Spring自动注入单例和多例如何选择</title>
-    <url>/2020/05/03/Spring%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5%E5%8D%95%E4%BE%8B%E5%92%8C%E5%A4%9A%E4%BE%8B%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9/</url>
-    <content><![CDATA[<h3 id="Spring中bean的scope属性，有如下5种类型："><a href="#Spring中bean的scope属性，有如下5种类型：" class="headerlink" title="Spring中bean的scope属性，有如下5种类型："></a>Spring中bean的scope属性，有如下5种类型：</h3><p><strong>singleton</strong> 表示在spring容器中的单例，通过spring容器获得该bean时总是返回唯一的实例</p>
-<p><strong>prototype</strong> 表示每次获得bean都会生成一个新的对象</p>
-<p><strong>request</strong> 表示在一次http请求内有效（只适用于web应用）</p>
-<p><strong>session</strong> 表示在一个用户会话内有效（只适用于web应用）</p>
-<p><strong>globalSession</strong> 表示在全局会话内有效（只适用于web应用）</p>
-<p><em>在多数情况，我们只会使用singleton和prototype两种scope</em>，如果在spring配置文件内未指定scope属性，默认为singleton。</p>
-<a id="more"></a>
-
-<h3 id="如何选择"><a href="#如何选择" class="headerlink" title="如何选择"></a>如何选择</h3><p>所谓单例就是所有的请求都用一个对象来处理，比如我们常用的service和dao层的对象通常都是单例的，而多例则指每个请求用一个新的对象来处理</p>
-<p><strong>之所以用单例，是因为没必要每个请求都新建一个对象，这样子既浪费CPU又浪费内存； 之所以用多例，是为了防止并发问题。</strong></p>
-<p>即一个请求改变了对象的状态，此时对象又处理另一个请求，而之前请求对对象状态的改变导致了对象对另一个请求做了错误的处理；</p>
-<p>用单例和多例的标准只有一个： <strong>当对象含有可改变的状态时（更精确的说就是在实际应用中该状态会改变），则多例，否则单例</strong>；</p>
-<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><p><a href="https://blog.csdn.net/zhang_dianliang/article/details/76850906" target="_blank" rel="noopener">https://blog.csdn.net/zhang_dianliang/article/details/76850906</a></p>
-<p><a href="https://www.imooc.com/wenda/detail/385159" target="_blank" rel="noopener">https://www.imooc.com/wenda/detail/385159</a></p>
 ]]></content>
   </entry>
   <entry>
@@ -894,6 +877,25 @@
 <p>3、cron表达式配置了在哪一刻执行任务，会在配置的任务开始时间判断任务是否可以执行，如果能则执行，不能则会跳过本次执行；</p>
 <p>4、<strong>如果是强调任务间隔的定时任务，建议使用fixedRate和fixedDelay，如果是强调任务在某时某分某刻执行的定时任务，建议使用cron表达式。</strong></p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://segmentfault.com/a/1190000015253688" target="_blank" rel="noopener">https://segmentfault.com/a/1190000015253688</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Spring自动注入单例和多例如何选择</title>
+    <url>/2020/05/03/Spring%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5%E5%8D%95%E4%BE%8B%E5%92%8C%E5%A4%9A%E4%BE%8B%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9/</url>
+    <content><![CDATA[<h3 id="Spring中bean的scope属性，有如下5种类型："><a href="#Spring中bean的scope属性，有如下5种类型：" class="headerlink" title="Spring中bean的scope属性，有如下5种类型："></a>Spring中bean的scope属性，有如下5种类型：</h3><p><strong>singleton</strong> 表示在spring容器中的单例，通过spring容器获得该bean时总是返回唯一的实例</p>
+<p><strong>prototype</strong> 表示每次获得bean都会生成一个新的对象</p>
+<p><strong>request</strong> 表示在一次http请求内有效（只适用于web应用）</p>
+<p><strong>session</strong> 表示在一个用户会话内有效（只适用于web应用）</p>
+<p><strong>globalSession</strong> 表示在全局会话内有效（只适用于web应用）</p>
+<p><em>在多数情况，我们只会使用singleton和prototype两种scope</em>，如果在spring配置文件内未指定scope属性，默认为singleton。</p>
+<a id="more"></a>
+
+<h3 id="如何选择"><a href="#如何选择" class="headerlink" title="如何选择"></a>如何选择</h3><p>所谓单例就是所有的请求都用一个对象来处理，比如我们常用的service和dao层的对象通常都是单例的，而多例则指每个请求用一个新的对象来处理</p>
+<p><strong>之所以用单例，是因为没必要每个请求都新建一个对象，这样子既浪费CPU又浪费内存； 之所以用多例，是为了防止并发问题。</strong></p>
+<p>即一个请求改变了对象的状态，此时对象又处理另一个请求，而之前请求对对象状态的改变导致了对象对另一个请求做了错误的处理；</p>
+<p>用单例和多例的标准只有一个： <strong>当对象含有可改变的状态时（更精确的说就是在实际应用中该状态会改变），则多例，否则单例</strong>；</p>
+<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><p><a href="https://blog.csdn.net/zhang_dianliang/article/details/76850906" target="_blank" rel="noopener">https://blog.csdn.net/zhang_dianliang/article/details/76850906</a></p>
+<p><a href="https://www.imooc.com/wenda/detail/385159" target="_blank" rel="noopener">https://www.imooc.com/wenda/detail/385159</a></p>
 ]]></content>
   </entry>
   <entry>
