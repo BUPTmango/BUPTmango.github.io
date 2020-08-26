@@ -176,6 +176,117 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/08/26/Git%E7%89%88%E6%9C%AC%E5%9B%9E%E9%80%80%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
+      <meta itemprop="name" content="Guolong Wang">
+      <meta itemprop="description" content="爱玩，爱技术">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王国隆的技术博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/08/26/Git%E7%89%88%E6%9C%AC%E5%9B%9E%E9%80%80%E6%96%B9%E6%B3%95/" class="post-title-link" itemprop="url">Git版本回退方法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-08-26 12:28:07 / 修改时间：12:50:41" itemprop="dateCreated datePublished" datetime="2020-08-26T12:28:07+08:00">2020-08-26</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+      
+          <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>今天在公司犯了错误，在公司公共的develop分支上push了错误的代码，顺便研究了一下git如何回退版本，参考了大佬的做法，记录下了这篇博客。</p>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>如果提交了一个错误的版本，怎么回退版本？</p>
+<p>如果提交了一个错误的版本到远程分支，怎么回退远程分支版本？</p>
+<p>如果提交了一个错误的版本到公共远程分支，又该怎么回退版本？</p>
+<h3 id="本地分支版本回退的方法"><a href="#本地分支版本回退的方法" class="headerlink" title="本地分支版本回退的方法"></a>本地分支版本回退的方法</h3><p>如果你在本地做了错误提交，那么回退版本的方法很简单</p>
+<p>先用下面命令找到要回退的版本的commit id：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reflog</span><br></pre></td></tr></table></figure>
+
+<p>接着回退版本:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reset --hard Obfafd</span><br></pre></td></tr></table></figure>
+
+<p>0bfafd就是你要回退的版本的commit id的前面几位</p>
+<h3 id="自己的远程分支版本回退的方法"><a href="#自己的远程分支版本回退的方法" class="headerlink" title="自己的远程分支版本回退的方法"></a>自己的远程分支版本回退的方法</h3><p>如果你的错误提交已经推送到自己的远程分支了，那么就需要回滚远程分支了。<br>首先要回退本地分支：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git reflog</span><br><span class="line">git reset --hard Obfafd</span><br></pre></td></tr></table></figure>
+
+<p>紧接着强制推送到远程分支：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push -f origin develop</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：本地分支回滚后，版本将落后远程分支，必须使用强制推送覆盖远程分支，否则无法推送到远程分支</strong></p>
+<h3 id="公共远程分支版本回退的方法"><a href="#公共远程分支版本回退的方法" class="headerlink" title="公共远程分支版本回退的方法"></a>公共远程分支版本回退的方法</h3><p>使用git reset回退公共远程分支的版本后，需要其他所有人手动用远程master分支覆盖本地master分支，</p>
+<p>显然，这不是优雅的回退方法，下面我们使用另个一个命令来回退版本：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git revert HEAD                     //撤销最近一次提交</span><br><span class="line">git revert HEAD~1                   //撤销上上次的提交，注意：数字从0开始</span><br><span class="line">git revert 0ffaacc                  //撤销0ffaacc这次提交</span><br></pre></td></tr></table></figure>
+
+<p>git revert 命令意思是撤销某次提交。它会产生一个新的提交，虽然代码回退了，但是<strong>版本依然是向前的</strong>，</p>
+<p>所以，当你用revert回退之后，所有人pull之后，他们的代码也自动的回退了。</p>
+<p>但是，要注意以下几点：</p>
+<ol>
+<li><p>revert 是撤销一次提交，所以后面的commit id是你需要回滚到的版本的前一次提交</p>
+</li>
+<li><p>使用revert HEAD是撤销最近的一次提交，如果你最近一次提交是用revert命令产生的，那么你再执行一次，就相当于撤销了上次的撤销操作，换句话说，你连续执行两次revert HEAD命令，就跟没执行是一样的</p>
+</li>
+<li><p>使用revert HEAD~1 表示撤销最近2次提交，这个数字是从0开始的，如果你之前撤销过产生了commi id，那么也会计算在内的。</p>
+</li>
+<li><p>如果使用 revert 撤销的不是最近一次提交，那么一定会有代码冲突，需要你合并代码，合并代码只需要把当前的代码全部去掉，保留之前版本的代码就可以了.</p>
+</li>
+</ol>
+<p>git revert 命令的好处就是<strong>不会丢掉别人的提交</strong>，即使你撤销后覆盖了别人的提交，他更新代码后，可以在本地用 reset 向前回滚，找到自己的代码，然后拉一下分支，再回来合并上去就可以找回被你覆盖的提交了。</p>
+<h3 id="继续扩展，简单粗暴的回滚方法"><a href="#继续扩展，简单粗暴的回滚方法" class="headerlink" title="继续扩展，简单粗暴的回滚方法"></a>继续扩展，简单粗暴的回滚方法</h3><p>看到这里也许你已经觉得学会了远程仓库版本回滚方法了，但是实践中总是会遇到很多不按套路来的问题，考虑下面一种情况：</p>
+<p>如果你们开发中，忽然发现前面很远的地方有一次错误的合并代码，把本来下一次才能发的功能的代码合并到了这一次来了，这个时候全体成员都觉得直接回滚比较快，因为他们都有备份，覆盖了无所谓，这个时候用reset的话对队友的要求比较高，用revert的话呢要大面积的解决冲突，也很麻烦呀，怎么办呢？</p>
+<p>这个时候，可以使用简单粗暴的办法，直接从那个错误的提交的前一次拉取一份代码放到其他目录，然后将master代码全部删除，把那份新代码方进去，然后提交，果然简单粗暴啊，虽然这种方法不入流，但是，实践中发现很好使啊，所以，实践是检验真理的唯一标准。遇到问题还是要灵活应对。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>远程分支回滚的三种方法：</p>
+<ol>
+<li><p>自己的分支回滚直接用reset</p>
+</li>
+<li><p>公共分支回滚用revert</p>
+</li>
+<li><p>错的太远了直接将代码全部删掉，用正确代码替代</p>
+</li>
+</ol>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="http://blog.csdn.net/fuchaosz/article/details/52170105" target="_blank" rel="noopener">http://blog.csdn.net/fuchaosz/article/details/52170105</a></p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <div>
+  
+</div>
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -863,86 +974,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/06/21/Java%E4%BD%BF%E7%94%A8easyexcel%E6%93%8D%E4%BD%9Cexcel/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/06/21/Java%E4%BD%BF%E7%94%A8easyexcel%E6%93%8D%E4%BD%9Cexcel/" class="post-title-link" itemprop="url">Java使用easyexcel操作excel</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-06-21 12:46:28" itemprop="dateCreated datePublished" datetime="2020-06-21T12:46:28+08:00">2020-06-21</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 12:58:44" itemprop="dateModified" datetime="2020-07-16T12:58:44+08:00">2020-07-16</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在工作中，使用excel表格处理数据是很常见的操作，本文就来讲解下如何使用开源轮子实现下载、导入、导出的功能。</p>
-<p>在之前，很多Java程序员都喜欢使用POI的类库来操作excel,但是非常的不方便，不仅代码写的很臃肿，还要处理各种office版本兼容问题，最怕的就是使用不当很容易造成内存溢出，因此今天给大家推荐阿里的一款开源项目 <strong>easyexcel</strong>。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/06/21/Java%E4%BD%BF%E7%94%A8easyexcel%E6%93%8D%E4%BD%9Cexcel/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1010,7 +1045,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-count">21</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1060,7 +1095,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共28.3k字</span>
+  <span class="post-count">博客全站共29.5k字</span>
 </div>
 
 

@@ -20,19 +20,19 @@
     var CONFIG = {"hostname":"www.wangguolong.top","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="最近有需求是点击下载按钮后下载指定url的pdf文件到本地 下面通过SpringBoot来实现一下：">
+  <meta name="description" content="简介今天在公司犯了错误，在公司公共的develop分支上push了错误的代码，顺便研究了一下git如何回退版本，参考了大佬的做法，记录下了这篇博客。 问题如果提交了一个错误的版本，怎么回退版本？ 如果提交了一个错误的版本到远程分支，怎么回退远程分支版本？ 如果提交了一个错误的版本到公共远程分支，又该怎么回退版本？ 本地分支版本回退的方法如果你在本地做了错误提交，那么回退版本的方法很简单 先用下面命">
 <meta property="og:type" content="article">
-<meta property="og:title" content="SpringBoot实现通过url下载pdf到本地">
-<meta property="og:url" content="http://www.wangguolong.top/2020/06/06/SpringBoot%E5%AE%9E%E7%8E%B0%E9%80%9A%E8%BF%87url%E4%B8%8B%E8%BD%BDpdf%E5%88%B0%E6%9C%AC%E5%9C%B0/index.html">
+<meta property="og:title" content="Git版本回退方法">
+<meta property="og:url" content="http://www.wangguolong.top/2020/08/26/Git%E7%89%88%E6%9C%AC%E5%9B%9E%E9%80%80%E6%96%B9%E6%B3%95/index.html">
 <meta property="og:site_name" content="王国隆的技术博客">
-<meta property="og:description" content="最近有需求是点击下载按钮后下载指定url的pdf文件到本地 下面通过SpringBoot来实现一下：">
+<meta property="og:description" content="简介今天在公司犯了错误，在公司公共的develop分支上push了错误的代码，顺便研究了一下git如何回退版本，参考了大佬的做法，记录下了这篇博客。 问题如果提交了一个错误的版本，怎么回退版本？ 如果提交了一个错误的版本到远程分支，怎么回退远程分支版本？ 如果提交了一个错误的版本到公共远程分支，又该怎么回退版本？ 本地分支版本回退的方法如果你在本地做了错误提交，那么回退版本的方法很简单 先用下面命">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2020-06-06T13:20:27.377Z">
-<meta property="article:modified_time" content="2020-07-16T05:00:34.009Z">
+<meta property="article:published_time" content="2020-08-26T04:28:07.255Z">
+<meta property="article:modified_time" content="2020-08-26T04:50:41.371Z">
 <meta property="article:author" content="Guolong Wang">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://www.wangguolong.top/2020/06/06/SpringBoot%E5%AE%9E%E7%8E%B0%E9%80%9A%E8%BF%87url%E4%B8%8B%E8%BD%BDpdf%E5%88%B0%E6%9C%AC%E5%9C%B0/">
+<link rel="canonical" href="http://www.wangguolong.top/2020/08/26/Git%E7%89%88%E6%9C%AC%E5%9B%9E%E9%80%80%E6%96%B9%E6%B3%95/">
 
 
 <script id="page-configurations">
@@ -45,7 +45,7 @@
   };
 </script>
 
-  <title>SpringBoot实现通过url下载pdf到本地 | 王国隆的技术博客</title>
+  <title>Git版本回退方法 | 王国隆的技术博客</title>
   
 
 
@@ -179,7 +179,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/06/06/SpringBoot%E5%AE%9E%E7%8E%B0%E9%80%9A%E8%BF%87url%E4%B8%8B%E8%BD%BDpdf%E5%88%B0%E6%9C%AC%E5%9C%B0/">
+    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/08/26/Git%E7%89%88%E6%9C%AC%E5%9B%9E%E9%80%80%E6%96%B9%E6%B3%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
@@ -192,7 +192,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          SpringBoot实现通过url下载pdf到本地
+          Git版本回退方法
         </h1>
 
         <div class="post-meta">
@@ -201,16 +201,10 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2020-06-06 21:20:27" itemprop="dateCreated datePublished" datetime="2020-06-06T21:20:27+08:00">2020-06-06</time>
+              <time title="创建时间：2020-08-26 12:28:07 / 修改时间：12:50:41" itemprop="dateCreated datePublished" datetime="2020-08-26T12:28:07+08:00">2020-08-26</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 13:00:34" itemprop="dateModified" datetime="2020-07-16T13:00:34+08:00">2020-07-16</time>
-              </span>
 
           
             <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
@@ -229,15 +223,56 @@
     
     <div class="post-body" itemprop="articleBody">
       
-        <p>最近有需求是点击下载按钮后下载指定url的pdf文件到本地</p>
-<p>下面通过<strong>SpringBoot</strong>来实现一下：</p>
-<a id="more"></a>
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>今天在公司犯了错误，在公司公共的develop分支上push了错误的代码，顺便研究了一下git如何回退版本，参考了大佬的做法，记录下了这篇博客。</p>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>如果提交了一个错误的版本，怎么回退版本？</p>
+<p>如果提交了一个错误的版本到远程分支，怎么回退远程分支版本？</p>
+<p>如果提交了一个错误的版本到公共远程分支，又该怎么回退版本？</p>
+<h3 id="本地分支版本回退的方法"><a href="#本地分支版本回退的方法" class="headerlink" title="本地分支版本回退的方法"></a>本地分支版本回退的方法</h3><p>如果你在本地做了错误提交，那么回退版本的方法很简单</p>
+<p>先用下面命令找到要回退的版本的commit id：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reflog</span><br></pre></td></tr></table></figure>
 
-<h4 id="思路就是："><a href="#思路就是：" class="headerlink" title="思路就是："></a><strong>思路</strong>就是：</h4><ol>
-<li>解析url，建立连接获取输入流</li>
-<li>copy输入流到输出流中，进行相关设置并返回</li>
+<p>接着回退版本:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reset --hard Obfafd</span><br></pre></td></tr></table></figure>
+
+<p>0bfafd就是你要回退的版本的commit id的前面几位</p>
+<h3 id="自己的远程分支版本回退的方法"><a href="#自己的远程分支版本回退的方法" class="headerlink" title="自己的远程分支版本回退的方法"></a>自己的远程分支版本回退的方法</h3><p>如果你的错误提交已经推送到自己的远程分支了，那么就需要回滚远程分支了。<br>首先要回退本地分支：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git reflog</span><br><span class="line">git reset --hard Obfafd</span><br></pre></td></tr></table></figure>
+
+<p>紧接着强制推送到远程分支：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push -f origin develop</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：本地分支回滚后，版本将落后远程分支，必须使用强制推送覆盖远程分支，否则无法推送到远程分支</strong></p>
+<h3 id="公共远程分支版本回退的方法"><a href="#公共远程分支版本回退的方法" class="headerlink" title="公共远程分支版本回退的方法"></a>公共远程分支版本回退的方法</h3><p>使用git reset回退公共远程分支的版本后，需要其他所有人手动用远程master分支覆盖本地master分支，</p>
+<p>显然，这不是优雅的回退方法，下面我们使用另个一个命令来回退版本：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git revert HEAD                     //撤销最近一次提交</span><br><span class="line">git revert HEAD~1                   //撤销上上次的提交，注意：数字从0开始</span><br><span class="line">git revert 0ffaacc                  //撤销0ffaacc这次提交</span><br></pre></td></tr></table></figure>
+
+<p>git revert 命令意思是撤销某次提交。它会产生一个新的提交，虽然代码回退了，但是<strong>版本依然是向前的</strong>，</p>
+<p>所以，当你用revert回退之后，所有人pull之后，他们的代码也自动的回退了。</p>
+<p>但是，要注意以下几点：</p>
+<ol>
+<li><p>revert 是撤销一次提交，所以后面的commit id是你需要回滚到的版本的前一次提交</p>
+</li>
+<li><p>使用revert HEAD是撤销最近的一次提交，如果你最近一次提交是用revert命令产生的，那么你再执行一次，就相当于撤销了上次的撤销操作，换句话说，你连续执行两次revert HEAD命令，就跟没执行是一样的</p>
+</li>
+<li><p>使用revert HEAD~1 表示撤销最近2次提交，这个数字是从0开始的，如果你之前撤销过产生了commi id，那么也会计算在内的。</p>
+</li>
+<li><p>如果使用 revert 撤销的不是最近一次提交，那么一定会有代码冲突，需要你合并代码，合并代码只需要把当前的代码全部去掉，保留之前版本的代码就可以了.</p>
+</li>
 </ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping</span>(<span class="string">"/download"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">download</span><span class="params">(@RequestParam(<span class="string">"url"</span>)</span> String urlStr, HttpServletResponse response) <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        URL url = <span class="keyword">new</span> URL(urlStr);</span><br><span class="line">        HttpURLConnection conn = (HttpURLConnection)url.openConnection();</span><br><span class="line">        <span class="comment">//设置超时间为5秒</span></span><br><span class="line"><span class="comment">//        conn.setConnectTimeout(5*1000);</span></span><br><span class="line">        <span class="comment">//防止屏蔽程序抓取而返回403错误</span></span><br><span class="line">        conn.setRequestProperty(<span class="string">"User-Agent"</span>, <span class="string">"Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)"</span>);</span><br><span class="line">        <span class="keyword">try</span>(InputStream inputStream = conn.getInputStream();</span><br><span class="line">            OutputStream outputStream = response.getOutputStream();) &#123;</span><br><span class="line">            response.setContentType(<span class="string">"application/x-download"</span>);</span><br><span class="line">            response.addHeader(<span class="string">"Content-Disposition"</span>, <span class="string">"attachment;filename=test.pdf"</span>);</span><br><span class="line">            <span class="comment">// 将输入流拷贝到输出流中</span></span><br><span class="line">            IOUtils.copy(inputStream, outputStream);</span><br><span class="line">            outputStream.flush();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>git revert 命令的好处就是<strong>不会丢掉别人的提交</strong>，即使你撤销后覆盖了别人的提交，他更新代码后，可以在本地用 reset 向前回滚，找到自己的代码，然后拉一下分支，再回来合并上去就可以找回被你覆盖的提交了。</p>
+<h3 id="继续扩展，简单粗暴的回滚方法"><a href="#继续扩展，简单粗暴的回滚方法" class="headerlink" title="继续扩展，简单粗暴的回滚方法"></a>继续扩展，简单粗暴的回滚方法</h3><p>看到这里也许你已经觉得学会了远程仓库版本回滚方法了，但是实践中总是会遇到很多不按套路来的问题，考虑下面一种情况：</p>
+<p>如果你们开发中，忽然发现前面很远的地方有一次错误的合并代码，把本来下一次才能发的功能的代码合并到了这一次来了，这个时候全体成员都觉得直接回滚比较快，因为他们都有备份，覆盖了无所谓，这个时候用reset的话对队友的要求比较高，用revert的话呢要大面积的解决冲突，也很麻烦呀，怎么办呢？</p>
+<p>这个时候，可以使用简单粗暴的办法，直接从那个错误的提交的前一次拉取一份代码放到其他目录，然后将master代码全部删除，把那份新代码方进去，然后提交，果然简单粗暴啊，虽然这种方法不入流，但是，实践中发现很好使啊，所以，实践是检验真理的唯一标准。遇到问题还是要灵活应对。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>远程分支回滚的三种方法：</p>
+<ol>
+<li><p>自己的分支回滚直接用reset</p>
+</li>
+<li><p>公共分支回滚用revert</p>
+</li>
+<li><p>错的太远了直接将代码全部删掉，用正确代码替代</p>
+</li>
+</ol>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="http://blog.csdn.net/fuchaosz/article/details/52170105" target="_blank" rel="noopener">http://blog.csdn.net/fuchaosz/article/details/52170105</a></p>
 
     </div>
 
@@ -264,13 +299,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/05/30/Spring-Boot%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90%E7%9A%84%E5%8A%A8%E6%80%81%E5%88%87%E6%8D%A2/" rel="prev" title="Spring-Boot多数据源的动态切换">
-      <i class="fa fa-chevron-left"></i> Spring-Boot多数据源的动态切换
+    <a href="/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/" rel="prev" title="Java编写单词小游戏">
+      <i class="fa fa-chevron-left"></i> Java编写单词小游戏
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/06/15/Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%9A%84%E5%8D%81%E6%9D%A1%E5%BB%BA%E8%AE%AE/" rel="next" title="Java异常处理的十条建议">
-      Java异常处理的十条建议 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -329,7 +361,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#思路就是："><span class="nav-number">1.</span> <span class="nav-text">思路就是：</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题"><span class="nav-number">2.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#本地分支版本回退的方法"><span class="nav-number">3.</span> <span class="nav-text">本地分支版本回退的方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自己的远程分支版本回退的方法"><span class="nav-number">4.</span> <span class="nav-text">自己的远程分支版本回退的方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#公共远程分支版本回退的方法"><span class="nav-number">5.</span> <span class="nav-text">公共远程分支版本回退的方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#继续扩展，简单粗暴的回滚方法"><span class="nav-number">6.</span> <span class="nav-text">继续扩展，简单粗暴的回滚方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">8.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
