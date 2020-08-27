@@ -20,30 +20,32 @@
     var CONFIG = {"hostname":"www.wangguolong.top","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="爱玩，爱技术">
-<meta property="og:type" content="website">
-<meta property="og:title" content="王国隆的技术博客">
-<meta property="og:url" content="http://www.wangguolong.top/index.html">
+  <meta name="description" content="介绍在Java应用中，绝大多数情况下都是通过同步的方式来实现交互处理的；但是在处理与第三方系统交互的时候，容易造成响应迟缓的情况，之前大部分都是使用多线程来完成此类任务。其实，在Spring 3.x之后，就已经内置了@Async来完美解决这个问题，本文将完成介绍@Async的用法。 @Async的使用注意事项 必须用在public方法上，且不能是static方法 不能与调用的方法在同一个类中 需要">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringBoot中-Async的用法与实践">
+<meta property="og:url" content="http://www.wangguolong.top/2020/08/27/SpringBoot%E4%B8%AD-Async%E7%9A%84%E7%94%A8%E6%B3%95%E4%B8%8E%E5%AE%9E%E8%B7%B5/index.html">
 <meta property="og:site_name" content="王国隆的技术博客">
-<meta property="og:description" content="爱玩，爱技术">
+<meta property="og:description" content="介绍在Java应用中，绝大多数情况下都是通过同步的方式来实现交互处理的；但是在处理与第三方系统交互的时候，容易造成响应迟缓的情况，之前大部分都是使用多线程来完成此类任务。其实，在Spring 3.x之后，就已经内置了@Async来完美解决这个问题，本文将完成介绍@Async的用法。 @Async的使用注意事项 必须用在public方法上，且不能是static方法 不能与调用的方法在同一个类中 需要">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-27T03:27:58.615Z">
+<meta property="article:modified_time" content="2020-08-27T07:11:38.912Z">
 <meta property="article:author" content="Guolong Wang">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://www.wangguolong.top/">
+<link rel="canonical" href="http://www.wangguolong.top/2020/08/27/SpringBoot%E4%B8%AD-Async%E7%9A%84%E7%94%A8%E6%B3%95%E4%B8%8E%E5%AE%9E%E8%B7%B5/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>王国隆的技术博客</title>
+  <title>SpringBoot中-Async的用法与实践 | 王国隆的技术博客</title>
   
 
 
@@ -170,9 +172,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
+
+    
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
@@ -188,10 +191,9 @@
       <meta itemprop="name" content="王国隆的技术博客">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/27/SpringBoot%E4%B8%AD-Async%E7%9A%84%E7%94%A8%E6%B3%95%E4%B8%8E%E5%AE%9E%E8%B7%B5/" class="post-title-link" itemprop="url">SpringBoot中-Async的用法与实践</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          SpringBoot中-Async的用法与实践
+        </h1>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -205,6 +207,13 @@
             </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
 
         </div>
       </header>
@@ -214,7 +223,7 @@
     
     <div class="post-body" itemprop="articleBody">
       
-          <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>在Java应用中，绝大多数情况下都是通过同步的方式来实现交互处理的；但是在处理与第三方系统交互的时候，容易造成响应迟缓的情况，之前大部分都是使用多线程来完成此类任务。其实，在Spring 3.x之后，就已经内置了@Async来完美解决这个问题，本文将完成介绍@Async的用法。</p>
+        <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>在Java应用中，绝大多数情况下都是通过同步的方式来实现交互处理的；但是在处理与第三方系统交互的时候，容易造成响应迟缓的情况，之前大部分都是使用多线程来完成此类任务。其实，在Spring 3.x之后，就已经内置了@Async来完美解决这个问题，本文将完成介绍@Async的用法。</p>
 <h3 id="Async的使用"><a href="#Async的使用" class="headerlink" title="@Async的使用"></a>@Async的使用</h3><h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
 <li>必须用在public方法上，且不能是static方法</li>
 <li>不能与调用的方法在同一个类中</li>
@@ -249,7 +258,6 @@
 <p><a href="https://blog.csdn.net/zhuyu19911016520/article/details/99992668" target="_blank" rel="noopener">https://blog.csdn.net/zhuyu19911016520/article/details/99992668</a></p>
 <p><a href="https://www.jianshu.com/p/49b9d15456d9?utm_campaign=hugo&amp;utm_medium=reader_share&amp;utm_content=note&amp;utm_source=weixin-friends" target="_blank" rel="noopener">https://www.jianshu.com/p/49b9d15456d9?utm_campaign=hugo&amp;utm_medium=reader_share&amp;utm_content=note&amp;utm_source=weixin-friends</a></p>
 
-      
     </div>
 
     
@@ -258,691 +266,34 @@
 
     <div>
   
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
 </div>
+
+  
+</div>
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/08/26/ThreadLocal%E5%AE%9E%E8%B7%B5%E4%B8%8E%E8%AF%A6%E8%A7%A3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/26/ThreadLocal%E5%AE%9E%E8%B7%B5%E4%B8%8E%E8%AF%A6%E8%A7%A3/" class="post-title-link" itemprop="url">ThreadLocal实践与详解</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-08-26 15:30:37 / 修改时间：16:14:43" itemprop="dateCreated datePublished" datetime="2020-08-26T15:30:37+08:00">2020-08-26</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>ThreadLocal类是用来提供线程内部的局部变量。让这些变量在多线程环境下访问（get/set）时能保证各个线程里的变量相对独立于其他线程内的变量。</p>
-<p>ThreadLocal是一个关于创建线程局部变量的类。</p>
-<p>通常情况下，我们创建的成员变量都是线程不安全的。因为他可能被多个线程同时修改，此变量对于多个线程之间彼此并不独立，是共享变量。而使用ThreadLocal创建的变量只能被当前线程访问，其他线程无法访问和修改。也就是说：将线程公有化变成线程私有化。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/08/26/ThreadLocal%E5%AE%9E%E8%B7%B5%E4%B8%8E%E8%AF%A6%E8%A7%A3/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
-    </div>
 
-    
-    
-    
 
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/08/26/Git%E7%89%88%E6%9C%AC%E5%9B%9E%E9%80%80%E6%96%B9%E6%B3%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/26/Git%E7%89%88%E6%9C%AC%E5%9B%9E%E9%80%80%E6%96%B9%E6%B3%95/" class="post-title-link" itemprop="url">Git版本回退方法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-08-26 12:28:07 / 修改时间：12:58:45" itemprop="dateCreated datePublished" datetime="2020-08-26T12:28:07+08:00">2020-08-26</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>今天在公司犯了错误，在公司公共的develop分支上push了错误的代码，顺便研究了一下git如何回退版本，参考了大佬的做法，记录下了这篇博客。</p>
-<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>如果提交了一个错误的版本，怎么回退版本？</p>
-<p>如果提交了一个错误的版本到远程分支，怎么回退远程分支版本？</p>
-<p>如果提交了一个错误的版本到公共远程分支，又该怎么回退版本？</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/08/26/Git%E7%89%88%E6%9C%AC%E5%9B%9E%E9%80%80%E6%96%B9%E6%B3%95/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/08/26/ThreadLocal%E5%AE%9E%E8%B7%B5%E4%B8%8E%E8%AF%A6%E8%A7%A3/" rel="prev" title="ThreadLocal实践与详解">
+      <i class="fa fa-chevron-left"></i> ThreadLocal实践与详解
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-
-    
-    
-    
-
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
       </footer>
+    
   </article>
   
   
   
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/" class="post-title-link" itemprop="url">Java编写单词小游戏</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-08-03 14:11:27 / 修改时间：15:18:50" itemprop="dateCreated datePublished" datetime="2020-08-03T14:11:27+08:00">2020-08-03</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>公司最近有一个竞技场项目，里面有一个单词小游戏。</p>
-<p>游戏大概就是随机生成一个5*5的棋盘，上面有单词的字母，通过滑动连出正确的单词。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/07/14/ControllerAdvice%E5%92%8CErrorController%E7%9A%84%E7%94%A8%E6%B3%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/07/14/ControllerAdvice%E5%92%8CErrorController%E7%9A%84%E7%94%A8%E6%B3%95/" class="post-title-link" itemprop="url">ControllerAdvice和ErrorController的用法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-07-14 13:58:43" itemprop="dateCreated datePublished" datetime="2020-07-14T13:58:43+08:00">2020-07-14</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 12:54:48" itemprop="dateModified" datetime="2020-07-16T12:54:48+08:00">2020-07-16</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>在Java中异常可以分为Error和Exception，<strong>@ControllerAdvice</strong>用来处理系统中的<strong>Exception</strong>，<strong>Error</strong>Controller处理系统中的<strong>Error</strong>。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/07/14/ControllerAdvice%E5%92%8CErrorController%E7%9A%84%E7%94%A8%E6%B3%95/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/07/10/Jackson%E7%9A%84%E4%BD%BF%E7%94%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/07/10/Jackson%E7%9A%84%E4%BD%BF%E7%94%A8/" class="post-title-link" itemprop="url">Jackson的使用</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-07-10 13:59:55" itemprop="dateCreated datePublished" datetime="2020-07-10T13:59:55+08:00">2020-07-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 12:58:04" itemprop="dateModified" datetime="2020-07-16T12:58:04+08:00">2020-07-16</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>最近公司的竞技场项目中使用了jackson来进行java对象和json的相互转换</p>
-<p>下面来介绍一下jackson的简单使用</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/07/10/Jackson%E7%9A%84%E4%BD%BF%E7%94%A8/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/07/04/MySQL%E4%BC%98%E5%8C%96%E6%8F%90%E9%AB%98%E7%AC%94%E8%AE%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/07/04/MySQL%E4%BC%98%E5%8C%96%E6%8F%90%E9%AB%98%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">MySQL优化提高笔记</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-07-04 10:59:25" itemprop="dateCreated datePublished" datetime="2020-07-04T10:59:25+08:00">2020-07-04</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-17 16:24:39" itemprop="dateModified" datetime="2020-07-17T16:24:39+08:00">2020-07-17</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>对于mysql的优化是一个综合性的技术，sql的优化只是其中的一种，其中主要包括</p>
-<p>表的设计合理化(符合3大范式)。</p>
-<p>添加索引(index) [普通索引、主键索引、唯一索引unique、全文索引]。</p>
-<p>分表技术(水平分割、垂直分割)。</p>
-<p>读写[写: update/delete/add]分离。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/07/04/MySQL%E4%BC%98%E5%8C%96%E6%8F%90%E9%AB%98%E7%AC%94%E8%AE%B0/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/07/02/SpringBoot%E6%95%B4%E5%90%88Redis%E5%B9%B6%E7%94%A8Redis%E5%AE%9E%E7%8E%B0%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/07/02/SpringBoot%E6%95%B4%E5%90%88Redis%E5%B9%B6%E7%94%A8Redis%E5%AE%9E%E7%8E%B0%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/" class="post-title-link" itemprop="url">SpringBoot整合Redis并用Redis实现定时任务</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-07-02 13:25:40" itemprop="dateCreated datePublished" datetime="2020-07-02T13:25:40+08:00">2020-07-02</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 13:00:42" itemprop="dateModified" datetime="2020-07-16T13:00:42+08:00">2020-07-16</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>Redis是一种可基于内存也可基于持久话的日志型、key-value数据库。因为性能高，存储数据类型丰富等优势常被用作数据缓存。</p>
-<p>下面介绍Redis集成到SpringBoot2.2.4和Redis定时任务的实现。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/07/02/SpringBoot%E6%95%B4%E5%90%88Redis%E5%B9%B6%E7%94%A8Redis%E5%AE%9E%E7%8E%B0%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/07/01/Java%E4%BD%BF%E7%94%A8iTextPDF%E7%94%9F%E6%88%90PDF%E6%96%87%E4%BB%B6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/07/01/Java%E4%BD%BF%E7%94%A8iTextPDF%E7%94%9F%E6%88%90PDF%E6%96%87%E4%BB%B6/" class="post-title-link" itemprop="url">Java使用iTextPDF生成PDF文件</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-07-01 17:31:03" itemprop="dateCreated datePublished" datetime="2020-07-01T17:31:03+08:00">2020-07-01</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 12:58:50" itemprop="dateModified" datetime="2020-07-16T12:58:50+08:00">2020-07-16</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h2 id="iText介绍和说明"><a href="#iText介绍和说明" class="headerlink" title="iText介绍和说明"></a>iText介绍和说明</h2><p>因为项目需要生成PDF文件，所以去找了一下能够生成PDF的Java工具，看到了iText可以说好评如潮。</p>
-<p>如果你想通过java操作PDF文件，那么 iText 绝对是你的首选。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/07/01/Java%E4%BD%BF%E7%94%A8iTextPDF%E7%94%9F%E6%88%90PDF%E6%96%87%E4%BB%B6/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/06/30/Spring%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1-Scheduled%E6%B3%A8%E8%A7%A3%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/06/30/Spring%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1-Scheduled%E6%B3%A8%E8%A7%A3%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F/" class="post-title-link" itemprop="url">Spring定时任务-Scheduled注解使用方式</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-06-30 14:17:24" itemprop="dateCreated datePublished" datetime="2020-06-30T14:17:24+08:00">2020-06-30</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 13:00:10" itemprop="dateModified" datetime="2020-07-16T13:00:10+08:00">2020-07-16</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>使用@Scheduled cron表达式标注任务方法</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">testTask</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Logger logger = LoggerFactory.getLogger(testTask<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Scheduled</span>(cron = <span class="string">"0/5 * * * * ?"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTask</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        logger.info(Thread.currentThread().getName()+<span class="string">"===task run"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/06/30/Spring%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1-Scheduled%E6%B3%A8%E8%A7%A3%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-
-  
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
-  </nav>
 
 
 
@@ -994,6 +345,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Async的使用"><span class="nav-number">2.</span> <span class="nav-text">@Async的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#注意事项"><span class="nav-number">2.1.</span> <span class="nav-text">注意事项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#注解配置开启"><span class="nav-number">2.2.</span> <span class="nav-text">注解配置开启</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#基于-Async无返回值调用"><span class="nav-number">2.3.</span> <span class="nav-text">基于@Async无返回值调用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#基于-Async返回值的调用"><span class="nav-number">2.4.</span> <span class="nav-text">基于@Async返回值的调用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#给-Async使用自定义的线程池"><span class="nav-number">3.</span> <span class="nav-text">给@Async使用自定义的线程池</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#使用自定义的线程池"><span class="nav-number">3.1.</span> <span class="nav-text">使用自定义的线程池</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Async调用中的事务处理机制"><span class="nav-number">4.</span> <span class="nav-text">@Async调用中的事务处理机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
