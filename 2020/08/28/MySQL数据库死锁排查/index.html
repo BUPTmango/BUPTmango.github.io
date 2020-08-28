@@ -20,19 +20,19 @@
     var CONFIG = {"hostname":"www.wangguolong.top","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="最近有需求是点击下载按钮后下载指定url的pdf文件到本地 下面通过SpringBoot来实现一下：">
+  <meta name="description" content="第一种 查询是否锁表  show open tables where in_use &gt; 0;  查询进程（如果您有super权限，您可以看到所有线程。否则，您只能看到您自己的线程）  show processlist  杀死进程id（就是上面命令的id列）  kill id 第二种： 查看下在锁的事务  select * from information_schema.innodb_trx;">
 <meta property="og:type" content="article">
-<meta property="og:title" content="SpringBoot实现通过url下载pdf到本地">
-<meta property="og:url" content="http://www.wangguolong.top/2020/06/06/SpringBoot%E5%AE%9E%E7%8E%B0%E9%80%9A%E8%BF%87url%E4%B8%8B%E8%BD%BDpdf%E5%88%B0%E6%9C%AC%E5%9C%B0/index.html">
+<meta property="og:title" content="MySQL数据库死锁排查">
+<meta property="og:url" content="http://www.wangguolong.top/2020/08/28/MySQL%E6%95%B0%E6%8D%AE%E5%BA%93%E6%AD%BB%E9%94%81%E6%8E%92%E6%9F%A5/index.html">
 <meta property="og:site_name" content="王国隆的技术博客">
-<meta property="og:description" content="最近有需求是点击下载按钮后下载指定url的pdf文件到本地 下面通过SpringBoot来实现一下：">
+<meta property="og:description" content="第一种 查询是否锁表  show open tables where in_use &gt; 0;  查询进程（如果您有super权限，您可以看到所有线程。否则，您只能看到您自己的线程）  show processlist  杀死进程id（就是上面命令的id列）  kill id 第二种： 查看下在锁的事务  select * from information_schema.innodb_trx;">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2020-06-06T13:20:27.377Z">
-<meta property="article:modified_time" content="2020-07-16T05:00:34.009Z">
+<meta property="article:published_time" content="2020-08-28T14:39:28.698Z">
+<meta property="article:modified_time" content="2020-08-28T14:45:32.583Z">
 <meta property="article:author" content="Guolong Wang">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://www.wangguolong.top/2020/06/06/SpringBoot%E5%AE%9E%E7%8E%B0%E9%80%9A%E8%BF%87url%E4%B8%8B%E8%BD%BDpdf%E5%88%B0%E6%9C%AC%E5%9C%B0/">
+<link rel="canonical" href="http://www.wangguolong.top/2020/08/28/MySQL%E6%95%B0%E6%8D%AE%E5%BA%93%E6%AD%BB%E9%94%81%E6%8E%92%E6%9F%A5/">
 
 
 <script id="page-configurations">
@@ -45,7 +45,7 @@
   };
 </script>
 
-  <title>SpringBoot实现通过url下载pdf到本地 | 王国隆的技术博客</title>
+  <title>MySQL数据库死锁排查 | 王国隆的技术博客</title>
   
 
 
@@ -179,7 +179,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/06/06/SpringBoot%E5%AE%9E%E7%8E%B0%E9%80%9A%E8%BF%87url%E4%B8%8B%E8%BD%BDpdf%E5%88%B0%E6%9C%AC%E5%9C%B0/">
+    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/08/28/MySQL%E6%95%B0%E6%8D%AE%E5%BA%93%E6%AD%BB%E9%94%81%E6%8E%92%E6%9F%A5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
@@ -192,7 +192,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          SpringBoot实现通过url下载pdf到本地
+          MySQL数据库死锁排查
         </h1>
 
         <div class="post-meta">
@@ -201,16 +201,10 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2020-06-06 21:20:27" itemprop="dateCreated datePublished" datetime="2020-06-06T21:20:27+08:00">2020-06-06</time>
+              <time title="创建时间：2020-08-28 22:39:28 / 修改时间：22:45:32" itemprop="dateCreated datePublished" datetime="2020-08-28T22:39:28+08:00">2020-08-28</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 13:00:34" itemprop="dateModified" datetime="2020-07-16T13:00:34+08:00">2020-07-16</time>
-              </span>
 
           
             <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
@@ -229,15 +223,38 @@
     
     <div class="post-body" itemprop="articleBody">
       
-        <p>最近有需求是点击下载按钮后下载指定url的pdf文件到本地</p>
-<p>下面通过<strong>SpringBoot</strong>来实现一下：</p>
-<a id="more"></a>
-
-<h4 id="思路就是："><a href="#思路就是：" class="headerlink" title="思路就是："></a><strong>思路</strong>就是：</h4><ol>
-<li>解析url，建立连接获取输入流</li>
-<li>copy输入流到输出流中，进行相关设置并返回</li>
+        <h3 id="第一种"><a href="#第一种" class="headerlink" title="第一种"></a>第一种</h3><ol>
+<li>查询是否锁表</li>
 </ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping</span>(<span class="string">"/download"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">download</span><span class="params">(@RequestParam(<span class="string">"url"</span>)</span> String urlStr, HttpServletResponse response) <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        URL url = <span class="keyword">new</span> URL(urlStr);</span><br><span class="line">        HttpURLConnection conn = (HttpURLConnection)url.openConnection();</span><br><span class="line">        <span class="comment">//设置超时间为5秒</span></span><br><span class="line"><span class="comment">//        conn.setConnectTimeout(5*1000);</span></span><br><span class="line">        <span class="comment">//防止屏蔽程序抓取而返回403错误</span></span><br><span class="line">        conn.setRequestProperty(<span class="string">"User-Agent"</span>, <span class="string">"Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)"</span>);</span><br><span class="line">        <span class="keyword">try</span>(InputStream inputStream = conn.getInputStream();</span><br><span class="line">            OutputStream outputStream = response.getOutputStream();) &#123;</span><br><span class="line">            response.setContentType(<span class="string">"application/x-download"</span>);</span><br><span class="line">            response.addHeader(<span class="string">"Content-Disposition"</span>, <span class="string">"attachment;filename=test.pdf"</span>);</span><br><span class="line">            <span class="comment">// 将输入流拷贝到输出流中</span></span><br><span class="line">            IOUtils.copy(inputStream, outputStream);</span><br><span class="line">            outputStream.flush();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>show open tables where in_use &gt; 0;</p>
+<ol start="2">
+<li>查询进程（如果您有super权限，您可以看到所有线程。否则，您只能看到您自己的线程）</li>
+</ol>
+<p>show processlist</p>
+<ol start="3">
+<li>杀死进程id（就是上面命令的id列）</li>
+</ol>
+<p>kill id</p>
+<h3 id="第二种："><a href="#第二种：" class="headerlink" title="第二种："></a>第二种：</h3><ol>
+<li>查看下在锁的事务</li>
+</ol>
+<p>select * from information_schema.innodb_trx;</p>
+<ol start="2">
+<li>杀死进程id（就是上面命令的trx_mysql_thread_id列）</li>
+</ol>
+<p>kill 线程id</p>
+<p><strong>例子：</strong></p>
+<p>查出死锁进程：show processlist</p>
+<p>杀掉进程 kill 420821;</p>
+<p><strong>其它关于查看死锁的命令：</strong></p>
+<p>1：查看当前的事务</p>
+<p>select * from information_schema.innodb_trx;</p>
+<p>2：查看当前锁定的事务</p>
+<p>select * from information_schema.innodb_locks;</p>
+<p>3：查看当前等锁的事务</p>
+<p>select * from information_schema.innodb_lock_waits;</p>
+<h3 id="第三种："><a href="#第三种：" class="headerlink" title="第三种："></a>第三种：</h3><p>show engine innodb status</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p>链接：<a href="https://www.jianshu.com/p/624c3403bb2a" target="_blank" rel="noopener">https://www.jianshu.com/p/624c3403bb2a</a></p>
 
     </div>
 
@@ -264,13 +281,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/05/30/Spring-Boot%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90%E7%9A%84%E5%8A%A8%E6%80%81%E5%88%87%E6%8D%A2/" rel="prev" title="Spring-Boot多数据源的动态切换">
-      <i class="fa fa-chevron-left"></i> Spring-Boot多数据源的动态切换
+    <a href="/2020/08/28/%E4%B8%89%E5%8F%A5%E8%AF%9D%E6%90%9E%E6%87%82Redis-%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E3%80%81%E5%87%BB%E7%A9%BF%E3%80%81%E9%9B%AA%E5%B4%A9/" rel="prev" title="三句话搞懂Redis-缓存穿透、击穿、雪崩">
+      <i class="fa fa-chevron-left"></i> 三句话搞懂Redis-缓存穿透、击穿、雪崩
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/06/15/Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%9A%84%E5%8D%81%E6%9D%A1%E5%BB%BA%E8%AE%AE/" rel="next" title="Java异常处理的十条建议">
-      Java异常处理的十条建议 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -329,7 +343,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#思路就是："><span class="nav-number">1.</span> <span class="nav-text">思路就是：</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一种"><span class="nav-number">1.</span> <span class="nav-text">第一种</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二种："><span class="nav-number">2.</span> <span class="nav-text">第二种：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第三种："><span class="nav-number">3.</span> <span class="nav-text">第三种：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
