@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.wangguolong.top","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="简介牛客网-java方向-基础知识体系及结构-Linux-面试常考知识点">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java方向-基础知识体系及结构-Linux-持续更新中">
+<meta property="og:url" content="http://www.wangguolong.top/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-Linux-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/index.html">
+<meta property="og:site_name" content="王国隆的技术博客">
+<meta property="og:description" content="简介牛客网-java方向-基础知识体系及结构-Linux-面试常考知识点">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://www.wangguolong.top/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-Linux-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/rwx.png">
+<meta property="og:image" content="http://www.wangguolong.top/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-Linux-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/cron.png">
+<meta property="article:published_time" content="2020-09-02T12:50:24.467Z">
+<meta property="article:modified_time" content="2020-09-02T13:39:09.404Z">
+<meta property="article:author" content="Guolong Wang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.wangguolong.top/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-Linux-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/rwx.png">
+
+<link rel="canonical" href="http://www.wangguolong.top/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-Linux-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Java方向-基础知识体系及结构-Linux-持续更新中 | 王国隆的技术博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+    <a href="https://github.com/BUPTmango" target="_blank" rel="noopener" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">王国隆的技术博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-Linux-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
+      <meta itemprop="name" content="Guolong Wang">
+      <meta itemprop="description" content="爱玩，爱技术">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王国隆的技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java方向-基础知识体系及结构-Linux-持续更新中
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-09-02 20:50:24 / 修改时间：21:39:09" itemprop="dateCreated datePublished" datetime="2020-09-02T20:50:24+08:00">2020-09-02</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>牛客网-java方向-基础知识体系及结构-Linux-面试常考知识点</p>
+<a id="more"></a>
+
+<h3 id="1-下面哪个命令可以从文本文件的每一行中截取指定内容的数据"><a href="#1-下面哪个命令可以从文本文件的每一行中截取指定内容的数据" class="headerlink" title="1. 下面哪个命令可以从文本文件的每一行中截取指定内容的数据"></a>1. 下面哪个命令可以从文本文件的每一行中截取指定内容的数据</h3><p><strong>cut</strong> ：从文本文件的每一行中截取指定内容的数据。</p>
+<p><strong>cp</strong> ：用来复制文件或目录。</p>
+<p><strong>dd</strong> ：将指定的输入文件拷贝到输出文件中，在拷贝的过程中可以进行格式转换。</p>
+<p><strong>fmt</strong> ：将所有非空白行的长度设置为几乎相同，来进行简单的文本格式化。</p>
+<h3 id="2-Linux下的进程有哪三种状态？"><a href="#2-Linux下的进程有哪三种状态？" class="headerlink" title="2. Linux下的进程有哪三种状态？"></a>2. Linux下的进程有哪三种状态？</h3><p>运行态，就绪态和等待态</p>
+<ul>
+<li><p>运行态 (Running) ：          占有CPU，并在CPU上运行</p>
+</li>
+<li><p>就绪态 (Ready)：             已经具备运行条件，但由于没有空闲CPU，而暂时不能运行</p>
+</li>
+<li><p>等待态 (Waiting/Blocked)：   因等待某一事件而暂时不能运行：如等待读盘结果</p>
+</li>
+</ul>
+<h3 id="3-在Linux中-file-sh文件的权限为-rw-r–r-x-其对应权限用数值形式表示为"><a href="#3-在Linux中-file-sh文件的权限为-rw-r–r-x-其对应权限用数值形式表示为" class="headerlink" title="3. 在Linux中,file.sh文件的权限为-rw-r–r-x,其对应权限用数值形式表示为()"></a>3. 在Linux中,file.sh文件的权限为-rw-r–r-x,其对应权限用数值形式表示为()</h3><p>645</p>
+<p>Linux权限中，<strong>第一个指是否是目录</strong>，后面根据rwx形式对拥有者，所属组，其他分别授权，-rw-r–r-x即为110,100,101，转换成十进制就是645</p>
+<img src="/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-Linux-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/rwx.png" class="" title="rwx">
+
+<h3 id="4-linux下给文件start-sh设置权限为自己可读可修改可执行-组内用户为可读可执行不可修改-其余用户没有任何权限-那么设置该文件权限的命令为"><a href="#4-linux下给文件start-sh设置权限为自己可读可修改可执行-组内用户为可读可执行不可修改-其余用户没有任何权限-那么设置该文件权限的命令为" class="headerlink" title="4. linux下给文件start.sh设置权限为自己可读可修改可执行,组内用户为可读可执行不可修改,其余用户没有任何权限,那么设置该文件权限的命令为()"></a>4. linux下给文件start.sh设置权限为自己可读可修改可执行,组内用户为可读可执行不可修改,其余用户没有任何权限,那么设置该文件权限的命令为()</h3><p>chmod start.sh 750</p>
+<p>linux中权限有九位二进制数表示XXX YYY ZZZ，前一个XXX表示<strong>owner的权限</strong>，YYY表示<strong>group的权限（也就是同组用户的权限）</strong>，ZZZ表示<strong>other的权限（非同组用户的权限）</strong>。根据本题要求，XXX=111，YYY=101，ZZZ=000，所以是750</p>
+<h3 id="5-下列关于链接描述，错误的是-。"><a href="#5-下列关于链接描述，错误的是-。" class="headerlink" title="5. 下列关于链接描述，错误的是 。"></a>5. 下列关于链接描述，错误的是 。</h3><ul>
+<li><p>硬链接： 与普通文件没什么不同，inode 都指向同一个文件在硬盘中的区块</p>
+</li>
+<li><p>软链接： 保存了其代表的文件的绝对路径，是另外一种文件，在硬盘上有独立的区块，访问时替换自身路径</p>
+</li>
+</ul>
+<h3 id="6-每5分钟运行一次crond任务exam，下面哪项正确？"><a href="#6-每5分钟运行一次crond任务exam，下面哪项正确？" class="headerlink" title="6. 每5分钟运行一次crond任务exam，下面哪项正确？"></a>6. 每5分钟运行一次crond任务exam，下面哪项正确？</h3><p>*/5 * * * * exam</p>
+<img src="/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-Linux-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/cron.png" class="" title="cron">
+
+<h3 id="7-孤儿进程和僵尸进程"><a href="#7-孤儿进程和僵尸进程" class="headerlink" title="7. 孤儿进程和僵尸进程"></a>7. 孤儿进程和僵尸进程</h3><p><strong>孤儿进程</strong>：一个父进程退出，而它的一个或多个子进程还在运行，那么那些子进程将成为孤儿进程。孤儿进程将被init进程(进程号为1)所收养，并由init进程对它们完成状态收集工作。</p>
+<p><strong>僵尸进程</strong>：一个进程使用fork创建子进程，如果子进程退出，而父进程并没有调用wait或waitpid获取子进程的状态信息，那么子进程的进程描述符仍然保存在系统中。这种进程称之为僵死进程。</p>
+<p>unix提供了一种机制可以保证只要父进程想知道子进程结束时的状态信息， 就可以得到。这种机制就是: 在每个进程退出的时候,内核释放该进程所有的资源,包括打开的文件,占用的内存等。 但是仍然为其保留一定的信息(包括进程号the process ID,退出状态the termination status of the process,运行时间the amount of CPU time taken by the process等)。直到父进程通过wait / waitpid来取时才释放。 但这样就导致了问题，如果进程不调用wait / waitpid的话， 那么保留的那段信息就不会释放，其进程号就会一直被占用，但是系统所能使用的进程号是有限的，<strong>如果大量的产生僵死进程，将因为没有可用的进程号而导致系统不能产生新的进程</strong>. 此即为僵尸进程的危害，应当避免。</p>
+<p>孤儿进程是没有父进程的进程，孤儿进程这个重任就落到了init进程身上，init进程就好像是一个民政局，专门负责处理孤儿进程的善后工作。每当出现一个孤儿进程的时候，内核就把孤 儿进程的父进程设置为init，而init进程会循环地wait()它的已经退出的子进程。这样，当一个孤儿进程凄凉地结束了其生命周期的时候，init进程就会代表党和政府出面处理它的一切善后工作。因此<strong>孤儿进程并不会有什么危害。</strong></p>
+<h3 id="8-启动交换文件的指令是（-）"><a href="#8-启动交换文件的指令是（-）" class="headerlink" title="8. 启动交换文件的指令是（ ）"></a>8. 启动交换文件的指令是（ ）</h3><p>swapon</p>
+<p>mkswap ： 设置交换区(swap area)，可将磁盘分区或文件设为Linux的交换区</p>
+<p>swapon ： 激活swap</p>
+<p>swapoff ： 关闭系统交换分区</p>
+<h3 id="9-linux下查看磁盘挂载状态的命令式？"><a href="#9-linux下查看磁盘挂载状态的命令式？" class="headerlink" title="9. linux下查看磁盘挂载状态的命令式？"></a>9. linux下查看磁盘挂载状态的命令式？</h3><p>mount</p>
+<p>安装命令：rpm -ivh</p>
+<p>卸载命令: rpm -e [package name]</p>
+<p>查看挂载状态: mount</p>
+<p>查看磁盘情况: df</p>
+<p>查看端口:netstat –anlp</p>
+<h3 id="10-Linux有三个查看文件的命令"><a href="#10-Linux有三个查看文件的命令" class="headerlink" title="10. Linux有三个查看文件的命令"></a>10. Linux有三个查看文件的命令</h3><ul>
+<li><p>cat命令：将文件内容一次全输出显示在屏幕上。</p>
+</li>
+<li><p>more命令：分屏显示文件内容，每次只显示一屏，只允许向前浏览。</p>
+</li>
+<li><p>less命令：与more相似，并且支持向前，向后浏览。</p>
+</li>
+</ul>
+<h3 id="11-64位Linux系统里，下面几个sizeof的运行结果是"><a href="#11-64位Linux系统里，下面几个sizeof的运行结果是" class="headerlink" title="11. 64位Linux系统里，下面几个sizeof的运行结果是"></a>11. 64位Linux系统里，下面几个sizeof的运行结果是</h3><p>（1）int在32位和64位系统中都是32位，4字节，sizeof=4 </p>
+<p>（2）<strong>字符串末尾为＼0</strong>，sizeof获得其长度为8 </p>
+<p>（3）<strong>指针大小在32位系统为4字节，64位系统为8字节</strong></p>
+<h3 id="以下命令用于设置环境变量的是："><a href="#以下命令用于设置环境变量的是：" class="headerlink" title="以下命令用于设置环境变量的是："></a>以下命令用于设置环境变量的是：</h3><p>export</p>
+<ul>
+<li><p>export： 设置环境变量</p>
+</li>
+<li><p>echo：查看是否成功</p>
+</li>
+<li><p>env：显示所有的环境变量</p>
+</li>
+<li><p>set：显示所有本地定义的Shell变量</p>
+</li>
+<li><p>unset：清除环境变量</p>
+</li>
+</ul>
+<h3 id="12-若fp已定义为指向某文件的指针-且没有读到该文件的末尾-C语言函数feof-fp-的函数返回值是？"><a href="#12-若fp已定义为指向某文件的指针-且没有读到该文件的末尾-C语言函数feof-fp-的函数返回值是？" class="headerlink" title="12. 若fp已定义为指向某文件的指针,且没有读到该文件的末尾,C语言函数feof( fp)的函数返回值是？"></a>12. 若fp已定义为指向某文件的指针,且没有读到该文件的末尾,C语言函数feof( fp)的函数返回值是？</h3><p>0</p>
+<p>feof（）函数： 如果文件结束，则返回非0值，否则返回0，文件结束符只能被clearerr()清除。</p>
+<h3 id="13-系统当前已经加载的所有文件系统在-文件中得到反映。"><a href="#13-系统当前已经加载的所有文件系统在-文件中得到反映。" class="headerlink" title="13. 系统当前已经加载的所有文件系统在_____文件中得到反映。"></a>13. 系统当前已经加载的所有文件系统在<strong>_____</strong>文件中得到反映。</h3><p>/etc/mtab</p>
+<p>/etc/mtab文件的作用：记载的是<strong>现在系统已经装载的文件系统</strong>，包括操作系统建立的虚拟文件等；而/etc/fstab是系统准备装载的</p>
+<p>/etc/fstab文件的作用 ：记录了<strong>计算机上硬盘分区的相关信息</strong>，启动 Linux 的时候，检查分区的 fsck 命令，和挂载分区的 mount 命令，都需要 fstab 中的信息，来正确的检查和挂载硬盘。</p>
+<h3 id="14-终止一个前台进程可能用到的命令和操作是？"><a href="#14-终止一个前台进程可能用到的命令和操作是？" class="headerlink" title="14. 终止一个前台进程可能用到的命令和操作是？"></a>14. 终止一个前台进程可能用到的命令和操作是？</h3><p>kill CTRL+C</p>
+<p><strong>kill</strong>杀死<strong>前台和后台</strong>的进程，而<strong>ctrl+c</strong>只能杀死正在运行的进程也就是<strong>前台</strong>进程</p>
+<h3 id="15-进程之间通信都有哪些方式？"><a href="#15-进程之间通信都有哪些方式？" class="headerlink" title="15. 进程之间通信都有哪些方式？"></a>15. 进程之间通信都有哪些方式？</h3><p>用于进程间通讯(IPC)的四种不同技术: </p>
+<ol>
+<li><p><strong>消息传递</strong>(管道,FIFO,posix和system v消息队列) </p>
+</li>
+<li><p><strong>同步</strong>(互斥锁,条件变量,读写锁,文件和记录锁,Posix和System V信号灯) </p>
+</li>
+<li><p><strong>共享内存区</strong>(匿名共享内存区,有名Posix共享内存区,有名System V共享内存区)  </p>
+</li>
+<li><p><strong>过程调用</strong>(Solaris门,Sun RPC) </p>
+</li>
+</ol>
+<h3 id="16-Linux系统上，下面哪些文件是与用户管理相关的配置文件（）"><a href="#16-Linux系统上，下面哪些文件是与用户管理相关的配置文件（）" class="headerlink" title="16. Linux系统上，下面哪些文件是与用户管理相关的配置文件（）"></a>16. Linux系统上，下面哪些文件是与用户管理相关的配置文件（）</h3><ul>
+<li><p>/etc/group 设定用户的组名与相关信息</p>
+</li>
+<li><p>/etc/passwd 帐号信息</p>
+</li>
+<li><p>/etc/shadow  密码信息</p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+  
+</div>
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/" rel="prev" title="Java方向-基础知识体系及结构-网络基础-持续更新中">
+      <i class="fa fa-chevron-left"></i> Java方向-基础知识体系及结构-网络基础-持续更新中
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-下面哪个命令可以从文本文件的每一行中截取指定内容的数据"><span class="nav-number">2.</span> <span class="nav-text">1. 下面哪个命令可以从文本文件的每一行中截取指定内容的数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Linux下的进程有哪三种状态？"><span class="nav-number">3.</span> <span class="nav-text">2. Linux下的进程有哪三种状态？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-在Linux中-file-sh文件的权限为-rw-r–r-x-其对应权限用数值形式表示为"><span class="nav-number">4.</span> <span class="nav-text">3. 在Linux中,file.sh文件的权限为-rw-r–r-x,其对应权限用数值形式表示为()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-linux下给文件start-sh设置权限为自己可读可修改可执行-组内用户为可读可执行不可修改-其余用户没有任何权限-那么设置该文件权限的命令为"><span class="nav-number">5.</span> <span class="nav-text">4. linux下给文件start.sh设置权限为自己可读可修改可执行,组内用户为可读可执行不可修改,其余用户没有任何权限,那么设置该文件权限的命令为()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-下列关于链接描述，错误的是-。"><span class="nav-number">6.</span> <span class="nav-text">5. 下列关于链接描述，错误的是 。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-每5分钟运行一次crond任务exam，下面哪项正确？"><span class="nav-number">7.</span> <span class="nav-text">6. 每5分钟运行一次crond任务exam，下面哪项正确？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-孤儿进程和僵尸进程"><span class="nav-number">8.</span> <span class="nav-text">7. 孤儿进程和僵尸进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-启动交换文件的指令是（-）"><span class="nav-number">9.</span> <span class="nav-text">8. 启动交换文件的指令是（ ）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-linux下查看磁盘挂载状态的命令式？"><span class="nav-number">10.</span> <span class="nav-text">9. linux下查看磁盘挂载状态的命令式？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-Linux有三个查看文件的命令"><span class="nav-number">11.</span> <span class="nav-text">10. Linux有三个查看文件的命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-64位Linux系统里，下面几个sizeof的运行结果是"><span class="nav-number">12.</span> <span class="nav-text">11. 64位Linux系统里，下面几个sizeof的运行结果是</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#以下命令用于设置环境变量的是："><span class="nav-number">13.</span> <span class="nav-text">以下命令用于设置环境变量的是：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12-若fp已定义为指向某文件的指针-且没有读到该文件的末尾-C语言函数feof-fp-的函数返回值是？"><span class="nav-number">14.</span> <span class="nav-text">12. 若fp已定义为指向某文件的指针,且没有读到该文件的末尾,C语言函数feof( fp)的函数返回值是？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#13-系统当前已经加载的所有文件系统在-文件中得到反映。"><span class="nav-number">15.</span> <span class="nav-text">13. 系统当前已经加载的所有文件系统在_____文件中得到反映。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#14-终止一个前台进程可能用到的命令和操作是？"><span class="nav-number">16.</span> <span class="nav-text">14. 终止一个前台进程可能用到的命令和操作是？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#15-进程之间通信都有哪些方式？"><span class="nav-number">17.</span> <span class="nav-text">15. 进程之间通信都有哪些方式？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#16-Linux系统上，下面哪些文件是与用户管理相关的配置文件（）"><span class="nav-number">18.</span> <span class="nav-text">16. Linux系统上，下面哪些文件是与用户管理相关的配置文件（）</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Guolong Wang"
+      src="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
+  <p class="site-author-name" itemprop="name">Guolong Wang</p>
+  <div class="site-description" itemprop="description">爱玩，爱技术</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/BUPTmango" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;BUPTmango" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:13121593633@163.com" title="E-Mail → mailto:13121593633@163.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guolong Wang</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+-->
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共41.5k字</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
