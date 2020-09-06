@@ -30,7 +30,7 @@
 <meta property="og:image" content="http://www.wangguolong.top/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-Linux-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/rwx.png">
 <meta property="og:image" content="http://www.wangguolong.top/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-Linux-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/cron.png">
 <meta property="article:published_time" content="2020-09-02T12:50:24.467Z">
-<meta property="article:modified_time" content="2020-09-03T12:57:43.916Z">
+<meta property="article:modified_time" content="2020-09-06T14:51:52.410Z">
 <meta property="article:author" content="Guolong Wang">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://www.wangguolong.top/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-Linux-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/rwx.png">
@@ -212,7 +212,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-09-03 20:57:43" itemprop="dateModified" datetime="2020-09-03T20:57:43+08:00">2020-09-03</time>
+                <time title="修改时间：2020-09-06 22:51:52" itemprop="dateModified" datetime="2020-09-06T22:51:52+08:00">2020-09-06</time>
               </span>
 
           
@@ -356,7 +356,62 @@
 <p><strong>tail</strong> -n k          # 打印最后k行</p>
 <p><strong>tail</strong> -n +k         # 从k行开始打印</p>
 <p><strong>sed</strong>命令 p ：列印，亦即将某个选择的数据印出。通常 p 会与参数 sed -n 一起运行～</p>
+<h3 id="22-Linux下通过哪个命令怎么查看中断？"><a href="#22-Linux下通过哪个命令怎么查看中断？" class="headerlink" title="22. Linux下通过哪个命令怎么查看中断？"></a>22. Linux下通过哪个命令怎么查看中断？</h3><p>cat /proc/interrupts</p>
+<p>/proc/interrupts 显示使用的中断</p>
+<p> /proc/ioports 当前使用的I/O端口</p>
+<p> /proc/kcore 系统物理内存映像。与物理内存大小完全一样，但不实际占用这么多的内存。</p>
+<p> /proc/kmsg  内核输出的消息，也被送到syslog</p>
+<h3 id="23-下列文件中，包含了主机名到IP地址的映射关系的文件是：-。"><a href="#23-下列文件中，包含了主机名到IP地址的映射关系的文件是：-。" class="headerlink" title="23. 下列文件中，包含了主机名到IP地址的映射关系的文件是： 。"></a>23. 下列文件中，包含了主机名到IP地址的映射关系的文件是： 。</h3><p>/etc/hosts</p>
+<p>/etc/resolv.conf     文件功能：DNS客户机配置文件，设置DNS服务器的IP地址及DNS域名<br>/etc/host.conf      指定主机名查找方法，通常指先查找文件/etc/hosts,找不到时再向DNS服务器请求。<br>/etc/networks       配置网络的</p>
+<h3 id="24-局域网的网络地址192-168-1-0-24，局域网络连接其它网络的网关地址是192-168-1-1。主机192-168-1-20访问172-16-1-0-24网络时，其路由设置正确的是？"><a href="#24-局域网的网络地址192-168-1-0-24，局域网络连接其它网络的网关地址是192-168-1-1。主机192-168-1-20访问172-16-1-0-24网络时，其路由设置正确的是？" class="headerlink" title="24. 局域网的网络地址192.168.1.0/24，局域网络连接其它网络的网关地址是192.168.1.1。主机192.168.1.20访问172.16.1.0/24网络时，其路由设置正确的是？"></a>24. 局域网的网络地址192.168.1.0/24，局域网络连接其它网络的网关地址是192.168.1.1。主机192.168.1.20访问172.16.1.0/24网络时，其路由设置正确的是？</h3><p>route add –net 172.16.1.0 gw 192.168.1.1 netmask 255.255.255.0 metric 1</p>
+<p>路由信息是由{目的主机所在的网络地址，下一跳地址，子网掩码}组成</p>
+<h3 id="25-arp协议用了"><a href="#25-arp协议用了" class="headerlink" title="25. arp协议用了()"></a>25. arp协议用了()</h3><p>broadcast</p>
+<p>地址解析协议，即ARP（Address Resolution Protocol），是根据 IP地址 获取 物理地址 的一个 TCP/IP协议 。 </p>
+<p>主机 发送信息时将包含目标IP地址的ARP请求广播到网络上的所有主机，并接收返回消息，以此确定目标的物理地址；收到返回消息后将该IP地址和物理地址存入本机ARP缓存中并<strong>保留一定时间</strong>，下次请求时直接<strong>查询ARP缓存</strong>以节约资源。</p>
+<h3 id="26-在命令行下使用-vi-编辑一个文件时-如何复制当前行？"><a href="#26-在命令行下使用-vi-编辑一个文件时-如何复制当前行？" class="headerlink" title="26. 在命令行下使用 vi 编辑一个文件时, 如何复制当前行？"></a>26. 在命令行下使用 vi 编辑一个文件时, 如何复制当前行？</h3><p>yy</p>
+<p>dd 删除光标所在的那一整行</p>
+<p>yy 复制光标所在的那一整行</p>
+<p>p 将已复制的数据在光标的下一行粘贴</p>
+<p>P 将已复制的数据在光标的上一行粘贴</p>
+<h3 id="27-bash中，需要将脚本demo-sh的标准输出和标准错误输出重定向至文件demo-log，以下哪些用法是正确的（"><a href="#27-bash中，需要将脚本demo-sh的标准输出和标准错误输出重定向至文件demo-log，以下哪些用法是正确的（" class="headerlink" title="27. bash中，需要将脚本demo.sh的标准输出和标准错误输出重定向至文件demo.log，以下哪些用法是正确的（)"></a>27. bash中，需要将脚本demo.sh的标准输出和标准错误输出重定向至文件demo.log，以下哪些用法是正确的（)</h3><p>bash  demo.sh &amp;&gt;demo.log</p>
+<p>bash  demo.sh &gt;demo.log 2&gt;&amp;1</p>
+<p>command &amp;&gt; file 表示将标准输出（stdout）和标准错误输出（stderr）重定向至指定的文件file中。 </p>
+<p>command &gt; file <strong>2&gt;&amp;1</strong>，是由两部分组成。首先command&gt;file表示将标准输出（stdout）重定向到文件file中。接下来的2&gt;&amp;1表示将标准错误输出（stderr）输出到文件描述符1指定的位置，即标准输出（stdout）的位置，由于标准输出已经冲定向到文件file中，所以标准错误输出也会重定向到文件file中。</p>
+<p>command 2&gt; file 1&gt; file，也可看成是由两部分组成。最终的file中不会包含标准错误输出（stderr）的信息，因为会被之后的标准输出（stdout）<strong>覆盖</strong>。</p>
+<h3 id="28-统计日志中ip登陆次数-下面可以正确统计的为"><a href="#28-统计日志中ip登陆次数-下面可以正确统计的为" class="headerlink" title="28. 统计日志中ip登陆次数,下面可以正确统计的为"></a>28. 统计日志中ip登陆次数,下面可以正确统计的为</h3><p>cat catalina.log  | awk -F ‘ ‘ ‘{print $3}’ | sort | uniq -c | wc -l</p>
+<p>cat catalina.log | awk ‘{print $3}’ | sort -k1nr | uniq -c | wc –l</p>
+<p>uniq -c（uniq命令可以去除排序过的文件中的重复行，因此<strong>uniq经常和sort合用</strong>。也就是说，<strong>为了使uniq起作用，所有的重复行必须是相邻的</strong>。</p>
+<p>wc -l 行计数。</p>
+<h3 id="29-在RHEL5系统中，小王希望将他执行的ls命令的输出结果保存在当前目录下文件output-ls中，以供日后进行分析和使用，但要求不覆盖原文件的内容，他应该使用的命令是（-）"><a href="#29-在RHEL5系统中，小王希望将他执行的ls命令的输出结果保存在当前目录下文件output-ls中，以供日后进行分析和使用，但要求不覆盖原文件的内容，他应该使用的命令是（-）" class="headerlink" title="29. 在RHEL5系统中，小王希望将他执行的ls命令的输出结果保存在当前目录下文件output.ls中，以供日后进行分析和使用，但要求不覆盖原文件的内容，他应该使用的命令是（  ）"></a>29. 在RHEL5系统中，小王希望将他执行的ls命令的输出结果保存在当前目录下文件output.ls中，以供日后进行分析和使用，但要求不覆盖原文件的内容，他应该使用的命令是（  ）</h3><p>ls&gt;&gt;output.ls</p>
+<p><strong>&gt;  **             输出重定向到一个文件或设备 覆盖原来的文件<br>*<em>&gt;! *</em>             输出重定向到一个文件或设备 强制覆盖原来的文件<br>**&gt;&gt;</strong>              输出重定向到一个文件或设备 追加原来的文件<br>**&lt; **              输入重定向到一个程序 </p>
+<h3 id="30-Linux系统中，用户文件描述符0表示-。"><a href="#30-Linux系统中，用户文件描述符0表示-。" class="headerlink" title="30. Linux系统中，用户文件描述符0表示 __ ___ 。"></a>30. Linux系统中，用户文件描述符0表示 __ ___ 。</h3><p>标准输入设备文件描述符</p>
+<p>文件描述符<strong>0</strong>：标准输入设备</p>
+<p>文件描述符<strong>1</strong>：标准输出设备</p>
+<p>文件描述符<strong>2</strong>：标准错误输出设备</p>
+<h3 id="31-Vi编辑器中-怎样将字符AAA全部替换成yyy"><a href="#31-Vi编辑器中-怎样将字符AAA全部替换成yyy" class="headerlink" title="31. Vi编辑器中,怎样将字符AAA全部替换成yyy?"></a>31. Vi编辑器中,怎样将字符AAA全部替换成yyy?</h3><p>s/AAA/yyy/g</p>
+<p>sed是非交互式的编辑器。它不会修改文件，除非使用shell重定向来保存结果。默认情况下，所有的输出行都被打印到屏幕上。sed编辑器逐行处理文件（或输入），并将结果发送到屏幕。</p>
+<p>sed命令行格式为：</p>
+<pre><code>sed [-nefri] ‘command’ 输入文本    </code></pre><p>常用选项：</p>
+<pre><code>-n∶使用安静(silent)模式。在一般 sed 的用法中，所有来自 STDIN的资料一般都会被列出到萤幕上。但如果加上 -n 参数后，则只有经过sed 特殊处理的那一行(或者动作)才会被列出来。
 
+-e∶直接在指令列模式上进行 sed 的动作编辑；
+
+-f∶直接将 sed 的动作写在一个档案内， -f filename 则可以执行 filename 内的sed 动作；
+
+-r∶sed 的动作支援的是延伸型正规表示法的语法。(预设是基础正规表示法语法)
+
+-i∶直接修改读取的档案内容，而不是由萤幕输出。       </code></pre><p>常用命令：<br>        a  ∶新增， a 的后面可以接字串，而这些字串会在新的一行出现(目前的下一行)～</p>
+<pre><code>c  ∶取代， c 的后面可以接字串，这些字串可以取代 n1,n2 之间的行！
+
+d  ∶删除，因为是删除啊，所以 d 后面通常不接任何咚咚；
+
+i  ∶插入， i 的后面可以接字串，而这些字串会在新的一行出现(目前的上一行)；
+
+p  ∶列印，亦即将某个选择的资料印出。通常 p 会与参数 sed -n 一起运作～
+
+s  ∶取代，可以直接进行取代的工作哩！通常这个 s 的动作可以搭配正规表示法！例如 1,20s/old/new/g！
+
+g  :是行内进行全局替换</code></pre>
     </div>
 
     
@@ -444,7 +499,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-下面哪个命令可以从文本文件的每一行中截取指定内容的数据"><span class="nav-number">2.</span> <span class="nav-text">1. 下面哪个命令可以从文本文件的每一行中截取指定内容的数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Linux下的进程有哪三种状态？"><span class="nav-number">3.</span> <span class="nav-text">2. Linux下的进程有哪三种状态？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-在Linux中-file-sh文件的权限为-rw-r–r-x-其对应权限用数值形式表示为"><span class="nav-number">4.</span> <span class="nav-text">3. 在Linux中,file.sh文件的权限为-rw-r–r-x,其对应权限用数值形式表示为()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-linux下给文件start-sh设置权限为自己可读可修改可执行-组内用户为可读可执行不可修改-其余用户没有任何权限-那么设置该文件权限的命令为"><span class="nav-number">5.</span> <span class="nav-text">4. linux下给文件start.sh设置权限为自己可读可修改可执行,组内用户为可读可执行不可修改,其余用户没有任何权限,那么设置该文件权限的命令为()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-下列关于链接描述，错误的是-。"><span class="nav-number">6.</span> <span class="nav-text">5. 下列关于链接描述，错误的是 。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-每5分钟运行一次crond任务exam，下面哪项正确？"><span class="nav-number">7.</span> <span class="nav-text">6. 每5分钟运行一次crond任务exam，下面哪项正确？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-孤儿进程和僵尸进程"><span class="nav-number">8.</span> <span class="nav-text">7. 孤儿进程和僵尸进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-启动交换文件的指令是（-）"><span class="nav-number">9.</span> <span class="nav-text">8. 启动交换文件的指令是（ ）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-linux下查看磁盘挂载状态的命令式？"><span class="nav-number">10.</span> <span class="nav-text">9. linux下查看磁盘挂载状态的命令式？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-Linux有三个查看文件的命令"><span class="nav-number">11.</span> <span class="nav-text">10. Linux有三个查看文件的命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-64位Linux系统里，下面几个sizeof的运行结果是"><span class="nav-number">12.</span> <span class="nav-text">11. 64位Linux系统里，下面几个sizeof的运行结果是</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#以下命令用于设置环境变量的是："><span class="nav-number">13.</span> <span class="nav-text">以下命令用于设置环境变量的是：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12-若fp已定义为指向某文件的指针-且没有读到该文件的末尾-C语言函数feof-fp-的函数返回值是？"><span class="nav-number">14.</span> <span class="nav-text">12. 若fp已定义为指向某文件的指针,且没有读到该文件的末尾,C语言函数feof( fp)的函数返回值是？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#13-系统当前已经加载的所有文件系统在-文件中得到反映。"><span class="nav-number">15.</span> <span class="nav-text">13. 系统当前已经加载的所有文件系统在_____文件中得到反映。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#14-终止一个前台进程可能用到的命令和操作是？"><span class="nav-number">16.</span> <span class="nav-text">14. 终止一个前台进程可能用到的命令和操作是？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#15-进程之间通信都有哪些方式？"><span class="nav-number">17.</span> <span class="nav-text">15. 进程之间通信都有哪些方式？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#16-Linux系统上，下面哪些文件是与用户管理相关的配置文件（）"><span class="nav-number">18.</span> <span class="nav-text">16. Linux系统上，下面哪些文件是与用户管理相关的配置文件（）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#17-Vsftpd-配置本地用户传输速率的参数？"><span class="nav-number">19.</span> <span class="nav-text">17. Vsftpd 配置本地用户传输速率的参数？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#18-使用什么命令进行查询，并不真正对硬盘上的文件系统进行查找，而是对文件名数据库进行检索，而且可以使用通配符？和-？"><span class="nav-number">20.</span> <span class="nav-text">18. 使用什么命令进行查询，并不真正对硬盘上的文件系统进行查找，而是对文件名数据库进行检索，而且可以使用通配符？和*？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#19-下列关于makefile描述正确的有？"><span class="nav-number">21.</span> <span class="nav-text">19. 下列关于makefile描述正确的有？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#20-程序员小李通过管道统计prog-c函数中for语句通过的次数，需要使用的指令分别是"><span class="nav-number">22.</span> <span class="nav-text">20. 程序员小李通过管道统计prog.c函数中for语句通过的次数，需要使用的指令分别是</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#21-下面哪些命令可以查看file1文件的第300-500行的内容？"><span class="nav-number">23.</span> <span class="nav-text">21. 下面哪些命令可以查看file1文件的第300-500行的内容？</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-下面哪个命令可以从文本文件的每一行中截取指定内容的数据"><span class="nav-number">2.</span> <span class="nav-text">1. 下面哪个命令可以从文本文件的每一行中截取指定内容的数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Linux下的进程有哪三种状态？"><span class="nav-number">3.</span> <span class="nav-text">2. Linux下的进程有哪三种状态？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-在Linux中-file-sh文件的权限为-rw-r–r-x-其对应权限用数值形式表示为"><span class="nav-number">4.</span> <span class="nav-text">3. 在Linux中,file.sh文件的权限为-rw-r–r-x,其对应权限用数值形式表示为()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-linux下给文件start-sh设置权限为自己可读可修改可执行-组内用户为可读可执行不可修改-其余用户没有任何权限-那么设置该文件权限的命令为"><span class="nav-number">5.</span> <span class="nav-text">4. linux下给文件start.sh设置权限为自己可读可修改可执行,组内用户为可读可执行不可修改,其余用户没有任何权限,那么设置该文件权限的命令为()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-下列关于链接描述，错误的是-。"><span class="nav-number">6.</span> <span class="nav-text">5. 下列关于链接描述，错误的是 。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-每5分钟运行一次crond任务exam，下面哪项正确？"><span class="nav-number">7.</span> <span class="nav-text">6. 每5分钟运行一次crond任务exam，下面哪项正确？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-孤儿进程和僵尸进程"><span class="nav-number">8.</span> <span class="nav-text">7. 孤儿进程和僵尸进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-启动交换文件的指令是（-）"><span class="nav-number">9.</span> <span class="nav-text">8. 启动交换文件的指令是（ ）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-linux下查看磁盘挂载状态的命令式？"><span class="nav-number">10.</span> <span class="nav-text">9. linux下查看磁盘挂载状态的命令式？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-Linux有三个查看文件的命令"><span class="nav-number">11.</span> <span class="nav-text">10. Linux有三个查看文件的命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-64位Linux系统里，下面几个sizeof的运行结果是"><span class="nav-number">12.</span> <span class="nav-text">11. 64位Linux系统里，下面几个sizeof的运行结果是</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#以下命令用于设置环境变量的是："><span class="nav-number">13.</span> <span class="nav-text">以下命令用于设置环境变量的是：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12-若fp已定义为指向某文件的指针-且没有读到该文件的末尾-C语言函数feof-fp-的函数返回值是？"><span class="nav-number">14.</span> <span class="nav-text">12. 若fp已定义为指向某文件的指针,且没有读到该文件的末尾,C语言函数feof( fp)的函数返回值是？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#13-系统当前已经加载的所有文件系统在-文件中得到反映。"><span class="nav-number">15.</span> <span class="nav-text">13. 系统当前已经加载的所有文件系统在_____文件中得到反映。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#14-终止一个前台进程可能用到的命令和操作是？"><span class="nav-number">16.</span> <span class="nav-text">14. 终止一个前台进程可能用到的命令和操作是？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#15-进程之间通信都有哪些方式？"><span class="nav-number">17.</span> <span class="nav-text">15. 进程之间通信都有哪些方式？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#16-Linux系统上，下面哪些文件是与用户管理相关的配置文件（）"><span class="nav-number">18.</span> <span class="nav-text">16. Linux系统上，下面哪些文件是与用户管理相关的配置文件（）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#17-Vsftpd-配置本地用户传输速率的参数？"><span class="nav-number">19.</span> <span class="nav-text">17. Vsftpd 配置本地用户传输速率的参数？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#18-使用什么命令进行查询，并不真正对硬盘上的文件系统进行查找，而是对文件名数据库进行检索，而且可以使用通配符？和-？"><span class="nav-number">20.</span> <span class="nav-text">18. 使用什么命令进行查询，并不真正对硬盘上的文件系统进行查找，而是对文件名数据库进行检索，而且可以使用通配符？和*？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#19-下列关于makefile描述正确的有？"><span class="nav-number">21.</span> <span class="nav-text">19. 下列关于makefile描述正确的有？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#20-程序员小李通过管道统计prog-c函数中for语句通过的次数，需要使用的指令分别是"><span class="nav-number">22.</span> <span class="nav-text">20. 程序员小李通过管道统计prog.c函数中for语句通过的次数，需要使用的指令分别是</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#21-下面哪些命令可以查看file1文件的第300-500行的内容？"><span class="nav-number">23.</span> <span class="nav-text">21. 下面哪些命令可以查看file1文件的第300-500行的内容？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#22-Linux下通过哪个命令怎么查看中断？"><span class="nav-number">24.</span> <span class="nav-text">22. Linux下通过哪个命令怎么查看中断？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#23-下列文件中，包含了主机名到IP地址的映射关系的文件是：-。"><span class="nav-number">25.</span> <span class="nav-text">23. 下列文件中，包含了主机名到IP地址的映射关系的文件是： 。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#24-局域网的网络地址192-168-1-0-24，局域网络连接其它网络的网关地址是192-168-1-1。主机192-168-1-20访问172-16-1-0-24网络时，其路由设置正确的是？"><span class="nav-number">26.</span> <span class="nav-text">24. 局域网的网络地址192.168.1.0&#x2F;24，局域网络连接其它网络的网关地址是192.168.1.1。主机192.168.1.20访问172.16.1.0&#x2F;24网络时，其路由设置正确的是？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#25-arp协议用了"><span class="nav-number">27.</span> <span class="nav-text">25. arp协议用了()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#26-在命令行下使用-vi-编辑一个文件时-如何复制当前行？"><span class="nav-number">28.</span> <span class="nav-text">26. 在命令行下使用 vi 编辑一个文件时, 如何复制当前行？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#27-bash中，需要将脚本demo-sh的标准输出和标准错误输出重定向至文件demo-log，以下哪些用法是正确的（"><span class="nav-number">29.</span> <span class="nav-text">27. bash中，需要将脚本demo.sh的标准输出和标准错误输出重定向至文件demo.log，以下哪些用法是正确的（)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#28-统计日志中ip登陆次数-下面可以正确统计的为"><span class="nav-number">30.</span> <span class="nav-text">28. 统计日志中ip登陆次数,下面可以正确统计的为</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#29-在RHEL5系统中，小王希望将他执行的ls命令的输出结果保存在当前目录下文件output-ls中，以供日后进行分析和使用，但要求不覆盖原文件的内容，他应该使用的命令是（-）"><span class="nav-number">31.</span> <span class="nav-text">29. 在RHEL5系统中，小王希望将他执行的ls命令的输出结果保存在当前目录下文件output.ls中，以供日后进行分析和使用，但要求不覆盖原文件的内容，他应该使用的命令是（  ）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#30-Linux系统中，用户文件描述符0表示-。"><span class="nav-number">32.</span> <span class="nav-text">30. Linux系统中，用户文件描述符0表示 __ ___ 。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#31-Vi编辑器中-怎样将字符AAA全部替换成yyy"><span class="nav-number">33.</span> <span class="nav-text">31. Vi编辑器中,怎样将字符AAA全部替换成yyy?</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -510,7 +565,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共45.8k字</span>
+  <span class="post-count">博客全站共50.1k字</span>
 </div>
 
 
