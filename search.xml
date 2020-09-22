@@ -1,21 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>ControllerAdvice和ErrorController的用法</title>
-    <url>/2020/07/14/ControllerAdvice%E5%92%8CErrorController%E7%9A%84%E7%94%A8%E6%B3%95/</url>
-    <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>在Java中异常可以分为Error和Exception，<strong>@ControllerAdvice</strong>用来处理系统中的<strong>Exception</strong>，<strong>Error</strong>Controller处理系统中的<strong>Error</strong>。</p>
-<a id="more"></a>
-
-<h2 id="ErrorController"><a href="#ErrorController" class="headerlink" title="ErrorController"></a>ErrorController</h2><p>在项目中我们遇到404找不到的错误、或者500服务器错误都需要配置相应的页面给用户一个友好的提示，而在Spring Boot中我们需要如何设置。</p>
-<p>当系统出现404或者405等错误信息时，springboot默认的访问路径为/error，所以实现ErrorController并重写。</p>
-<h3 id="ErrorController源码"><a href="#ErrorController源码" class="headerlink" title="ErrorController源码"></a>ErrorController源码</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> org.springframework.boot.web.servlet.error;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Controller;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Marker interface used to indicate that a &#123;<span class="doctag">@link</span> Controller <span class="doctag">@Controller</span>&#125; is used to</span></span><br><span class="line"><span class="comment"> * render errors. Primarily used to know the error paths that will not need to be secured.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Phillip Webb</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 2.0.0</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ErrorController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Returns the path of the error page.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> the error path</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function">String <span class="title">getErrorPath</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="重写ErrorController样例"><a href="#重写ErrorController样例" class="headerlink" title="重写ErrorController样例"></a>重写ErrorController样例</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 全局Error/404处理</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> geekidea</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2018-11-08</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@ApiIgnore</span></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GlobalErrorController</span> <span class="keyword">implements</span> <span class="title">ErrorController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String ERROR_PATH = <span class="string">"/error"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(ERROR_PATH)</span><br><span class="line">    <span class="keyword">public</span> ApiResult&lt;?&gt; handleError(HttpServletRequest request,HttpServletResponse response)&#123;</span><br><span class="line">        <span class="keyword">int</span> status = response.getStatus();</span><br><span class="line">        <span class="keyword">switch</span> (status)&#123;</span><br><span class="line">            <span class="keyword">case</span> HttpServletResponse.SC_UNAUTHORIZED:</span><br><span class="line">                <span class="keyword">return</span> ApiResult.fail(ApiCode.UNAUTHORIZED);</span><br><span class="line">            <span class="keyword">case</span> HttpServletResponse.SC_FORBIDDEN:</span><br><span class="line">                <span class="keyword">return</span> ApiResult.fail(ApiCode.NOT_PERMISSION);</span><br><span class="line">            <span class="keyword">case</span> HttpServletResponse.SC_NOT_FOUND:</span><br><span class="line">                <span class="keyword">return</span> ApiResult.fail(ApiCode.NOT_FOUND);</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.FAIL);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getErrorPath</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        log.error(<span class="string">"errorPath...."</span>);</span><br><span class="line">        <span class="keyword">return</span> ERROR_PATH;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="ControllerAdvice"><a href="#ControllerAdvice" class="headerlink" title="@ControllerAdvice"></a>@ControllerAdvice</h2><p>ControllerAdvice用来处理发生Exception错误的注解。需要注意的是不能使用try catch 捕获</p>
-<h3 id="ControllerAdvice样例"><a href="#ControllerAdvice样例" class="headerlink" title="@ControllerAdvice样例"></a>@ControllerAdvice样例</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> geekidea</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2018-11-08</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@ControllerAdvice</span></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GlobalExceptionHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 非法参数验证异常</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> ex</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(MethodArgumentNotValidException<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">value</span> </span>= HttpStatus.OK)</span><br><span class="line">    <span class="keyword">public</span> ApiResult&lt;List&lt;String&gt;&gt; handleMethodArgumentNotValidExceptionHandler(MethodArgumentNotValidException ex) &#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        BindingResult bindingResult = ex.getBindingResult();</span><br><span class="line">        List&lt;String&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        List&lt;FieldError&gt; fieldErrors = bindingResult.getFieldErrors();</span><br><span class="line">        <span class="keyword">for</span> (FieldError fieldError : fieldErrors) &#123;</span><br><span class="line">            list.add(fieldError.getDefaultMessage());</span><br><span class="line">        &#125;</span><br><span class="line">        Collections.sort(list);</span><br><span class="line">        log.error(getApiCodeString(ApiCode.PARAMETER_EXCEPTION) + <span class="string">":"</span> + JSON.toJSONString(list));</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.PARAMETER_EXCEPTION, list);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 系统登录异常处理</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = SysLoginException<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">Boolean</span>&gt; <span class="title">sysLoginExceptionHandler</span>(<span class="title">SysLoginException</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        printApiCodeException(ApiCode.LOGIN_EXCEPTION, exception);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.LOGIN_EXCEPTION);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * HTTP解析请求参数异常</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = HttpMessageNotReadableException<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">Boolean</span>&gt; <span class="title">httpMessageNotReadableException</span>(<span class="title">HttpMessageNotReadableException</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        printApiCodeException(ApiCode.PARAMETER_EXCEPTION, exception);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.PARAMETER_EXCEPTION);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * HTTP</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = HttpMediaTypeException<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">Boolean</span>&gt; <span class="title">httpMediaTypeException</span>(<span class="title">HttpMediaTypeException</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        printApiCodeException(ApiCode.HTTP_MEDIA_TYPE_EXCEPTION, exception);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.HTTP_MEDIA_TYPE_EXCEPTION);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 自定义业务/数据异常处理</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = &#123;SpringBootPlusException<span class="class">.<span class="keyword">class</span>&#125;)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">Boolean</span>&gt; <span class="title">springBootPlusExceptionHandler</span>(<span class="title">SpringBootPlusException</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        log.error(<span class="string">"springBootPlusException:"</span>, exception);</span><br><span class="line">        <span class="keyword">int</span> errorCode;</span><br><span class="line">        <span class="keyword">if</span> (exception <span class="keyword">instanceof</span> BusinessException) &#123;</span><br><span class="line">            errorCode = ApiCode.BUSINESS_EXCEPTION.getCode();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (exception <span class="keyword">instanceof</span> DaoException) &#123;</span><br><span class="line">            errorCode = ApiCode.DAO_EXCEPTION.getCode();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (exception <span class="keyword">instanceof</span> VerificationCodeException) &#123;</span><br><span class="line">            errorCode = ApiCode.VERIFICATION_CODE_EXCEPTION.getCode();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            errorCode = ApiCode.SPRING_BOOT_PLUS_EXCEPTION.getCode();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ApiResult&lt;Boolean&gt;()</span><br><span class="line">                .setCode(errorCode)</span><br><span class="line">                .setMessage(exception.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 登录授权异常处理</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = AuthenticationException<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">Boolean</span>&gt; <span class="title">authenticationExceptionHandler</span>(<span class="title">AuthenticationException</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        printApiCodeException(ApiCode.AUTHENTICATION_EXCEPTION, exception);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.AUTHENTICATION_EXCEPTION);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 未认证异常处理</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = UnauthenticatedException<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">Boolean</span>&gt; <span class="title">unauthenticatedExceptionHandler</span>(<span class="title">UnauthenticatedException</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        printApiCodeException(ApiCode.UNAUTHENTICATED_EXCEPTION, exception);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.UNAUTHENTICATED_EXCEPTION);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 未授权异常处理</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = UnauthorizedException<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">Boolean</span>&gt; <span class="title">unauthorizedExceptionHandler</span>(<span class="title">UnauthorizedException</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        printApiCodeException(ApiCode.UNAUTHORIZED_EXCEPTION, exception);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.UNAUTHORIZED_EXCEPTION);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * JWT Token解析异常</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = JWTDecodeException<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">Boolean</span>&gt; <span class="title">jWTDecodeExceptionHandler</span>(<span class="title">JWTDecodeException</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        printApiCodeException(ApiCode.JWTDECODE_EXCEPTION, exception);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.JWTDECODE_EXCEPTION);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 默认的异常处理</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = HttpRequestMethodNotSupportedException<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">String</span>&gt; <span class="title">httpRequestMethodNotSupportedExceptionHandler</span>(<span class="title">Exception</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        printApiCodeException(ApiCode.HTTP_REQUEST_METHOD_NOT_SUPPORTED_EXCEPTION, exception);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.HTTP_REQUEST_METHOD_NOT_SUPPORTED_EXCEPTION.getCode(), exception.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 默认的异常处理</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = Exception<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">Boolean</span>&gt; <span class="title">exceptionHandler</span>(<span class="title">Exception</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        printApiCodeException(ApiCode.SYSTEM_EXCEPTION, exception);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.SYSTEM_EXCEPTION);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 打印请求详情</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">printRequestDetail</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        RequestDetail requestDetail = RequestDetailThreadLocal.getRequestDetail();</span><br><span class="line">        <span class="keyword">if</span> (requestDetail != <span class="keyword">null</span>) &#123;</span><br><span class="line">            log.error(<span class="string">"异常来源：ip: &#123;&#125;, path: &#123;&#125;"</span>, requestDetail.getIp(), requestDetail.getPath());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取ApiCode格式化字符串</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> apiCode</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">getApiCodeString</span><span class="params">(ApiCode apiCode)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (apiCode != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> String.format(<span class="string">"errorCode: %s, errorMessage: %s"</span>, apiCode.getCode(), apiCode.getMessage());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 打印错误码及异常</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> apiCode</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">printApiCodeException</span><span class="params">(ApiCode apiCode, Exception exception)</span> </span>&#123;</span><br><span class="line">        log.error(getApiCodeString(apiCode), exception);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
-  </entry>
-  <entry>
     <title>Git版本回退方法</title>
     <url>/2020/08/26/Git%E7%89%88%E6%9C%AC%E5%9B%9E%E9%80%80%E6%96%B9%E6%B3%95/</url>
     <content><![CDATA[<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>今天在公司犯了错误，在公司公共的develop分支上push了错误的代码，顺便研究了一下git如何回退版本，参考了大佬的做法，记录下了这篇博客。</p>
@@ -71,6 +56,21 @@
 </ol>
 <h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="http://blog.csdn.net/fuchaosz/article/details/52170105" target="_blank" rel="noopener">http://blog.csdn.net/fuchaosz/article/details/52170105</a></p>
 ]]></content>
+  </entry>
+  <entry>
+    <title>ControllerAdvice和ErrorController的用法</title>
+    <url>/2020/07/14/ControllerAdvice%E5%92%8CErrorController%E7%9A%84%E7%94%A8%E6%B3%95/</url>
+    <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>在Java中异常可以分为Error和Exception，<strong>@ControllerAdvice</strong>用来处理系统中的<strong>Exception</strong>，<strong>Error</strong>Controller处理系统中的<strong>Error</strong>。</p>
+<a id="more"></a>
+
+<h2 id="ErrorController"><a href="#ErrorController" class="headerlink" title="ErrorController"></a>ErrorController</h2><p>在项目中我们遇到404找不到的错误、或者500服务器错误都需要配置相应的页面给用户一个友好的提示，而在Spring Boot中我们需要如何设置。</p>
+<p>当系统出现404或者405等错误信息时，springboot默认的访问路径为/error，所以实现ErrorController并重写。</p>
+<h3 id="ErrorController源码"><a href="#ErrorController源码" class="headerlink" title="ErrorController源码"></a>ErrorController源码</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> org.springframework.boot.web.servlet.error;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Controller;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Marker interface used to indicate that a &#123;<span class="doctag">@link</span> Controller <span class="doctag">@Controller</span>&#125; is used to</span></span><br><span class="line"><span class="comment"> * render errors. Primarily used to know the error paths that will not need to be secured.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Phillip Webb</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 2.0.0</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ErrorController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Returns the path of the error page.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> the error path</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function">String <span class="title">getErrorPath</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="重写ErrorController样例"><a href="#重写ErrorController样例" class="headerlink" title="重写ErrorController样例"></a>重写ErrorController样例</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 全局Error/404处理</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> geekidea</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2018-11-08</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@ApiIgnore</span></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GlobalErrorController</span> <span class="keyword">implements</span> <span class="title">ErrorController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String ERROR_PATH = <span class="string">"/error"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(ERROR_PATH)</span><br><span class="line">    <span class="keyword">public</span> ApiResult&lt;?&gt; handleError(HttpServletRequest request,HttpServletResponse response)&#123;</span><br><span class="line">        <span class="keyword">int</span> status = response.getStatus();</span><br><span class="line">        <span class="keyword">switch</span> (status)&#123;</span><br><span class="line">            <span class="keyword">case</span> HttpServletResponse.SC_UNAUTHORIZED:</span><br><span class="line">                <span class="keyword">return</span> ApiResult.fail(ApiCode.UNAUTHORIZED);</span><br><span class="line">            <span class="keyword">case</span> HttpServletResponse.SC_FORBIDDEN:</span><br><span class="line">                <span class="keyword">return</span> ApiResult.fail(ApiCode.NOT_PERMISSION);</span><br><span class="line">            <span class="keyword">case</span> HttpServletResponse.SC_NOT_FOUND:</span><br><span class="line">                <span class="keyword">return</span> ApiResult.fail(ApiCode.NOT_FOUND);</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.FAIL);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getErrorPath</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        log.error(<span class="string">"errorPath...."</span>);</span><br><span class="line">        <span class="keyword">return</span> ERROR_PATH;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="ControllerAdvice"><a href="#ControllerAdvice" class="headerlink" title="@ControllerAdvice"></a>@ControllerAdvice</h2><p>ControllerAdvice用来处理发生Exception错误的注解。需要注意的是不能使用try catch 捕获</p>
+<h3 id="ControllerAdvice样例"><a href="#ControllerAdvice样例" class="headerlink" title="@ControllerAdvice样例"></a>@ControllerAdvice样例</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> geekidea</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2018-11-08</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@ControllerAdvice</span></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GlobalExceptionHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 非法参数验证异常</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> ex</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(MethodArgumentNotValidException<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">value</span> </span>= HttpStatus.OK)</span><br><span class="line">    <span class="keyword">public</span> ApiResult&lt;List&lt;String&gt;&gt; handleMethodArgumentNotValidExceptionHandler(MethodArgumentNotValidException ex) &#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        BindingResult bindingResult = ex.getBindingResult();</span><br><span class="line">        List&lt;String&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        List&lt;FieldError&gt; fieldErrors = bindingResult.getFieldErrors();</span><br><span class="line">        <span class="keyword">for</span> (FieldError fieldError : fieldErrors) &#123;</span><br><span class="line">            list.add(fieldError.getDefaultMessage());</span><br><span class="line">        &#125;</span><br><span class="line">        Collections.sort(list);</span><br><span class="line">        log.error(getApiCodeString(ApiCode.PARAMETER_EXCEPTION) + <span class="string">":"</span> + JSON.toJSONString(list));</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.PARAMETER_EXCEPTION, list);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 系统登录异常处理</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = SysLoginException<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">Boolean</span>&gt; <span class="title">sysLoginExceptionHandler</span>(<span class="title">SysLoginException</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        printApiCodeException(ApiCode.LOGIN_EXCEPTION, exception);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.LOGIN_EXCEPTION);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * HTTP解析请求参数异常</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = HttpMessageNotReadableException<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">Boolean</span>&gt; <span class="title">httpMessageNotReadableException</span>(<span class="title">HttpMessageNotReadableException</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        printApiCodeException(ApiCode.PARAMETER_EXCEPTION, exception);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.PARAMETER_EXCEPTION);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * HTTP</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = HttpMediaTypeException<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">Boolean</span>&gt; <span class="title">httpMediaTypeException</span>(<span class="title">HttpMediaTypeException</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        printApiCodeException(ApiCode.HTTP_MEDIA_TYPE_EXCEPTION, exception);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.HTTP_MEDIA_TYPE_EXCEPTION);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 自定义业务/数据异常处理</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = &#123;SpringBootPlusException<span class="class">.<span class="keyword">class</span>&#125;)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">Boolean</span>&gt; <span class="title">springBootPlusExceptionHandler</span>(<span class="title">SpringBootPlusException</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        log.error(<span class="string">"springBootPlusException:"</span>, exception);</span><br><span class="line">        <span class="keyword">int</span> errorCode;</span><br><span class="line">        <span class="keyword">if</span> (exception <span class="keyword">instanceof</span> BusinessException) &#123;</span><br><span class="line">            errorCode = ApiCode.BUSINESS_EXCEPTION.getCode();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (exception <span class="keyword">instanceof</span> DaoException) &#123;</span><br><span class="line">            errorCode = ApiCode.DAO_EXCEPTION.getCode();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (exception <span class="keyword">instanceof</span> VerificationCodeException) &#123;</span><br><span class="line">            errorCode = ApiCode.VERIFICATION_CODE_EXCEPTION.getCode();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            errorCode = ApiCode.SPRING_BOOT_PLUS_EXCEPTION.getCode();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ApiResult&lt;Boolean&gt;()</span><br><span class="line">                .setCode(errorCode)</span><br><span class="line">                .setMessage(exception.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 登录授权异常处理</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = AuthenticationException<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">Boolean</span>&gt; <span class="title">authenticationExceptionHandler</span>(<span class="title">AuthenticationException</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        printApiCodeException(ApiCode.AUTHENTICATION_EXCEPTION, exception);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.AUTHENTICATION_EXCEPTION);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 未认证异常处理</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = UnauthenticatedException<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">Boolean</span>&gt; <span class="title">unauthenticatedExceptionHandler</span>(<span class="title">UnauthenticatedException</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        printApiCodeException(ApiCode.UNAUTHENTICATED_EXCEPTION, exception);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.UNAUTHENTICATED_EXCEPTION);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 未授权异常处理</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = UnauthorizedException<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">Boolean</span>&gt; <span class="title">unauthorizedExceptionHandler</span>(<span class="title">UnauthorizedException</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        printApiCodeException(ApiCode.UNAUTHORIZED_EXCEPTION, exception);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.UNAUTHORIZED_EXCEPTION);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * JWT Token解析异常</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = JWTDecodeException<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">Boolean</span>&gt; <span class="title">jWTDecodeExceptionHandler</span>(<span class="title">JWTDecodeException</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        printApiCodeException(ApiCode.JWTDECODE_EXCEPTION, exception);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.JWTDECODE_EXCEPTION);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 默认的异常处理</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = HttpRequestMethodNotSupportedException<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">String</span>&gt; <span class="title">httpRequestMethodNotSupportedExceptionHandler</span>(<span class="title">Exception</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        printApiCodeException(ApiCode.HTTP_REQUEST_METHOD_NOT_SUPPORTED_EXCEPTION, exception);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.HTTP_REQUEST_METHOD_NOT_SUPPORTED_EXCEPTION.getCode(), exception.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 默认的异常处理</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(value = Exception<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">ResponseStatus</span>(<span class="title">HttpStatus</span>.<span class="title">OK</span>)</span></span><br><span class="line"><span class="class">    <span class="title">public</span> <span class="title">ApiResult</span>&lt;<span class="title">Boolean</span>&gt; <span class="title">exceptionHandler</span>(<span class="title">Exception</span> <span class="title">exception</span>) </span>&#123;</span><br><span class="line">        printRequestDetail();</span><br><span class="line">        printApiCodeException(ApiCode.SYSTEM_EXCEPTION, exception);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.fail(ApiCode.SYSTEM_EXCEPTION);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 打印请求详情</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">printRequestDetail</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        RequestDetail requestDetail = RequestDetailThreadLocal.getRequestDetail();</span><br><span class="line">        <span class="keyword">if</span> (requestDetail != <span class="keyword">null</span>) &#123;</span><br><span class="line">            log.error(<span class="string">"异常来源：ip: &#123;&#125;, path: &#123;&#125;"</span>, requestDetail.getIp(), requestDetail.getPath());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取ApiCode格式化字符串</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> apiCode</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">getApiCodeString</span><span class="params">(ApiCode apiCode)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (apiCode != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> String.format(<span class="string">"errorCode: %s, errorMessage: %s"</span>, apiCode.getCode(), apiCode.getMessage());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 打印错误码及异常</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> apiCode</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> exception</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">printApiCodeException</span><span class="params">(ApiCode apiCode, Exception exception)</span> </span>&#123;</span><br><span class="line">        log.error(getApiCodeString(apiCode), exception);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
   </entry>
   <entry>
     <title>IntelliJ-IDEA-高级调试技巧</title>
@@ -397,100 +397,6 @@
 <li>因为NumberFormatException是IllegalArgumentException 的子类，反例中，不管是哪个异常，都会匹配到IllegalArgumentException，就不会再往下执行啦，因此不知道是否是NumberFormatException。所以需要优先捕获具体的异常，把NumberFormatException放前面~</li>
 </ul>
 <h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.im/post/5ee45107f265da770952788f" target="_blank" rel="noopener">https://juejin.im/post/5ee45107f265da770952788f</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>Java方向-基础知识体系及结构-网络基础-持续更新中</title>
-    <url>/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/</url>
-    <content><![CDATA[<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>牛客网-java方向-基础知识体系及结构-网络基础-面试常考知识点</p>
-<a id="more"></a>
-
-<h3 id="1-OSI，TCP-IP，五层协议的体系结构，以及各层协议"><a href="#1-OSI，TCP-IP，五层协议的体系结构，以及各层协议" class="headerlink" title="1. OSI，TCP/IP，五层协议的体系结构，以及各层协议"></a>1. OSI，TCP/IP，五层协议的体系结构，以及各层协议</h3><p>OSI分层（7层）:  <strong>物理层、数据链路层、网络层、传输层、会话层、表示层、应用层。</strong></p>
-<p>TCP/IP分层（4层）:  <strong>网络接口层、 网际层、运输层、 应用层。</strong></p>
-<p>五层协议（5层）:  <strong>物理层、数据链路层、网络层、运输层、 应用层。</strong></p>
-<p>每一层的协议如下:  </p>
-<p>物理层:  RJ45、CLOCK、IEEE802.3 （中继器，集线器）</p>
-<p>数据链路:  PPP、FR、HDLC、VLAN、MAC （网桥，交换机）</p>
-<p>网络层:  IP、ICMP、ARP、RARP、OSPF、IPX、RIP、IGRP、 （路由器）</p>
-<p>传输层:  TCP、UDP、SPX</p>
-<p>会话层:  NFS、SQL、NETBIOS、RPC</p>
-<p>表示层:  JPEG、MPEG、ASII</p>
-<p>应用层:  FTP、DNS、Telnet、SMTP、HTTP、WWW、NFS</p>
-<p>每一层的作用如下: </p>
-<p><strong>物理层</strong>:  通过媒介传输比特,确定机械及电气规范（比特Bit）</p>
-<p><strong>数据链路层</strong>:  将比特组装成帧和点到点的传递（帧Frame）</p>
-<p><strong>网络层</strong>:  负责数据包从源到宿的传递和网际互连（包Packet）</p>
-<p><strong>传输层</strong>:  提供端到端的可靠报文传递和错误恢复（段Segment）</p>
-<p><strong>会话层</strong>:  建立、管理和终止会话（会话协议数据单元SPDU）</p>
-<p><strong>表示层</strong>:  对数据进行翻译、加密和压缩（表示协议数据单元PPDU）</p>
-<p><strong>应用层</strong>:  允许访问OSI环境的手段（应用协议数据单元APDU）</p>
-<h3 id="2-IP地址的分类"><a href="#2-IP地址的分类" class="headerlink" title="2. IP地址的分类"></a>2. IP地址的分类</h3><p>A类地址：以0开头，   第一个字节范围：1~126（1.0.0.0 - 126.255.255.255）； </p>
-<p>B类地址：以10开头，  第一个字节范围：128~191（128.0.0.0 - 191.255.255.255）； </p>
-<p>C类地址：以110开头， 第一个字节范围：192~223（192.0.0.0 - 223.255.255.255）； </p>
-<p>D类地址：以1110开头，第一个字节范围：224~239（224.0.0.0 - 239.255.255.255）；（作为多播使用） </p>
-<p>E类地址：保留 </p>
-<img src="/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/IPaddress.png" class="" title="IP address">
-
-<p>其中A、B、C是基本类，D、E类作为多播和保留使用。 </p>
-<p>以下是留用的内部私有地址： </p>
-<p>IP等级            IP位置                    默认子网掩码</p>
-<p>A类     10.0.0.0–10.255.255.255           255.0.0.0 </p>
-<p>B类     172.16.0.0–172.31.255.255         255.255.0.0 </p>
-<p>C类     192.168.0.0–192.168.255.255       255.255.255.0</p>
-<p>IP地址与子网掩码相与得到网络号： </p>
-<p>ip       : 192.168.2.110 </p>
-<p>&amp; </p>
-<p>Submask : 255.255.255.0 </p>
-<hr>
-<p>网络号   ：192.168.2  .0 </p>
-<p>注: 主机号，全为0的是网络号（例如：192.168.2.0），主机号全为1的为广播地址（192.168.2.255）</p>
-<h3 id="3-ARP是地址解析协议，简单语言解释一下工作原理。"><a href="#3-ARP是地址解析协议，简单语言解释一下工作原理。" class="headerlink" title="3. ARP是地址解析协议，简单语言解释一下工作原理。"></a>3. ARP是地址解析协议，简单语言解释一下工作原理。</h3><p>1：首先，每个主机都会在自己的ARP缓冲区中建立一个ARP列表，以表示IP地址和MAC地址之间的对应关系。</p>
-<p>2：当源主机要发送数据时，首先检查ARP列表中是否有对应IP地址的目的主机的MAC地址，如果有，则直接发送数据，如果没有，就向本网段的所有主机发送ARP数据包，该数据包包括的内容有：源主机IP地址，源主机MAC地址，目的主机的IP地址。</p>
-<p>3：当本网络的所有主机收到该ARP数据包时，首先检查数据包中的IP地址是否是自己的IP地址，如果不是，则忽略该数据包，如果是，则首先从数据包中取出源主机的IP和MAC地址写入到ARP列表中，如果已经存在，则覆盖，然后将自己的MAC地址写入ARP响应包中，告诉源主机自己是它想要找的MAC地址。</p>
-<p>4：源主机收到ARP响应包后。将目的主机的IP和MAC地址写入ARP列表，并利用此信息发送数据。如果源主机一直没有收到ARP响应数据包，表示ARP查询失败。</p>
-<p>广播发送ARP请求，单播发送ARP响应。</p>
-<h3 id="4-各种协议的介绍"><a href="#4-各种协议的介绍" class="headerlink" title="4. 各种协议的介绍"></a>4. 各种协议的介绍</h3><p>ICMP协议： （Internet Control Message Protocol）因特网控制报文协议。它是TCP/IP协议族的一个子协议，用于在IP主机、路由器之间传递控制消息。</p>
-<p>TFTP协议： （Trivial File Transfer Protocol,简单文件传输协议）是TCP/IP协议族中的一个用来在客户机与服务器之间进行简单文件传输的协议，提供不复杂、开销不大的文件传输服务。</p>
-<p>HTTP协议： （HyperText Transfer Protocol）超文本传输协议，是一个属于应用层的面向对象的协议，由于其简捷、快速的方式，适用于分布式超媒体信息系统。</p>
-<p>NAT协议：（Network Address Translation）网络地址转换属接入广域网(WAN)技术，是一种将私有（保留）地址转化为合法IP地址的转换技术。</p>
-<p>DHCP协议：（Dynamic Host Configuration Protocol）动态主机配置协议，是一种让系统得以连接到网络上，并获取所需要的配置参数手段，使用UDP协议工作。具体用途：给内部网络或网络服务供应商自动分配IP地址，给用户或者内部网络管理员作为对所有计算机作中央管理的手段。</p>
-<h3 id="5-描述RARP协议"><a href="#5-描述RARP协议" class="headerlink" title="5. 描述RARP协议"></a>5. 描述RARP协议</h3><p>RARP（Reverse Address Resolution Protocol）是逆地址解析协议，作用是<strong>完成硬件地址到IP地址的映射</strong>，主要用于无盘工作站，因为给无盘工作站配置的IP地址不能保存。</p>
-<p><strong>工作流程</strong>：在网络中配置一台RARP服务器，里面保存着IP地址和MAC地址的映射关系，当无盘工作站启动后，就封装一个RARP数据包，里面有其MAC地址，然后广播到网络上去，当服务器收到请求包后，就查找对应的MAC地址的IP地址装入响应报文中发回给请求者。因为需要广播请求报文，因此<strong>RARP只能用于具有广播能力的网络</strong>。</p>
-<h3 id="6-TCP三次握手和四次挥手的全过程"><a href="#6-TCP三次握手和四次挥手的全过程" class="headerlink" title="6. TCP三次握手和四次挥手的全过程"></a>6. TCP三次握手和四次挥手的全过程</h3><p><strong>三次握手</strong></p>
-<p>第一次握手：客户端发送<strong>syn</strong>包(syn=1，seq=x)到服务器，并进入SYN_SENT状态，等待服务器确认；</p>
-<p>第二次握手：服务器收到syn包，必须确认客户的SYN（ack=x+1），同时自己也发送一个SYN包（syn=y），即<strong>SYN+ACK</strong>包，此时服务器进入SYN_RECV状态；</p>
-<p>第三次握手：客户端收到服务器的SYN＋ACK包，向服务器发送确认包<strong>ACK</strong>(ack=y+1)，此包发送完毕，客户端和服务器进入ESTABLISHED状态，完成三次握手。</p>
-<p>握手过程中传送的包里不包含数据，三次握手完毕后，客户端与服务器才正式开始传送数据。理想状态下，TCP连接一旦建立，在通信双方中的任何一方主动关闭连接之前，TCP 连接都将被一直保持下去。</p>
-<p><strong>四次挥手</strong></p>
-<p>与建立连接的“三次握手”类似，断开一个TCP连接则需要“四次挥手”。 </p>
-<p>第一次挥手：主动关闭方发送一个<strong>FIN</strong>，<strong>用来关闭主动方到被动关闭方的数据传送</strong>，也就是主动关闭方告诉被动关闭方：我已经不会再给你发数据了(当然，在fin包之前发送出去的数据，如果没有收到对应的ack确认报文，主动关闭方依然会重发这些数据)，但是，此时主动关闭方还可以接受数据。</p>
-<p>第二次挥手：被动关闭方收到FIN包后，发送一个<strong>ACK</strong>给对方，确认序号为收到序号+1（与SYN相同，一个FIN占用一个序号）。</p>
-<p>第三次挥手：被动关闭方发送一个<strong>FIN</strong>，<strong>用来关闭被动关闭方到主动关闭方的数据传送</strong>，也就是告诉主动关闭方，我的数据也发送完了，不会再给你发数据了。</p>
-<p>第四次挥手：主动关闭方收到FIN后，发送一个<strong>ACK</strong>给被动关闭方，确认序号为收到序号+1，至此，完成四次挥手。</p>
-<h3 id="7-在浏览器中输入www-baidu-com后执行的全部过程"><a href="#7-在浏览器中输入www-baidu-com后执行的全部过程" class="headerlink" title="7. 在浏览器中输入www.baidu.com后执行的全部过程"></a>7. 在浏览器中输入<a href="http://www.baidu.com后执行的全部过程" target="_blank" rel="noopener">www.baidu.com后执行的全部过程</a></h3><ol>
-<li><p>客户端浏览器通过<strong>DNS</strong>解析到<a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a> 的<strong>IP地址</strong>220.181.27.48，通过这个IP地址找到<strong>客户端到服务器的路径</strong>。客户端浏览器发起一个<strong>HTTP会话</strong>到220.181.27.48，然后通过<strong>TCP</strong>进行封装数据包，输入到<strong>网络层</strong>。</p>
-</li>
-<li><p>在客户端的传输层，把HTTP会话请求分成<strong>报文段</strong>，添加源和目的端口，如服务器使用80端口监听客户端的请求，客户端由系统随机选择一个端口如5000，与服务器进行交换，服务器把相应的请求返回给客户端的5000端口。然后使用IP层的IP地址查找目的端。</p>
-</li>
-<li><p>客户端的网络层不用关心应用层或者传输层的东西，主要做的是通过<strong>查找路由表</strong>确定如何到达服务器，期间可能经过多个路由器，这些都是由路由器来完成的工作，我不作过多的描述，无非就是通过查找路由表决定通过那个路径到达服务器。</p>
-</li>
-<li><p>客户端的链路层，包通过链路层发送到路由器，通过邻居协议查找给定IP地址的<strong>MAC地址</strong>，然后发送<strong>ARP</strong>请求查找目的地址，如果得到回应后就可以使用ARP的请求应答交换的IP数据包现在就可以传输了，然后发送IP数据包到达服务器的地址。</p>
-</li>
-</ol>
-<h3 id="8-TCP和UDP的区别？"><a href="#8-TCP和UDP的区别？" class="headerlink" title="8. TCP和UDP的区别？"></a>8. TCP和UDP的区别？</h3><p>TCP提供<strong>面向连接的</strong>、<strong>可靠</strong>的数据流传输，而UDP提供的是<strong>非面向连接的</strong>、<strong>不可靠</strong>的数据流传输。</p>
-<p>TCP传输单位称为<strong>TCP报文段</strong>，UDP传输单位称为<strong>用户数据报</strong>。</p>
-<p><strong>TCP注重数据安全性</strong>，<strong>UDP数据传输快</strong>，因为不需要连接等待，少了许多操作，但是其安全性却一般。</p>
-<p>TCP对应的协议和UDP对应的协议</p>
-<p>TCP对应的协议：</p>
-<p>（1） FTP：定义了文件传输协议，使用21端口。</p>
-<p>（2） Telnet：一种用于远程登陆的端口，使用23端口，用户可以以自己的身份远程连接到计算机上，可提供基于DOS模式下的通信服务。</p>
-<p>（3） SMTP：邮件传送协议，用于发送邮件。服务器开放的是25号端口。</p>
-<p>（4） POP3：它是和SMTP对应，POP3用于接收邮件。POP3协议所用的是110端口。</p>
-<p>（5）HTTP：是从Web服务器传输超文本到本地浏览器的传送协议。</p>
-<p>UDP对应的协议：</p>
-<p>（1） DNS：用于域名解析服务，将域名地址转换为IP地址。DNS用的是53号端口。</p>
-<p>（2） SNMP：简单网络管理协议，使用161号端口，是用来管理网络设备的。由于网络设备很多，无连接的服务就体现出其优势。</p>
-<p>（3） TFTP(Trivial File Transfer Protocal)，简单文件传输协议，该协议在熟知端口69上使用UDP服务。</p>
 ]]></content>
   </entry>
   <entry>
@@ -904,6 +810,100 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 <h3 id="45-76"><a href="#45-76" class="headerlink" title="45. 76"></a>45. 76</h3>]]></content>
   </entry>
   <entry>
+    <title>Java方向-基础知识体系及结构-网络基础-持续更新中</title>
+    <url>/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/</url>
+    <content><![CDATA[<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>牛客网-java方向-基础知识体系及结构-网络基础-面试常考知识点</p>
+<a id="more"></a>
+
+<h3 id="1-OSI，TCP-IP，五层协议的体系结构，以及各层协议"><a href="#1-OSI，TCP-IP，五层协议的体系结构，以及各层协议" class="headerlink" title="1. OSI，TCP/IP，五层协议的体系结构，以及各层协议"></a>1. OSI，TCP/IP，五层协议的体系结构，以及各层协议</h3><p>OSI分层（7层）:  <strong>物理层、数据链路层、网络层、传输层、会话层、表示层、应用层。</strong></p>
+<p>TCP/IP分层（4层）:  <strong>网络接口层、 网际层、运输层、 应用层。</strong></p>
+<p>五层协议（5层）:  <strong>物理层、数据链路层、网络层、运输层、 应用层。</strong></p>
+<p>每一层的协议如下:  </p>
+<p>物理层:  RJ45、CLOCK、IEEE802.3 （中继器，集线器）</p>
+<p>数据链路:  PPP、FR、HDLC、VLAN、MAC （网桥，交换机）</p>
+<p>网络层:  IP、ICMP、ARP、RARP、OSPF、IPX、RIP、IGRP、 （路由器）</p>
+<p>传输层:  TCP、UDP、SPX</p>
+<p>会话层:  NFS、SQL、NETBIOS、RPC</p>
+<p>表示层:  JPEG、MPEG、ASII</p>
+<p>应用层:  FTP、DNS、Telnet、SMTP、HTTP、WWW、NFS</p>
+<p>每一层的作用如下: </p>
+<p><strong>物理层</strong>:  通过媒介传输比特,确定机械及电气规范（比特Bit）</p>
+<p><strong>数据链路层</strong>:  将比特组装成帧和点到点的传递（帧Frame）</p>
+<p><strong>网络层</strong>:  负责数据包从源到宿的传递和网际互连（包Packet）</p>
+<p><strong>传输层</strong>:  提供端到端的可靠报文传递和错误恢复（段Segment）</p>
+<p><strong>会话层</strong>:  建立、管理和终止会话（会话协议数据单元SPDU）</p>
+<p><strong>表示层</strong>:  对数据进行翻译、加密和压缩（表示协议数据单元PPDU）</p>
+<p><strong>应用层</strong>:  允许访问OSI环境的手段（应用协议数据单元APDU）</p>
+<h3 id="2-IP地址的分类"><a href="#2-IP地址的分类" class="headerlink" title="2. IP地址的分类"></a>2. IP地址的分类</h3><p>A类地址：以0开头，   第一个字节范围：1~126（1.0.0.0 - 126.255.255.255）； </p>
+<p>B类地址：以10开头，  第一个字节范围：128~191（128.0.0.0 - 191.255.255.255）； </p>
+<p>C类地址：以110开头， 第一个字节范围：192~223（192.0.0.0 - 223.255.255.255）； </p>
+<p>D类地址：以1110开头，第一个字节范围：224~239（224.0.0.0 - 239.255.255.255）；（作为多播使用） </p>
+<p>E类地址：保留 </p>
+<img src="/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/IPaddress.png" class="" title="IP address">
+
+<p>其中A、B、C是基本类，D、E类作为多播和保留使用。 </p>
+<p>以下是留用的内部私有地址： </p>
+<p>IP等级            IP位置                    默认子网掩码</p>
+<p>A类     10.0.0.0–10.255.255.255           255.0.0.0 </p>
+<p>B类     172.16.0.0–172.31.255.255         255.255.0.0 </p>
+<p>C类     192.168.0.0–192.168.255.255       255.255.255.0</p>
+<p>IP地址与子网掩码相与得到网络号： </p>
+<p>ip       : 192.168.2.110 </p>
+<p>&amp; </p>
+<p>Submask : 255.255.255.0 </p>
+<hr>
+<p>网络号   ：192.168.2  .0 </p>
+<p>注: 主机号，全为0的是网络号（例如：192.168.2.0），主机号全为1的为广播地址（192.168.2.255）</p>
+<h3 id="3-ARP是地址解析协议，简单语言解释一下工作原理。"><a href="#3-ARP是地址解析协议，简单语言解释一下工作原理。" class="headerlink" title="3. ARP是地址解析协议，简单语言解释一下工作原理。"></a>3. ARP是地址解析协议，简单语言解释一下工作原理。</h3><p>1：首先，每个主机都会在自己的ARP缓冲区中建立一个ARP列表，以表示IP地址和MAC地址之间的对应关系。</p>
+<p>2：当源主机要发送数据时，首先检查ARP列表中是否有对应IP地址的目的主机的MAC地址，如果有，则直接发送数据，如果没有，就向本网段的所有主机发送ARP数据包，该数据包包括的内容有：源主机IP地址，源主机MAC地址，目的主机的IP地址。</p>
+<p>3：当本网络的所有主机收到该ARP数据包时，首先检查数据包中的IP地址是否是自己的IP地址，如果不是，则忽略该数据包，如果是，则首先从数据包中取出源主机的IP和MAC地址写入到ARP列表中，如果已经存在，则覆盖，然后将自己的MAC地址写入ARP响应包中，告诉源主机自己是它想要找的MAC地址。</p>
+<p>4：源主机收到ARP响应包后。将目的主机的IP和MAC地址写入ARP列表，并利用此信息发送数据。如果源主机一直没有收到ARP响应数据包，表示ARP查询失败。</p>
+<p>广播发送ARP请求，单播发送ARP响应。</p>
+<h3 id="4-各种协议的介绍"><a href="#4-各种协议的介绍" class="headerlink" title="4. 各种协议的介绍"></a>4. 各种协议的介绍</h3><p>ICMP协议： （Internet Control Message Protocol）因特网控制报文协议。它是TCP/IP协议族的一个子协议，用于在IP主机、路由器之间传递控制消息。</p>
+<p>TFTP协议： （Trivial File Transfer Protocol,简单文件传输协议）是TCP/IP协议族中的一个用来在客户机与服务器之间进行简单文件传输的协议，提供不复杂、开销不大的文件传输服务。</p>
+<p>HTTP协议： （HyperText Transfer Protocol）超文本传输协议，是一个属于应用层的面向对象的协议，由于其简捷、快速的方式，适用于分布式超媒体信息系统。</p>
+<p>NAT协议：（Network Address Translation）网络地址转换属接入广域网(WAN)技术，是一种将私有（保留）地址转化为合法IP地址的转换技术。</p>
+<p>DHCP协议：（Dynamic Host Configuration Protocol）动态主机配置协议，是一种让系统得以连接到网络上，并获取所需要的配置参数手段，使用UDP协议工作。具体用途：给内部网络或网络服务供应商自动分配IP地址，给用户或者内部网络管理员作为对所有计算机作中央管理的手段。</p>
+<h3 id="5-描述RARP协议"><a href="#5-描述RARP协议" class="headerlink" title="5. 描述RARP协议"></a>5. 描述RARP协议</h3><p>RARP（Reverse Address Resolution Protocol）是逆地址解析协议，作用是<strong>完成硬件地址到IP地址的映射</strong>，主要用于无盘工作站，因为给无盘工作站配置的IP地址不能保存。</p>
+<p><strong>工作流程</strong>：在网络中配置一台RARP服务器，里面保存着IP地址和MAC地址的映射关系，当无盘工作站启动后，就封装一个RARP数据包，里面有其MAC地址，然后广播到网络上去，当服务器收到请求包后，就查找对应的MAC地址的IP地址装入响应报文中发回给请求者。因为需要广播请求报文，因此<strong>RARP只能用于具有广播能力的网络</strong>。</p>
+<h3 id="6-TCP三次握手和四次挥手的全过程"><a href="#6-TCP三次握手和四次挥手的全过程" class="headerlink" title="6. TCP三次握手和四次挥手的全过程"></a>6. TCP三次握手和四次挥手的全过程</h3><p><strong>三次握手</strong></p>
+<p>第一次握手：客户端发送<strong>syn</strong>包(syn=1，seq=x)到服务器，并进入SYN_SENT状态，等待服务器确认；</p>
+<p>第二次握手：服务器收到syn包，必须确认客户的SYN（ack=x+1），同时自己也发送一个SYN包（syn=y），即<strong>SYN+ACK</strong>包，此时服务器进入SYN_RECV状态；</p>
+<p>第三次握手：客户端收到服务器的SYN＋ACK包，向服务器发送确认包<strong>ACK</strong>(ack=y+1)，此包发送完毕，客户端和服务器进入ESTABLISHED状态，完成三次握手。</p>
+<p>握手过程中传送的包里不包含数据，三次握手完毕后，客户端与服务器才正式开始传送数据。理想状态下，TCP连接一旦建立，在通信双方中的任何一方主动关闭连接之前，TCP 连接都将被一直保持下去。</p>
+<p><strong>四次挥手</strong></p>
+<p>与建立连接的“三次握手”类似，断开一个TCP连接则需要“四次挥手”。 </p>
+<p>第一次挥手：主动关闭方发送一个<strong>FIN</strong>，<strong>用来关闭主动方到被动关闭方的数据传送</strong>，也就是主动关闭方告诉被动关闭方：我已经不会再给你发数据了(当然，在fin包之前发送出去的数据，如果没有收到对应的ack确认报文，主动关闭方依然会重发这些数据)，但是，此时主动关闭方还可以接受数据。</p>
+<p>第二次挥手：被动关闭方收到FIN包后，发送一个<strong>ACK</strong>给对方，确认序号为收到序号+1（与SYN相同，一个FIN占用一个序号）。</p>
+<p>第三次挥手：被动关闭方发送一个<strong>FIN</strong>，<strong>用来关闭被动关闭方到主动关闭方的数据传送</strong>，也就是告诉主动关闭方，我的数据也发送完了，不会再给你发数据了。</p>
+<p>第四次挥手：主动关闭方收到FIN后，发送一个<strong>ACK</strong>给被动关闭方，确认序号为收到序号+1，至此，完成四次挥手。</p>
+<h3 id="7-在浏览器中输入www-baidu-com后执行的全部过程"><a href="#7-在浏览器中输入www-baidu-com后执行的全部过程" class="headerlink" title="7. 在浏览器中输入www.baidu.com后执行的全部过程"></a>7. 在浏览器中输入<a href="http://www.baidu.com后执行的全部过程" target="_blank" rel="noopener">www.baidu.com后执行的全部过程</a></h3><ol>
+<li><p>客户端浏览器通过<strong>DNS</strong>解析到<a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a> 的<strong>IP地址</strong>220.181.27.48，通过这个IP地址找到<strong>客户端到服务器的路径</strong>。客户端浏览器发起一个<strong>HTTP会话</strong>到220.181.27.48，然后通过<strong>TCP</strong>进行封装数据包，输入到<strong>网络层</strong>。</p>
+</li>
+<li><p>在客户端的传输层，把HTTP会话请求分成<strong>报文段</strong>，添加源和目的端口，如服务器使用80端口监听客户端的请求，客户端由系统随机选择一个端口如5000，与服务器进行交换，服务器把相应的请求返回给客户端的5000端口。然后使用IP层的IP地址查找目的端。</p>
+</li>
+<li><p>客户端的网络层不用关心应用层或者传输层的东西，主要做的是通过<strong>查找路由表</strong>确定如何到达服务器，期间可能经过多个路由器，这些都是由路由器来完成的工作，我不作过多的描述，无非就是通过查找路由表决定通过那个路径到达服务器。</p>
+</li>
+<li><p>客户端的链路层，包通过链路层发送到路由器，通过邻居协议查找给定IP地址的<strong>MAC地址</strong>，然后发送<strong>ARP</strong>请求查找目的地址，如果得到回应后就可以使用ARP的请求应答交换的IP数据包现在就可以传输了，然后发送IP数据包到达服务器的地址。</p>
+</li>
+</ol>
+<h3 id="8-TCP和UDP的区别？"><a href="#8-TCP和UDP的区别？" class="headerlink" title="8. TCP和UDP的区别？"></a>8. TCP和UDP的区别？</h3><p>TCP提供<strong>面向连接的</strong>、<strong>可靠</strong>的数据流传输，而UDP提供的是<strong>非面向连接的</strong>、<strong>不可靠</strong>的数据流传输。</p>
+<p>TCP传输单位称为<strong>TCP报文段</strong>，UDP传输单位称为<strong>用户数据报</strong>。</p>
+<p><strong>TCP注重数据安全性</strong>，<strong>UDP数据传输快</strong>，因为不需要连接等待，少了许多操作，但是其安全性却一般。</p>
+<p>TCP对应的协议和UDP对应的协议</p>
+<p>TCP对应的协议：</p>
+<p>（1） FTP：定义了文件传输协议，使用21端口。</p>
+<p>（2） Telnet：一种用于远程登陆的端口，使用23端口，用户可以以自己的身份远程连接到计算机上，可提供基于DOS模式下的通信服务。</p>
+<p>（3） SMTP：邮件传送协议，用于发送邮件。服务器开放的是25号端口。</p>
+<p>（4） POP3：它是和SMTP对应，POP3用于接收邮件。POP3协议所用的是110端口。</p>
+<p>（5）HTTP：是从Web服务器传输超文本到本地浏览器的传送协议。</p>
+<p>UDP对应的协议：</p>
+<p>（1） DNS：用于域名解析服务，将域名地址转换为IP地址。DNS用的是53号端口。</p>
+<p>（2） SNMP：简单网络管理协议，使用161号端口，是用来管理网络设备的。由于网络设备很多，无连接的服务就体现出其优势。</p>
+<p>（3） TFTP(Trivial File Transfer Protocal)，简单文件传输协议，该协议在熟知端口69上使用UDP服务。</p>
+]]></content>
+  </entry>
+  <entry>
     <title>Java编写单词小游戏</title>
     <url>/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/</url>
     <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>公司最近有一个竞技场项目，里面有一个单词小游戏。</p>
@@ -949,67 +949,6 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 <h2 id="2-自定义注解示例"><a href="#2-自定义注解示例" class="headerlink" title="2 自定义注解示例"></a>2 自定义注解示例</h2><p>自定义@permission注解</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 权限注解 用于检查权限 规定访问权限</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@example</span> <span class="doctag">@Permission</span>(&#123;role1,role2&#125;)</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@example</span> <span class="doctag">@Permission</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Inherited</span></span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Target</span>(&#123;ElementType.METHOD&#125;)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Permission &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * &lt;p&gt;角色英文名称&lt;/p&gt;</span></span><br><span class="line"><span class="comment">     * &lt;p&gt;使用注解时加上这个值表示限制只有某个角色的才可以访问对应的资源&lt;/p&gt;</span></span><br><span class="line"><span class="comment">     * &lt;p&gt;常用在某些资源限制只有超级管理员角色才可访问&lt;/p&gt;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    String[] value() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="3-注解的使用"><a href="#3-注解的使用" class="headerlink" title="3 注解的使用"></a>3 注解的使用</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Permission</span>(Const.ADMIN_NAME)</span><br><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/edit"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Tip <span class="title">edit</span><span class="params">(BindingResult result)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (result.hasErrors()) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> GunsException(ExceptionEnum.REQUEST_NULL);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">this</span>.menuService.updateById(menu);</span><br><span class="line">    <span class="keyword">return</span> SUCCESS_TIP;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-]]></content>
-  </entry>
-  <entry>
-    <title>Java面试常见问题-1</title>
-    <url>/2020/05/04/Java%E9%9D%A2%E8%AF%95%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98-1/</url>
-    <content><![CDATA[<h2 id="1-String-StringBuilder-StringBuffer区别"><a href="#1-String-StringBuilder-StringBuffer区别" class="headerlink" title="1. String, StringBuilder, StringBuffer区别"></a>1. String, StringBuilder, StringBuffer区别</h2><p>这三个类的主要区别在两个方面：<strong>运算速度</strong>（运算性能或执行效率）和<strong>线程安全性</strong>。</p>
-<h3 id="1-运算速度比较（通常情况下）：StringBuilder-gt-StringBuffer-gt-String"><a href="#1-运算速度比较（通常情况下）：StringBuilder-gt-StringBuffer-gt-String" class="headerlink" title="1. 运算速度比较（通常情况下）：StringBuilder &gt; StringBuffer &gt; String"></a>1. <strong>运算速度</strong>比较（通常情况下）：<strong>StringBuilder &gt; StringBuffer &gt; String</strong></h3><a id="more"></a>
-
-<p>String是<strong>final</strong>类不能被继承且为字符串常量，而StringBuilder和StringBuffer均为<strong>字符串变量</strong>。String对象一旦创建便<strong>不可更改</strong>，而后两者是<strong>可更改</strong>的，它们只能通过构造函数来建立对象，且对象被建立以后将在内存中分配内存空间，并初始保存一个null，通过append方法向StringBuffer和StringBuilder中赋值。</p>
-<p>Java中对String对象进行的操作实际上是一个不断创建并回收对象的过程，因此在运行速度上很慢。</p>
-<h3 id="2-线程安全性"><a href="#2-线程安全性" class="headerlink" title="2. 线程安全性"></a>2. 线程安全性</h3><p>StringBuilder（<strong>非线程安全</strong>）</p>
-<p>而StringBuilder的方法没有该关键字修饰，所以不能保证线程安全性。</p>
-<p>StringBuffer（<strong>线程安全的</strong>）</p>
-<p>StringBuffer中大部分方法由<strong>synchronized</strong>关键字修饰，在必要时可对方法进行同步，因此任意特定实例上的所有操作就好像是以串行顺序发生的，该顺序与所涉及的每个线程进行的方法调用顺序一致，所以是线程安全的。</p>
-<h3 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a>3. 总结</h3><p>String：适用于<strong>少量</strong>的字符串操作。</p>
-<p>StringBuilder：适用于<strong>单线程</strong>下在字符串缓冲区进行大量操作。</p>
-<p>StringBuffer：适用于<strong>多线程</strong>下在字符串缓冲区进行大量操作。</p>
-<h2 id="2-Spring-Bean为什么是单例"><a href="#2-Spring-Bean为什么是单例" class="headerlink" title="2. Spring Bean为什么是单例"></a>2. Spring Bean为什么是单例</h2><h3 id="单例bean与原型bean的区别"><a href="#单例bean与原型bean的区别" class="headerlink" title="单例bean与原型bean的区别"></a>单例bean与原型bean的区别</h3><p><strong>单例：</strong>一个bean被声明为单例时，处理多次请求时spring容器里只实例化一个bean，后续的请求公用这个对象，这个对象存储在一个map中，当有请求时，先在缓存中（map）查找是否存在，存在则使用，不存在才实例化一个对象</p>
-<p><strong>原型：</strong>每当有请求来就实例化一个新的bean，没有缓存以及从缓存中查</p>
-<h4 id="单例bean的优势"><a href="#单例bean的优势" class="headerlink" title="单例bean的优势"></a>单例bean的优势</h4><p>由于不会每次都新创建新对象所以有一下几个性能上的优势：</p>
-<p><strong>减少了新生成实例的消耗</strong></p>
-<p>新生成实例消耗包括两方面，第一，spring会通过反射或者cglib来生成bean实例这都是耗性能的操作，其次给对象分配内存也会涉及复杂算法。</p>
-<p><strong>减少jvm垃圾回收</strong></p>
-<p>由于不会给每个请求都新生成bean实例，所以自然回收的对象少了。</p>
-<p><strong>可以快速获取到bean</strong></p>
-<p>因为单例的获取bean操作除了第一次生成之外其余的都是从缓存里获取的所以很快。</p>
-<h3 id="单例bean的劣势"><a href="#单例bean的劣势" class="headerlink" title="单例bean的劣势"></a>单例bean的劣势</h3><p>单例的bean一个很大的劣势就是他不能做到线程安全，由于所有请求都共享一个bean实例，所以这个bean要是有状态的一个bean的话可能在并发场景下出现问题，而原型的bean则不会有这样问题（但也有例外，比如他被单例bean依赖），因为给每个请求都新创建实例。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>面试题：Spring 为啥把bean默认设计成单例？</p>
-<p>答案：</p>
-<p>为了提高性能<br>少创建实例<br>垃圾回收<br>缓存快速获取</p>
-<p>单例有啥劣势？</p>
-<p>如果是有状态的话在并发环境下线程不安全。</p>
-<h2 id="3-项目中有用到多线程嘛"><a href="#3-项目中有用到多线程嘛" class="headerlink" title="3. 项目中有用到多线程嘛"></a>3. 项目中有用到多线程嘛</h2><p>用户注册完成送大礼包/积分之类，且积分等也是另一个系统并<strong>比较耗时</strong>；且这类任务即使失败也不是特别重要的。</p>
-<p>后台线程：比如<strong>定期执行</strong>一些特殊任务，如定期更新配置文件，任务调度（如quartz），一些监控用于定期信息采集等。</p>
-<p>特别耗时的操作，如备份数据库，可以开个线程执行备份，然后执行返回，前台不断向后台询问线程执行状态</p>
-<p>场景一:一个业务逻辑有很多次的循环，<strong>每次循环之间没有影响</strong>，比如验证1万条url路径是否存在，正常情况要循环1万次，逐个去验证每一条URL，这样效率会很低，假设验证一条需要1分钟，总共就需要1万分钟，有点恐怖。这时可以用多线程，将1万条URL分成50等份，开50个线程，没个线程只需验证200条，这样所有的线程执行完是远小于1万分钟的。</p>
-<p>场景二:需要知道一个任务的执行进度，比如我们常看到的进度条，实现方式可以是在任务中加入一个整型属性变量(这样不同方法可以共享)，任务执行一定程度就给变量值加1，另外开一个线程按时间间隔不断去访问这个变量，并反馈给用户。</p>
-<p>总之<strong>使用多线程就是为了充分利用cpu的资源，提高程序执行效率</strong>，当你发现一个业务逻辑执行效率特别低，耗时特别长，就可以考虑使用多线程。<strong>不过CPU执行哪个线程的时间和顺序是不确定的</strong>，即使设置了线程的优先级，因此使用多线程的风险也是比较大的，会出现很多预料不到的问题，一定要多熟悉概念，多构造不同的场景去测试才能够掌握!</p>
-<h2 id="4-HashMap为什么要重写hashCode和equals方法"><a href="#4-HashMap为什么要重写hashCode和equals方法" class="headerlink" title="4. HashMap为什么要重写hashCode和equals方法"></a>4. HashMap为什么要重写hashCode和equals方法</h2><p>HashMap和Hashtable的底层实现都是数组+链表结构实现的</p>
-<p>使用HashMap，如果key是自定义的类，就必须重写hashcode()和equals()。</p>
-<p>如果你重载了equals，比如说是基于对象的内容实现的，而保留hashCode的实现不变，那么很可能某两个对象明明是“相等”，而hashCode却不一样。</p>
-<p>这样，当你用其中的一个作为键保存到hashMap、hasoTable或hashSet中，再以“相等的”找另一个作为键值去查找他们的时候，则根本找不到。</p>
-<p>对于每一个对象，通过其hashCode()方法可为其生成一个整形值（散列码），该整型值被处理后，将会作为数组下标，存放该对象所对应的Entry（存放该对象及其对应值）。 </p>
-<p>equals()方法则是在HashMap中插入值或查询时会使用到。当HashMap中插入值或查询值对应的散列码与数组中的散列码相等时，则会通过equals方法比较key值是否相等</p>
-<p>所以想以自建对象作为HashMap的key，必须重写该对象继承object的hashCode和equals方法。</p>
-<h2 id="5-Java集合中为什么要使用设计迭代器"><a href="#5-Java集合中为什么要使用设计迭代器" class="headerlink" title="5. Java集合中为什么要使用设计迭代器"></a>5. Java集合中为什么要使用设计迭代器</h2><p>优点: </p>
-<pre><code>1. 可以不了解集合内部的数据结构,就可以直接遍历;
-
-2. **不暴露内部的数据**,可以直接外部遍历;
-
-3. 适用性强,基本上的集合都能使用迭代器;</code></pre><h2 id="6-为什么使用迭代器遍历删除是安全的"><a href="#6-为什么使用迭代器遍历删除是安全的" class="headerlink" title="6. 为什么使用迭代器遍历删除是安全的"></a>6. 为什么使用迭代器遍历删除是安全的</h2><p>基本上<strong>ArrayList采用size属性来维护自已的状态，而Iterator采用cursor来来维护自已的状态</strong>。</p>
-<p>当size出现变化时，cursor并不一定能够得到同步，除非这种变化是Iterator主动导致的。</p>
-<p>当Iterator.remove方法导致ArrayList列表发生变化时，他会更新cursor来同步这一变化。但其他方式导致的ArrayList变化，Iterator是无法感知的。ArrayList自然也不会主动通知Iterator们，那将是一个繁重的工作。Iterator到底还是做了努力：为了防止状态不一致可能引发的无法设想的后果，Iterator会经常做checkForComodification检查，以防有变。如果有变，则以异常抛出，所以就出现了上面的异常。</p>
-<h2 id="7-Spring事务传播机制"><a href="#7-Spring事务传播机制" class="headerlink" title="7. Spring事务传播机制"></a>7. Spring事务传播机制</h2><ul>
-<li>@Transactional(propagation=Propagation.REQUIRED)<br>如果有事务, 那么加入事务, 没有的话新建一个(默认情况下)</li>
-<li>@Transactional(propagation=Propagation.NOT_SUPPORTED)<br>容器不为这个方法开启事务</li>
-<li>@Transactional(propagation=Propagation.REQUIRES_NEW)<br>不管是否存在事务,都创建一个新的事务,原来的挂起,新的执行完毕,继续执行老的事务</li>
-<li>@Transactional(propagation=Propagation.MANDATORY)<br>必须在一个已有的事务中执行,否则抛出异常</li>
-<li>@Transactional(propagation=Propagation.NEVER)<br>必须在一个没有的事务中执行,否则抛出异常(与Propagation.MANDATORY相反)</li>
-<li>@Transactional(propagation=Propagation.SUPPORTS)<br>如果其他bean调用这个方法,在其他bean中声明事务,那就用事务.如果其他bean没有声明事务,那就不用事务.</li>
-</ul>
 ]]></content>
   </entry>
   <entry>
@@ -1155,6 +1094,67 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 <h2 id="和equals的区别"><a href="#和equals的区别" class="headerlink" title="==和equals的区别"></a>==和equals的区别</h2><p>==对于基本类型来说是值比较，对于引用类型来说是比较的是引用；</p>
 <p>而 equals 默认情况下是引用比较，只是很多类重写了 equals 方法，比如 String、Integer 等把它变成了值比较，所以一般情况下 equals 比较的是值是否相等。</p>
 <h2 id="Mysql查询性能优化"><a href="#Mysql查询性能优化" class="headerlink" title="Mysql查询性能优化"></a>Mysql查询性能优化</h2><p><a href="https://segmentfault.com/a/1190000011330649" target="_blank" rel="noopener">https://segmentfault.com/a/1190000011330649</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Java面试常见问题-1</title>
+    <url>/2020/05/04/Java%E9%9D%A2%E8%AF%95%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98-1/</url>
+    <content><![CDATA[<h2 id="1-String-StringBuilder-StringBuffer区别"><a href="#1-String-StringBuilder-StringBuffer区别" class="headerlink" title="1. String, StringBuilder, StringBuffer区别"></a>1. String, StringBuilder, StringBuffer区别</h2><p>这三个类的主要区别在两个方面：<strong>运算速度</strong>（运算性能或执行效率）和<strong>线程安全性</strong>。</p>
+<h3 id="1-运算速度比较（通常情况下）：StringBuilder-gt-StringBuffer-gt-String"><a href="#1-运算速度比较（通常情况下）：StringBuilder-gt-StringBuffer-gt-String" class="headerlink" title="1. 运算速度比较（通常情况下）：StringBuilder &gt; StringBuffer &gt; String"></a>1. <strong>运算速度</strong>比较（通常情况下）：<strong>StringBuilder &gt; StringBuffer &gt; String</strong></h3><a id="more"></a>
+
+<p>String是<strong>final</strong>类不能被继承且为字符串常量，而StringBuilder和StringBuffer均为<strong>字符串变量</strong>。String对象一旦创建便<strong>不可更改</strong>，而后两者是<strong>可更改</strong>的，它们只能通过构造函数来建立对象，且对象被建立以后将在内存中分配内存空间，并初始保存一个null，通过append方法向StringBuffer和StringBuilder中赋值。</p>
+<p>Java中对String对象进行的操作实际上是一个不断创建并回收对象的过程，因此在运行速度上很慢。</p>
+<h3 id="2-线程安全性"><a href="#2-线程安全性" class="headerlink" title="2. 线程安全性"></a>2. 线程安全性</h3><p>StringBuilder（<strong>非线程安全</strong>）</p>
+<p>而StringBuilder的方法没有该关键字修饰，所以不能保证线程安全性。</p>
+<p>StringBuffer（<strong>线程安全的</strong>）</p>
+<p>StringBuffer中大部分方法由<strong>synchronized</strong>关键字修饰，在必要时可对方法进行同步，因此任意特定实例上的所有操作就好像是以串行顺序发生的，该顺序与所涉及的每个线程进行的方法调用顺序一致，所以是线程安全的。</p>
+<h3 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a>3. 总结</h3><p>String：适用于<strong>少量</strong>的字符串操作。</p>
+<p>StringBuilder：适用于<strong>单线程</strong>下在字符串缓冲区进行大量操作。</p>
+<p>StringBuffer：适用于<strong>多线程</strong>下在字符串缓冲区进行大量操作。</p>
+<h2 id="2-Spring-Bean为什么是单例"><a href="#2-Spring-Bean为什么是单例" class="headerlink" title="2. Spring Bean为什么是单例"></a>2. Spring Bean为什么是单例</h2><h3 id="单例bean与原型bean的区别"><a href="#单例bean与原型bean的区别" class="headerlink" title="单例bean与原型bean的区别"></a>单例bean与原型bean的区别</h3><p><strong>单例：</strong>一个bean被声明为单例时，处理多次请求时spring容器里只实例化一个bean，后续的请求公用这个对象，这个对象存储在一个map中，当有请求时，先在缓存中（map）查找是否存在，存在则使用，不存在才实例化一个对象</p>
+<p><strong>原型：</strong>每当有请求来就实例化一个新的bean，没有缓存以及从缓存中查</p>
+<h4 id="单例bean的优势"><a href="#单例bean的优势" class="headerlink" title="单例bean的优势"></a>单例bean的优势</h4><p>由于不会每次都新创建新对象所以有一下几个性能上的优势：</p>
+<p><strong>减少了新生成实例的消耗</strong></p>
+<p>新生成实例消耗包括两方面，第一，spring会通过反射或者cglib来生成bean实例这都是耗性能的操作，其次给对象分配内存也会涉及复杂算法。</p>
+<p><strong>减少jvm垃圾回收</strong></p>
+<p>由于不会给每个请求都新生成bean实例，所以自然回收的对象少了。</p>
+<p><strong>可以快速获取到bean</strong></p>
+<p>因为单例的获取bean操作除了第一次生成之外其余的都是从缓存里获取的所以很快。</p>
+<h3 id="单例bean的劣势"><a href="#单例bean的劣势" class="headerlink" title="单例bean的劣势"></a>单例bean的劣势</h3><p>单例的bean一个很大的劣势就是他不能做到线程安全，由于所有请求都共享一个bean实例，所以这个bean要是有状态的一个bean的话可能在并发场景下出现问题，而原型的bean则不会有这样问题（但也有例外，比如他被单例bean依赖），因为给每个请求都新创建实例。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>面试题：Spring 为啥把bean默认设计成单例？</p>
+<p>答案：</p>
+<p>为了提高性能<br>少创建实例<br>垃圾回收<br>缓存快速获取</p>
+<p>单例有啥劣势？</p>
+<p>如果是有状态的话在并发环境下线程不安全。</p>
+<h2 id="3-项目中有用到多线程嘛"><a href="#3-项目中有用到多线程嘛" class="headerlink" title="3. 项目中有用到多线程嘛"></a>3. 项目中有用到多线程嘛</h2><p>用户注册完成送大礼包/积分之类，且积分等也是另一个系统并<strong>比较耗时</strong>；且这类任务即使失败也不是特别重要的。</p>
+<p>后台线程：比如<strong>定期执行</strong>一些特殊任务，如定期更新配置文件，任务调度（如quartz），一些监控用于定期信息采集等。</p>
+<p>特别耗时的操作，如备份数据库，可以开个线程执行备份，然后执行返回，前台不断向后台询问线程执行状态</p>
+<p>场景一:一个业务逻辑有很多次的循环，<strong>每次循环之间没有影响</strong>，比如验证1万条url路径是否存在，正常情况要循环1万次，逐个去验证每一条URL，这样效率会很低，假设验证一条需要1分钟，总共就需要1万分钟，有点恐怖。这时可以用多线程，将1万条URL分成50等份，开50个线程，没个线程只需验证200条，这样所有的线程执行完是远小于1万分钟的。</p>
+<p>场景二:需要知道一个任务的执行进度，比如我们常看到的进度条，实现方式可以是在任务中加入一个整型属性变量(这样不同方法可以共享)，任务执行一定程度就给变量值加1，另外开一个线程按时间间隔不断去访问这个变量，并反馈给用户。</p>
+<p>总之<strong>使用多线程就是为了充分利用cpu的资源，提高程序执行效率</strong>，当你发现一个业务逻辑执行效率特别低，耗时特别长，就可以考虑使用多线程。<strong>不过CPU执行哪个线程的时间和顺序是不确定的</strong>，即使设置了线程的优先级，因此使用多线程的风险也是比较大的，会出现很多预料不到的问题，一定要多熟悉概念，多构造不同的场景去测试才能够掌握!</p>
+<h2 id="4-HashMap为什么要重写hashCode和equals方法"><a href="#4-HashMap为什么要重写hashCode和equals方法" class="headerlink" title="4. HashMap为什么要重写hashCode和equals方法"></a>4. HashMap为什么要重写hashCode和equals方法</h2><p>HashMap和Hashtable的底层实现都是数组+链表结构实现的</p>
+<p>使用HashMap，如果key是自定义的类，就必须重写hashcode()和equals()。</p>
+<p>如果你重载了equals，比如说是基于对象的内容实现的，而保留hashCode的实现不变，那么很可能某两个对象明明是“相等”，而hashCode却不一样。</p>
+<p>这样，当你用其中的一个作为键保存到hashMap、hasoTable或hashSet中，再以“相等的”找另一个作为键值去查找他们的时候，则根本找不到。</p>
+<p>对于每一个对象，通过其hashCode()方法可为其生成一个整形值（散列码），该整型值被处理后，将会作为数组下标，存放该对象所对应的Entry（存放该对象及其对应值）。 </p>
+<p>equals()方法则是在HashMap中插入值或查询时会使用到。当HashMap中插入值或查询值对应的散列码与数组中的散列码相等时，则会通过equals方法比较key值是否相等</p>
+<p>所以想以自建对象作为HashMap的key，必须重写该对象继承object的hashCode和equals方法。</p>
+<h2 id="5-Java集合中为什么要使用设计迭代器"><a href="#5-Java集合中为什么要使用设计迭代器" class="headerlink" title="5. Java集合中为什么要使用设计迭代器"></a>5. Java集合中为什么要使用设计迭代器</h2><p>优点: </p>
+<pre><code>1. 可以不了解集合内部的数据结构,就可以直接遍历;
+
+2. **不暴露内部的数据**,可以直接外部遍历;
+
+3. 适用性强,基本上的集合都能使用迭代器;</code></pre><h2 id="6-为什么使用迭代器遍历删除是安全的"><a href="#6-为什么使用迭代器遍历删除是安全的" class="headerlink" title="6. 为什么使用迭代器遍历删除是安全的"></a>6. 为什么使用迭代器遍历删除是安全的</h2><p>基本上<strong>ArrayList采用size属性来维护自已的状态，而Iterator采用cursor来来维护自已的状态</strong>。</p>
+<p>当size出现变化时，cursor并不一定能够得到同步，除非这种变化是Iterator主动导致的。</p>
+<p>当Iterator.remove方法导致ArrayList列表发生变化时，他会更新cursor来同步这一变化。但其他方式导致的ArrayList变化，Iterator是无法感知的。ArrayList自然也不会主动通知Iterator们，那将是一个繁重的工作。Iterator到底还是做了努力：为了防止状态不一致可能引发的无法设想的后果，Iterator会经常做checkForComodification检查，以防有变。如果有变，则以异常抛出，所以就出现了上面的异常。</p>
+<h2 id="7-Spring事务传播机制"><a href="#7-Spring事务传播机制" class="headerlink" title="7. Spring事务传播机制"></a>7. Spring事务传播机制</h2><ul>
+<li>@Transactional(propagation=Propagation.REQUIRED)<br>如果有事务, 那么加入事务, 没有的话新建一个(默认情况下)</li>
+<li>@Transactional(propagation=Propagation.NOT_SUPPORTED)<br>容器不为这个方法开启事务</li>
+<li>@Transactional(propagation=Propagation.REQUIRES_NEW)<br>不管是否存在事务,都创建一个新的事务,原来的挂起,新的执行完毕,继续执行老的事务</li>
+<li>@Transactional(propagation=Propagation.MANDATORY)<br>必须在一个已有的事务中执行,否则抛出异常</li>
+<li>@Transactional(propagation=Propagation.NEVER)<br>必须在一个没有的事务中执行,否则抛出异常(与Propagation.MANDATORY相反)</li>
+<li>@Transactional(propagation=Propagation.SUPPORTS)<br>如果其他bean调用这个方法,在其他bean中声明事务,那就用事务.如果其他bean没有声明事务,那就不用事务.</li>
+</ul>
 ]]></content>
   </entry>
   <entry>
@@ -1334,6 +1334,20 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 ]]></content>
   </entry>
   <entry>
+    <title>SpringBoot实现通过url下载pdf到本地</title>
+    <url>/2020/06/06/SpringBoot%E5%AE%9E%E7%8E%B0%E9%80%9A%E8%BF%87url%E4%B8%8B%E8%BD%BDpdf%E5%88%B0%E6%9C%AC%E5%9C%B0/</url>
+    <content><![CDATA[<p>最近有需求是点击下载按钮后下载指定url的pdf文件到本地</p>
+<p>下面通过<strong>SpringBoot</strong>来实现一下：</p>
+<a id="more"></a>
+
+<h4 id="思路就是："><a href="#思路就是：" class="headerlink" title="思路就是："></a><strong>思路</strong>就是：</h4><ol>
+<li>解析url，建立连接获取输入流</li>
+<li>copy输入流到输出流中，进行相关设置并返回</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@GetMapping</span>(<span class="string">"/download"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">download</span><span class="params">(@RequestParam(<span class="string">"url"</span>)</span> String urlStr, HttpServletResponse response) <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        URL url = <span class="keyword">new</span> URL(urlStr);</span><br><span class="line">        HttpURLConnection conn = (HttpURLConnection)url.openConnection();</span><br><span class="line">        <span class="comment">//设置超时间为5秒</span></span><br><span class="line"><span class="comment">//        conn.setConnectTimeout(5*1000);</span></span><br><span class="line">        <span class="comment">//防止屏蔽程序抓取而返回403错误</span></span><br><span class="line">        conn.setRequestProperty(<span class="string">"User-Agent"</span>, <span class="string">"Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)"</span>);</span><br><span class="line">        <span class="keyword">try</span>(InputStream inputStream = conn.getInputStream();</span><br><span class="line">            OutputStream outputStream = response.getOutputStream();) &#123;</span><br><span class="line">            response.setContentType(<span class="string">"application/x-download"</span>);</span><br><span class="line">            response.addHeader(<span class="string">"Content-Disposition"</span>, <span class="string">"attachment;filename=test.pdf"</span>);</span><br><span class="line">            <span class="comment">// 将输入流拷贝到输出流中</span></span><br><span class="line">            IOUtils.copy(inputStream, outputStream);</span><br><span class="line">            outputStream.flush();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+  </entry>
+  <entry>
     <title>Spring-Boot多数据源的动态切换</title>
     <url>/2020/05/30/Spring-Boot%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90%E7%9A%84%E5%8A%A8%E6%80%81%E5%88%87%E6%8D%A2/</url>
     <content><![CDATA[<h3 id="创建数据库和数据表"><a href="#创建数据库和数据表" class="headerlink" title="创建数据库和数据表"></a>创建数据库和数据表</h3><p>首先需要建立两个库进行测试，我这里使用的是master_test和slave_test两个库，</p>
@@ -1372,20 +1386,6 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 
 
 <h5 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h5><p><a href="https://mp.weixin.qq.com/s/HNr97Fqonq3SZkJj21cDlg" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/HNr97Fqonq3SZkJj21cDlg</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>SpringBoot实现通过url下载pdf到本地</title>
-    <url>/2020/06/06/SpringBoot%E5%AE%9E%E7%8E%B0%E9%80%9A%E8%BF%87url%E4%B8%8B%E8%BD%BDpdf%E5%88%B0%E6%9C%AC%E5%9C%B0/</url>
-    <content><![CDATA[<p>最近有需求是点击下载按钮后下载指定url的pdf文件到本地</p>
-<p>下面通过<strong>SpringBoot</strong>来实现一下：</p>
-<a id="more"></a>
-
-<h4 id="思路就是："><a href="#思路就是：" class="headerlink" title="思路就是："></a><strong>思路</strong>就是：</h4><ol>
-<li>解析url，建立连接获取输入流</li>
-<li>copy输入流到输出流中，进行相关设置并返回</li>
-</ol>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@GetMapping</span>(<span class="string">"/download"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">download</span><span class="params">(@RequestParam(<span class="string">"url"</span>)</span> String urlStr, HttpServletResponse response) <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        URL url = <span class="keyword">new</span> URL(urlStr);</span><br><span class="line">        HttpURLConnection conn = (HttpURLConnection)url.openConnection();</span><br><span class="line">        <span class="comment">//设置超时间为5秒</span></span><br><span class="line"><span class="comment">//        conn.setConnectTimeout(5*1000);</span></span><br><span class="line">        <span class="comment">//防止屏蔽程序抓取而返回403错误</span></span><br><span class="line">        conn.setRequestProperty(<span class="string">"User-Agent"</span>, <span class="string">"Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)"</span>);</span><br><span class="line">        <span class="keyword">try</span>(InputStream inputStream = conn.getInputStream();</span><br><span class="line">            OutputStream outputStream = response.getOutputStream();) &#123;</span><br><span class="line">            response.setContentType(<span class="string">"application/x-download"</span>);</span><br><span class="line">            response.addHeader(<span class="string">"Content-Disposition"</span>, <span class="string">"attachment;filename=test.pdf"</span>);</span><br><span class="line">            <span class="comment">// 将输入流拷贝到输出流中</span></span><br><span class="line">            IOUtils.copy(inputStream, outputStream);</span><br><span class="line">            outputStream.flush();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 ]]></content>
   </entry>
   <entry>
@@ -1591,25 +1591,6 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 ]]></content>
   </entry>
   <entry>
-    <title>Spring自动注入单例和多例如何选择</title>
-    <url>/2020/05/03/Spring%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5%E5%8D%95%E4%BE%8B%E5%92%8C%E5%A4%9A%E4%BE%8B%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9/</url>
-    <content><![CDATA[<h3 id="Spring中bean的scope属性，有如下5种类型："><a href="#Spring中bean的scope属性，有如下5种类型：" class="headerlink" title="Spring中bean的scope属性，有如下5种类型："></a>Spring中bean的scope属性，有如下5种类型：</h3><p><strong>singleton</strong> 表示在spring容器中的单例，通过spring容器获得该bean时总是返回唯一的实例</p>
-<p><strong>prototype</strong> 表示每次获得bean都会生成一个新的对象</p>
-<p><strong>request</strong> 表示在一次http请求内有效（只适用于web应用）</p>
-<p><strong>session</strong> 表示在一个用户会话内有效（只适用于web应用）</p>
-<p><strong>globalSession</strong> 表示在全局会话内有效（只适用于web应用）</p>
-<p><em>在多数情况，我们只会使用singleton和prototype两种scope</em>，如果在spring配置文件内未指定scope属性，默认为singleton。</p>
-<a id="more"></a>
-
-<h3 id="如何选择"><a href="#如何选择" class="headerlink" title="如何选择"></a>如何选择</h3><p>所谓单例就是所有的请求都用一个对象来处理，比如我们常用的service和dao层的对象通常都是单例的，而多例则指每个请求用一个新的对象来处理</p>
-<p><strong>之所以用单例，是因为没必要每个请求都新建一个对象，这样子既浪费CPU又浪费内存； 之所以用多例，是为了防止并发问题。</strong></p>
-<p>即一个请求改变了对象的状态，此时对象又处理另一个请求，而之前请求对对象状态的改变导致了对象对另一个请求做了错误的处理；</p>
-<p>用单例和多例的标准只有一个： <strong>当对象含有可改变的状态时（更精确的说就是在实际应用中该状态会改变），则多例，否则单例</strong>；</p>
-<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><p><a href="https://blog.csdn.net/zhang_dianliang/article/details/76850906" target="_blank" rel="noopener">https://blog.csdn.net/zhang_dianliang/article/details/76850906</a></p>
-<p><a href="https://www.imooc.com/wenda/detail/385159" target="_blank" rel="noopener">https://www.imooc.com/wenda/detail/385159</a></p>
-]]></content>
-  </entry>
-  <entry>
     <title>Spring定时任务-Scheduled注解使用方式</title>
     <url>/2020/06/30/Spring%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1-Scheduled%E6%B3%A8%E8%A7%A3%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F/</url>
     <content><![CDATA[<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>使用@Scheduled cron表达式标注任务方法</p>
@@ -1673,22 +1654,22 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 ]]></content>
   </entry>
   <entry>
-    <title>cookie和session的区别</title>
-    <url>/2020/04/30/cookie%E5%92%8Csession%E7%9A%84%E5%8C%BA%E5%88%AB/</url>
-    <content><![CDATA[<h2 id="http无状态和session"><a href="#http无状态和session" class="headerlink" title="http无状态和session"></a>http无状态和session</h2><p>由于HTTP协议是<strong>无状态</strong>的协议，所以服务端需要记录用户的状态时，就需要用某种机制来识具体的用户，这个机制就是Session.</p>
+    <title>Spring自动注入单例和多例如何选择</title>
+    <url>/2020/05/03/Spring%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5%E5%8D%95%E4%BE%8B%E5%92%8C%E5%A4%9A%E4%BE%8B%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9/</url>
+    <content><![CDATA[<h3 id="Spring中bean的scope属性，有如下5种类型："><a href="#Spring中bean的scope属性，有如下5种类型：" class="headerlink" title="Spring中bean的scope属性，有如下5种类型："></a>Spring中bean的scope属性，有如下5种类型：</h3><p><strong>singleton</strong> 表示在spring容器中的单例，通过spring容器获得该bean时总是返回唯一的实例</p>
+<p><strong>prototype</strong> 表示每次获得bean都会生成一个新的对象</p>
+<p><strong>request</strong> 表示在一次http请求内有效（只适用于web应用）</p>
+<p><strong>session</strong> 表示在一个用户会话内有效（只适用于web应用）</p>
+<p><strong>globalSession</strong> 表示在全局会话内有效（只适用于web应用）</p>
+<p><em>在多数情况，我们只会使用singleton和prototype两种scope</em>，如果在spring配置文件内未指定scope属性，默认为singleton。</p>
 <a id="more"></a>
 
-<p>典型的场景比如购物车，当你点击下单按钮时，由于HTTP协议无状态，所以并不知道是哪个用户操作的，所以服务端要为特定的用户创建了特定的Session，用用于标识这个用户，并且跟踪用户，这样才知道购物车里面有几本书。</p>
-<p>这个Session是保存在服务端的，有一个唯一标识。在服务端保存Session的方法很多，内存、数据库、文件都有。</p>
-<p>集群的时候也要考虑Session的转移，在大型的网站，一般会有专门的Session服务器集群，用来保存用户会话，这个时候Session信息都是放在内存的，使用一些缓存服务比如Memcached之类的来放Session。</p>
-<h2 id="cookie"><a href="#cookie" class="headerlink" title="cookie"></a>cookie</h2><p>思考一下服务端如何识别特定的客户？这个时候Cookie就登场了。每次HTTP请求的时候，客户端都会发送相应的Cookie信息到服务端。</p>
-<p>实际上大多数的应用都是用 Cookie 来实现Session跟踪的，第一次创建Session的时候，服务端会在HTTP协议中告诉客户端，需要在 Cookie 里面记录一个Session ID，以后每次请求把这个会话ID发送到服务器，我就知道你是谁了。</p>
-<p>有人问，如果客户端的浏览器禁用了Cookie怎么办？一般这种情况下，会使用一种叫做URL重写的技术来进行会话跟踪，即每次HTTP交互，URL后面都会被附加上一个诸如 sid=xxxxx 这样的参数，服务端据此来识别用户。</p>
-<p>Cookie其实还可以用在一些方便用户的场景下，设想你某次登陆过一个网站，下次登录的时候不想再次输入账号了，怎么办？这个信息可以写到Cookie里面，访问网站的时候，网站页面的脚本可以读取这个信息，就自动帮你把用户名给填了，能够方便一下用户。这也是Cookie名称的由来，给用户的一点甜头。</p>
-<h2 id="cookie和session"><a href="#cookie和session" class="headerlink" title="cookie和session"></a>cookie和session</h2><p>所以，总结一下：<em>Session是在服务端保存的一个数据结构，用来跟踪用户的状态，这个数据可以保存在集群、数据库、文件中；Cookie是客户端保存用户信息的一种机制，用来记录用户的一些信息，也是实现Session的一种方式</em>。</p>
-<p>cookie和session的<strong>共同之处</strong>在于：cookie和session都是用来<strong>跟踪浏览器用户身份</strong>的会话方式。</p>
-<p>cookie 和session的<strong>区别</strong>是：cookie数据保存在<strong>客户端</strong>，session数据保存在<strong>服务器端</strong>。</p>
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://www.imooc.com/article/3369" target="_blank" rel="noopener">https://www.imooc.com/article/3369</a><br><a href="https://www.zhihu.com/question/19786827/answer/28752144" target="_blank" rel="noopener">https://www.zhihu.com/question/19786827/answer/28752144</a></p>
+<h3 id="如何选择"><a href="#如何选择" class="headerlink" title="如何选择"></a>如何选择</h3><p>所谓单例就是所有的请求都用一个对象来处理，比如我们常用的service和dao层的对象通常都是单例的，而多例则指每个请求用一个新的对象来处理</p>
+<p><strong>之所以用单例，是因为没必要每个请求都新建一个对象，这样子既浪费CPU又浪费内存； 之所以用多例，是为了防止并发问题。</strong></p>
+<p>即一个请求改变了对象的状态，此时对象又处理另一个请求，而之前请求对对象状态的改变导致了对象对另一个请求做了错误的处理；</p>
+<p>用单例和多例的标准只有一个： <strong>当对象含有可改变的状态时（更精确的说就是在实际应用中该状态会改变），则多例，否则单例</strong>；</p>
+<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><p><a href="https://blog.csdn.net/zhang_dianliang/article/details/76850906" target="_blank" rel="noopener">https://blog.csdn.net/zhang_dianliang/article/details/76850906</a></p>
+<p><a href="https://www.imooc.com/wenda/detail/385159" target="_blank" rel="noopener">https://www.imooc.com/wenda/detail/385159</a></p>
 ]]></content>
   </entry>
   <entry>
@@ -1774,7 +1755,7 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
   <entry>
     <title>为什么阿里巴巴禁止使用BigDecimal的equals方法做等值比较</title>
     <url>/2020/09/22/%E4%B8%BA%E4%BB%80%E4%B9%88%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E7%A6%81%E6%AD%A2%E4%BD%BF%E7%94%A8BigDecimal%E7%9A%84equals%E6%96%B9%E6%B3%95%E5%81%9A%E7%AD%89%E5%80%BC%E6%AF%94%E8%BE%83/</url>
-    <content><![CDATA[<h3 id="BigDecimal介绍"><a href="#BigDecimal介绍" class="headerlink" title="BigDecimal介绍"></a>BigDecimal介绍</h3><p>BigDecimal，相信对于很多人来说都不陌生，很多人都知道他的用法，这是一种java.math包中提供的一种可以用来进行精确运算的类型。</p>
+    <content><![CDATA[<h3 id="BigDecimal介绍"><a href="#BigDecimal介绍" class="headerlink" title="BigDecimal介绍"></a>BigDecimal介绍</h3><p><code>BigDecimal</code>，相信对于很多人来说都不陌生，很多人都知道他的用法，这是一种java.math包中提供的一种可以用来进行精确运算的类型。</p>
 <img src="/2020/09/22/%E4%B8%BA%E4%BB%80%E4%B9%88%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E7%A6%81%E6%AD%A2%E4%BD%BF%E7%94%A8BigDecimal%E7%9A%84equals%E6%96%B9%E6%B3%95%E5%81%9A%E7%AD%89%E5%80%BC%E6%AF%94%E8%BE%83/bigdecimal.png" class="" title="bigdecimal">
 
 <a id="more"></a>
@@ -1911,49 +1892,22 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 ]]></content>
   </entry>
   <entry>
-    <title>如何通俗易懂的理解翻墙</title>
-    <url>/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/</url>
-    <content><![CDATA[<p><strong>为了更好的理解翻墙，首先先了解一下互联网是怎么工作的：</strong></p>
+    <title>cookie和session的区别</title>
+    <url>/2020/04/30/cookie%E5%92%8Csession%E7%9A%84%E5%8C%BA%E5%88%AB/</url>
+    <content><![CDATA[<h2 id="http无状态和session"><a href="#http无状态和session" class="headerlink" title="http无状态和session"></a>http无状态和session</h2><p>由于HTTP协议是<strong>无状态</strong>的协议，所以服务端需要记录用户的状态时，就需要用某种机制来识具体的用户，这个机制就是Session.</p>
 <a id="more"></a>
 
-<h2 id="互联网怎么工作的"><a href="#互联网怎么工作的" class="headerlink" title="互联网怎么工作的"></a>互联网怎么工作的</h2><p>假如没有互联网，我们家里有两台电脑，这两台电脑需要互相发送文件，那我们需要用网线把他们连起来，就可以互相传输文件了</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/two_computers.png" class="" title="two computers">
-
-<p>假如我们又增加了三台电脑，一共有五台电脑，那么我们就把他们一对一的连接起来，每台电脑都需要4个网线接口，就组成了一个局域网。</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/five_computers.png" class="" title="five computers">
-
-<p>但是如果我们继续增加电脑，就会发现这种一对一的连接方式就会非常复杂了，所以这个时候就增加了一个控制中心，这个控制中心就是我们熟悉的<strong>路由器</strong>。</p>
-<p>每台电脑只需要连接路由器，然后路由器统一协调这些电脑之前的传输问题</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/router.png" class="" title="router">
-
-<p>然后我们再往大了想，如果我们想给同学家发文件，也就是一个局域网向另外一个局域网发送文件，我们就只需要把两家的路由器连上就可以发送文件了。</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/two_routers.png" class="" title="two routers">
-
-<p>继续往下想就会发现开始的问题，各个局域网的路由器进行一对一的连接变得异常复杂。</p>
-<p>所以我们就新增了一个控制中心<strong>ISP</strong>，也就是我们说的互联网服务供应商，我们可以把它想象成更大号的路由器。</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/ISP.png" class="" title="two ISP">
-
-<p>这里家里的路由器只需要连接我们这个区域的ISP。</p>
-<p>各个区域的ISP进行连接，这样我们的互联网就形成了。</p>
-<h2 id="翻墙的原理"><a href="#翻墙的原理" class="headerlink" title="翻墙的原理"></a>翻墙的原理</h2><p>先说一下现象，我们访问部分网站，比如google的时候就会出现下面的现象：</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/page_not_found.png" class="" title="page not found">
-
-<p>我们输入一个网址访问一个网站，其实就是通过DNS找到网址对应的IP地址，然后访问网站的服务器，从网站服务器获取相应信息</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/DNS.png" class="" title="DNS">
-
-<p>举个例子：</p>
-<p>比如小明通过百度经常访问大姐姐小姐姐的视频网站，然后百度就把这个情况向爸爸反映了，小明的爸爸为了小明的健康，就<strong>让DNS服务器不再查询大姐姐小姐姐网站的IP地址</strong>，这样小明就打不开网站了。</p>
-<p>但是小明通过<strong>修改电脑host</strong>的方式，再一次成功的访问了网站，小明爸爸一气之下在网络传输中增加了一个关卡，告诉关卡看见数据包有大姐姐小姐姐字样的都不能通过，小明就又打不开网站了。</p>
-<p>然后网站就给<strong>数据包加密</strong>，本来数据包上写的是大姐姐小姐姐，加密之后写的是办公用品，小明又一次打开了网站。小明爸爸又告诉关卡，只要是这个网站的IP地址都不能通过，所以小明又打不开网站了。</p>
-<p>然后小明想了一个办法，<strong>把发送出去的数据包先进行完全的加密，通过关卡之后先传到另外一个服务器上，让这个服务器把数据包解密，然后让这个服务器去访问大姐姐小姐姐的网站，收到网站的数据包之后，服务器再进行完全的加密，通过关卡之后再解密，</strong>这样小明就再一次打开了网站。</p>
-<h2 id="VPN翻墙原理"><a href="#VPN翻墙原理" class="headerlink" title="VPN翻墙原理"></a>VPN翻墙原理</h2><p>有些网站我们是没有办法打开的，这个是因为这中间有一个<strong>长城防火墙</strong>(GFW)，这个防火墙的作用就是检查这些数据包。</p>
-<p>比如我们打开一个网站，DNS服务器就会告诉我们电脑，没有查到这个网址所对应的IP地址或者是长城防火墙发现这些数据包是被屏蔽网站的IP地址，就会把数据包拦下，这个就是我们没办法访问被屏蔽网站的原因。</p>
-<p>为了能访问这些被屏蔽的网站，我们就用到了VPN。</p>
-<p>当我们打开VPN之后，VPN就会在电脑上<strong>虚拟出一个IP地址</strong>。当电脑要传输数据包的时候，这个即将传输的数据包和没有开VPN的时候一样，先用盒子装好，然后写上寄件人和收件人的IP地址。</p>
-<p>之后这个数据包会交给电脑的VPN，VPN就会对这个数据包进行加密，相当于又给数据包套了一个盒子，然后这个盒子的寄件人地址写的是刚才虚拟出来的IP地址，收件人地址写的是VPN服务器的IP地址，然后这个数据包就可以发送出去了。</p>
-<p>因为<strong>这个数据包的目的地并不是被屏蔽网站的IP地址，而且数据包也加过密</strong>，防火墙自然也检测不出什么问题。</p>
-<p>当数据包到了VPN的服务器之后，就会对数据包解密，再把里面的数据传给网站的服务器，网站服务器再传数据包给VPN服务器，VPN服务器把数据加密之后，又传回给我们，这个就是VPN的工作原理。</p>
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://www.youtube.com/watch?v=EUKmF_IKttc" target="_blank" rel="noopener">https://www.youtube.com/watch?v=EUKmF_IKttc</a><br><a href="https://www.youtube.com/watch?v=ZT-q6mJ-e3g" target="_blank" rel="noopener">https://www.youtube.com/watch?v=ZT-q6mJ-e3g</a></p>
+<p>典型的场景比如购物车，当你点击下单按钮时，由于HTTP协议无状态，所以并不知道是哪个用户操作的，所以服务端要为特定的用户创建了特定的Session，用用于标识这个用户，并且跟踪用户，这样才知道购物车里面有几本书。</p>
+<p>这个Session是保存在服务端的，有一个唯一标识。在服务端保存Session的方法很多，内存、数据库、文件都有。</p>
+<p>集群的时候也要考虑Session的转移，在大型的网站，一般会有专门的Session服务器集群，用来保存用户会话，这个时候Session信息都是放在内存的，使用一些缓存服务比如Memcached之类的来放Session。</p>
+<h2 id="cookie"><a href="#cookie" class="headerlink" title="cookie"></a>cookie</h2><p>思考一下服务端如何识别特定的客户？这个时候Cookie就登场了。每次HTTP请求的时候，客户端都会发送相应的Cookie信息到服务端。</p>
+<p>实际上大多数的应用都是用 Cookie 来实现Session跟踪的，第一次创建Session的时候，服务端会在HTTP协议中告诉客户端，需要在 Cookie 里面记录一个Session ID，以后每次请求把这个会话ID发送到服务器，我就知道你是谁了。</p>
+<p>有人问，如果客户端的浏览器禁用了Cookie怎么办？一般这种情况下，会使用一种叫做URL重写的技术来进行会话跟踪，即每次HTTP交互，URL后面都会被附加上一个诸如 sid=xxxxx 这样的参数，服务端据此来识别用户。</p>
+<p>Cookie其实还可以用在一些方便用户的场景下，设想你某次登陆过一个网站，下次登录的时候不想再次输入账号了，怎么办？这个信息可以写到Cookie里面，访问网站的时候，网站页面的脚本可以读取这个信息，就自动帮你把用户名给填了，能够方便一下用户。这也是Cookie名称的由来，给用户的一点甜头。</p>
+<h2 id="cookie和session"><a href="#cookie和session" class="headerlink" title="cookie和session"></a>cookie和session</h2><p>所以，总结一下：<em>Session是在服务端保存的一个数据结构，用来跟踪用户的状态，这个数据可以保存在集群、数据库、文件中；Cookie是客户端保存用户信息的一种机制，用来记录用户的一些信息，也是实现Session的一种方式</em>。</p>
+<p>cookie和session的<strong>共同之处</strong>在于：cookie和session都是用来<strong>跟踪浏览器用户身份</strong>的会话方式。</p>
+<p>cookie 和session的<strong>区别</strong>是：cookie数据保存在<strong>客户端</strong>，session数据保存在<strong>服务器端</strong>。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://www.imooc.com/article/3369" target="_blank" rel="noopener">https://www.imooc.com/article/3369</a><br><a href="https://www.zhihu.com/question/19786827/answer/28752144" target="_blank" rel="noopener">https://www.zhihu.com/question/19786827/answer/28752144</a></p>
 ]]></content>
   </entry>
   <entry>
@@ -2056,6 +2010,52 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 </li>
 </ul>
 <h2 id="5-参考"><a href="#5-参考" class="headerlink" title="5. 参考"></a>5. 参考</h2><p><a href="https://juejin.im/post/5e4791a7f265da5715630629" target="_blank" rel="noopener">https://juejin.im/post/5e4791a7f265da5715630629</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>如何通俗易懂的理解翻墙</title>
+    <url>/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/</url>
+    <content><![CDATA[<p><strong>为了更好的理解翻墙，首先先了解一下互联网是怎么工作的：</strong></p>
+<a id="more"></a>
+
+<h2 id="互联网怎么工作的"><a href="#互联网怎么工作的" class="headerlink" title="互联网怎么工作的"></a>互联网怎么工作的</h2><p>假如没有互联网，我们家里有两台电脑，这两台电脑需要互相发送文件，那我们需要用网线把他们连起来，就可以互相传输文件了</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/two_computers.png" class="" title="two computers">
+
+<p>假如我们又增加了三台电脑，一共有五台电脑，那么我们就把他们一对一的连接起来，每台电脑都需要4个网线接口，就组成了一个局域网。</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/five_computers.png" class="" title="five computers">
+
+<p>但是如果我们继续增加电脑，就会发现这种一对一的连接方式就会非常复杂了，所以这个时候就增加了一个控制中心，这个控制中心就是我们熟悉的<strong>路由器</strong>。</p>
+<p>每台电脑只需要连接路由器，然后路由器统一协调这些电脑之前的传输问题</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/router.png" class="" title="router">
+
+<p>然后我们再往大了想，如果我们想给同学家发文件，也就是一个局域网向另外一个局域网发送文件，我们就只需要把两家的路由器连上就可以发送文件了。</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/two_routers.png" class="" title="two routers">
+
+<p>继续往下想就会发现开始的问题，各个局域网的路由器进行一对一的连接变得异常复杂。</p>
+<p>所以我们就新增了一个控制中心<strong>ISP</strong>，也就是我们说的互联网服务供应商，我们可以把它想象成更大号的路由器。</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/ISP.png" class="" title="two ISP">
+
+<p>这里家里的路由器只需要连接我们这个区域的ISP。</p>
+<p>各个区域的ISP进行连接，这样我们的互联网就形成了。</p>
+<h2 id="翻墙的原理"><a href="#翻墙的原理" class="headerlink" title="翻墙的原理"></a>翻墙的原理</h2><p>先说一下现象，我们访问部分网站，比如google的时候就会出现下面的现象：</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/page_not_found.png" class="" title="page not found">
+
+<p>我们输入一个网址访问一个网站，其实就是通过DNS找到网址对应的IP地址，然后访问网站的服务器，从网站服务器获取相应信息</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/DNS.png" class="" title="DNS">
+
+<p>举个例子：</p>
+<p>比如小明通过百度经常访问大姐姐小姐姐的视频网站，然后百度就把这个情况向爸爸反映了，小明的爸爸为了小明的健康，就<strong>让DNS服务器不再查询大姐姐小姐姐网站的IP地址</strong>，这样小明就打不开网站了。</p>
+<p>但是小明通过<strong>修改电脑host</strong>的方式，再一次成功的访问了网站，小明爸爸一气之下在网络传输中增加了一个关卡，告诉关卡看见数据包有大姐姐小姐姐字样的都不能通过，小明就又打不开网站了。</p>
+<p>然后网站就给<strong>数据包加密</strong>，本来数据包上写的是大姐姐小姐姐，加密之后写的是办公用品，小明又一次打开了网站。小明爸爸又告诉关卡，只要是这个网站的IP地址都不能通过，所以小明又打不开网站了。</p>
+<p>然后小明想了一个办法，<strong>把发送出去的数据包先进行完全的加密，通过关卡之后先传到另外一个服务器上，让这个服务器把数据包解密，然后让这个服务器去访问大姐姐小姐姐的网站，收到网站的数据包之后，服务器再进行完全的加密，通过关卡之后再解密，</strong>这样小明就再一次打开了网站。</p>
+<h2 id="VPN翻墙原理"><a href="#VPN翻墙原理" class="headerlink" title="VPN翻墙原理"></a>VPN翻墙原理</h2><p>有些网站我们是没有办法打开的，这个是因为这中间有一个<strong>长城防火墙</strong>(GFW)，这个防火墙的作用就是检查这些数据包。</p>
+<p>比如我们打开一个网站，DNS服务器就会告诉我们电脑，没有查到这个网址所对应的IP地址或者是长城防火墙发现这些数据包是被屏蔽网站的IP地址，就会把数据包拦下，这个就是我们没办法访问被屏蔽网站的原因。</p>
+<p>为了能访问这些被屏蔽的网站，我们就用到了VPN。</p>
+<p>当我们打开VPN之后，VPN就会在电脑上<strong>虚拟出一个IP地址</strong>。当电脑要传输数据包的时候，这个即将传输的数据包和没有开VPN的时候一样，先用盒子装好，然后写上寄件人和收件人的IP地址。</p>
+<p>之后这个数据包会交给电脑的VPN，VPN就会对这个数据包进行加密，相当于又给数据包套了一个盒子，然后这个盒子的寄件人地址写的是刚才虚拟出来的IP地址，收件人地址写的是VPN服务器的IP地址，然后这个数据包就可以发送出去了。</p>
+<p>因为<strong>这个数据包的目的地并不是被屏蔽网站的IP地址，而且数据包也加过密</strong>，防火墙自然也检测不出什么问题。</p>
+<p>当数据包到了VPN的服务器之后，就会对数据包解密，再把里面的数据传给网站的服务器，网站服务器再传数据包给VPN服务器，VPN服务器把数据加密之后，又传回给我们，这个就是VPN的工作原理。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://www.youtube.com/watch?v=EUKmF_IKttc" target="_blank" rel="noopener">https://www.youtube.com/watch?v=EUKmF_IKttc</a><br><a href="https://www.youtube.com/watch?v=ZT-q6mJ-e3g" target="_blank" rel="noopener">https://www.youtube.com/watch?v=ZT-q6mJ-e3g</a></p>
 ]]></content>
   </entry>
 </search>
