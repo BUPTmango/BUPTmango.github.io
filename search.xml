@@ -1,63 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Git版本回退方法</title>
-    <url>/2020/08/26/Git%E7%89%88%E6%9C%AC%E5%9B%9E%E9%80%80%E6%96%B9%E6%B3%95/</url>
-    <content><![CDATA[<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>今天在公司犯了错误，在公司公共的develop分支上push了错误的代码，顺便研究了一下git如何回退版本，参考了大佬的做法，记录下了这篇博客。</p>
-<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>如果提交了一个错误的版本，怎么回退版本？</p>
-<p>如果提交了一个错误的版本到远程分支，怎么回退远程分支版本？</p>
-<p>如果提交了一个错误的版本到公共远程分支，又该怎么回退版本？</p>
-<a id="more"></a>
-
-<h3 id="本地分支版本回退的方法"><a href="#本地分支版本回退的方法" class="headerlink" title="本地分支版本回退的方法"></a>本地分支版本回退的方法</h3><p>如果你在本地做了错误提交，那么回退版本的方法很简单</p>
-<p>先用下面命令找到要回退的版本的commit id：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git reflog</span><br></pre></td></tr></table></figure>
-
-<p>接着回退版本:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git reset --hard Obfafd</span><br></pre></td></tr></table></figure>
-
-<p>0bfafd就是你要回退的版本的commit id的前面几位</p>
-<h3 id="自己的远程分支版本回退的方法"><a href="#自己的远程分支版本回退的方法" class="headerlink" title="自己的远程分支版本回退的方法"></a>自己的远程分支版本回退的方法</h3><p>如果你的错误提交已经推送到自己的远程分支了，那么就需要回滚远程分支了。<br>首先要回退本地分支：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git reflog</span><br><span class="line">git reset --hard Obfafd</span><br></pre></td></tr></table></figure>
-
-<p>紧接着强制推送到远程分支：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git push -f origin develop</span><br></pre></td></tr></table></figure>
-
-<p><strong>注意：本地分支回滚后，版本将落后远程分支，必须使用强制推送覆盖远程分支，否则无法推送到远程分支</strong></p>
-<h3 id="公共远程分支版本回退的方法"><a href="#公共远程分支版本回退的方法" class="headerlink" title="公共远程分支版本回退的方法"></a>公共远程分支版本回退的方法</h3><p>使用git reset回退公共远程分支的版本后，需要其他所有人手动用远程master分支覆盖本地master分支，</p>
-<p>显然，这不是优雅的回退方法，下面我们使用另个一个命令来回退版本：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git revert HEAD                     //撤销最近一次提交</span><br><span class="line">git revert HEAD~1                   //撤销上上次的提交，注意：数字从0开始</span><br><span class="line">git revert 0ffaacc                  //撤销0ffaacc这次提交</span><br></pre></td></tr></table></figure>
-
-<p>git revert 命令意思是撤销某次提交。它会产生一个新的提交，虽然代码回退了，但是<strong>版本依然是向前的</strong>，</p>
-<p>所以，当你用revert回退之后，所有人pull之后，他们的代码也自动的回退了。</p>
-<p>但是，要注意以下几点：</p>
-<ol>
-<li><p>revert 是撤销一次提交，所以后面的commit id是你需要回滚到的版本的前一次提交</p>
-</li>
-<li><p>使用revert HEAD是撤销最近的一次提交，如果你最近一次提交是用revert命令产生的，那么你再执行一次，就相当于撤销了上次的撤销操作，换句话说，你连续执行两次revert HEAD命令，就跟没执行是一样的</p>
-</li>
-<li><p>使用revert HEAD~1 表示撤销最近2次提交，这个数字是从0开始的，如果你之前撤销过产生了commi id，那么也会计算在内的。</p>
-</li>
-<li><p>如果使用 revert 撤销的不是最近一次提交，那么一定会有代码冲突，需要你合并代码，合并代码只需要把当前的代码全部去掉，保留之前版本的代码就可以了.</p>
-</li>
-</ol>
-<p>git revert 命令的好处就是<strong>不会丢掉别人的提交</strong>，即使你撤销后覆盖了别人的提交，他更新代码后，可以在本地用 reset 向前回滚，找到自己的代码，然后拉一下分支，再回来合并上去就可以找回被你覆盖的提交了。</p>
-<h3 id="继续扩展，简单粗暴的回滚方法"><a href="#继续扩展，简单粗暴的回滚方法" class="headerlink" title="继续扩展，简单粗暴的回滚方法"></a>继续扩展，简单粗暴的回滚方法</h3><p>看到这里也许你已经觉得学会了远程仓库版本回滚方法了，但是实践中总是会遇到很多不按套路来的问题，考虑下面一种情况：</p>
-<p>如果你们开发中，忽然发现前面很远的地方有一次错误的合并代码，把本来下一次才能发的功能的代码合并到了这一次来了，这个时候全体成员都觉得直接回滚比较快，因为他们都有备份，覆盖了无所谓，这个时候用reset的话对队友的要求比较高，用revert的话呢要大面积的解决冲突，也很麻烦呀，怎么办呢？</p>
-<p>这个时候，可以使用简单粗暴的办法，直接从那个错误的提交的前一次拉取一份代码放到其他目录，然后将master代码全部删除，把那份新代码方进去，然后提交，果然简单粗暴啊，虽然这种方法不入流，但是，实践中发现很好使啊，所以，实践是检验真理的唯一标准。遇到问题还是要灵活应对。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>远程分支回滚的三种方法：</p>
-<ol>
-<li><p>自己的分支回滚直接用reset</p>
-</li>
-<li><p>公共分支回滚用revert</p>
-</li>
-<li><p>错的太远了直接将代码全部删掉，用正确代码替代</p>
-</li>
-</ol>
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="http://blog.csdn.net/fuchaosz/article/details/52170105" target="_blank" rel="noopener">http://blog.csdn.net/fuchaosz/article/details/52170105</a></p>
-]]></content>
-  </entry>
-  <entry>
     <title>ControllerAdvice和ErrorController的用法</title>
     <url>/2020/07/14/ControllerAdvice%E5%92%8CErrorController%E7%9A%84%E7%94%A8%E6%B3%95/</url>
     <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>在Java中异常可以分为Error和Exception，<strong>@ControllerAdvice</strong>用来处理系统中的<strong>Exception</strong>，<strong>Error</strong>Controller处理系统中的<strong>Error</strong>。</p>
@@ -133,6 +76,63 @@
 
 <p>善用上述调试技巧，相当大家撸起代码来会更有感觉，祝大家端午节愉快！</p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://www.cnblogs.com/jun1019/p/9741224.html" target="_blank" rel="noopener">https://www.cnblogs.com/jun1019/p/9741224.html</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Git版本回退方法</title>
+    <url>/2020/08/26/Git%E7%89%88%E6%9C%AC%E5%9B%9E%E9%80%80%E6%96%B9%E6%B3%95/</url>
+    <content><![CDATA[<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>今天在公司犯了错误，在公司公共的develop分支上push了错误的代码，顺便研究了一下git如何回退版本，参考了大佬的做法，记录下了这篇博客。</p>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>如果提交了一个错误的版本，怎么回退版本？</p>
+<p>如果提交了一个错误的版本到远程分支，怎么回退远程分支版本？</p>
+<p>如果提交了一个错误的版本到公共远程分支，又该怎么回退版本？</p>
+<a id="more"></a>
+
+<h3 id="本地分支版本回退的方法"><a href="#本地分支版本回退的方法" class="headerlink" title="本地分支版本回退的方法"></a>本地分支版本回退的方法</h3><p>如果你在本地做了错误提交，那么回退版本的方法很简单</p>
+<p>先用下面命令找到要回退的版本的commit id：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git reflog</span><br></pre></td></tr></table></figure>
+
+<p>接着回退版本:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git reset --hard Obfafd</span><br></pre></td></tr></table></figure>
+
+<p>0bfafd就是你要回退的版本的commit id的前面几位</p>
+<h3 id="自己的远程分支版本回退的方法"><a href="#自己的远程分支版本回退的方法" class="headerlink" title="自己的远程分支版本回退的方法"></a>自己的远程分支版本回退的方法</h3><p>如果你的错误提交已经推送到自己的远程分支了，那么就需要回滚远程分支了。<br>首先要回退本地分支：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git reflog</span><br><span class="line">git reset --hard Obfafd</span><br></pre></td></tr></table></figure>
+
+<p>紧接着强制推送到远程分支：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git push -f origin develop</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：本地分支回滚后，版本将落后远程分支，必须使用强制推送覆盖远程分支，否则无法推送到远程分支</strong></p>
+<h3 id="公共远程分支版本回退的方法"><a href="#公共远程分支版本回退的方法" class="headerlink" title="公共远程分支版本回退的方法"></a>公共远程分支版本回退的方法</h3><p>使用git reset回退公共远程分支的版本后，需要其他所有人手动用远程master分支覆盖本地master分支，</p>
+<p>显然，这不是优雅的回退方法，下面我们使用另个一个命令来回退版本：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git revert HEAD                     //撤销最近一次提交</span><br><span class="line">git revert HEAD~1                   //撤销上上次的提交，注意：数字从0开始</span><br><span class="line">git revert 0ffaacc                  //撤销0ffaacc这次提交</span><br></pre></td></tr></table></figure>
+
+<p>git revert 命令意思是撤销某次提交。它会产生一个新的提交，虽然代码回退了，但是<strong>版本依然是向前的</strong>，</p>
+<p>所以，当你用revert回退之后，所有人pull之后，他们的代码也自动的回退了。</p>
+<p>但是，要注意以下几点：</p>
+<ol>
+<li><p>revert 是撤销一次提交，所以后面的commit id是你需要回滚到的版本的前一次提交</p>
+</li>
+<li><p>使用revert HEAD是撤销最近的一次提交，如果你最近一次提交是用revert命令产生的，那么你再执行一次，就相当于撤销了上次的撤销操作，换句话说，你连续执行两次revert HEAD命令，就跟没执行是一样的</p>
+</li>
+<li><p>使用revert HEAD~1 表示撤销最近2次提交，这个数字是从0开始的，如果你之前撤销过产生了commi id，那么也会计算在内的。</p>
+</li>
+<li><p>如果使用 revert 撤销的不是最近一次提交，那么一定会有代码冲突，需要你合并代码，合并代码只需要把当前的代码全部去掉，保留之前版本的代码就可以了.</p>
+</li>
+</ol>
+<p>git revert 命令的好处就是<strong>不会丢掉别人的提交</strong>，即使你撤销后覆盖了别人的提交，他更新代码后，可以在本地用 reset 向前回滚，找到自己的代码，然后拉一下分支，再回来合并上去就可以找回被你覆盖的提交了。</p>
+<h3 id="继续扩展，简单粗暴的回滚方法"><a href="#继续扩展，简单粗暴的回滚方法" class="headerlink" title="继续扩展，简单粗暴的回滚方法"></a>继续扩展，简单粗暴的回滚方法</h3><p>看到这里也许你已经觉得学会了远程仓库版本回滚方法了，但是实践中总是会遇到很多不按套路来的问题，考虑下面一种情况：</p>
+<p>如果你们开发中，忽然发现前面很远的地方有一次错误的合并代码，把本来下一次才能发的功能的代码合并到了这一次来了，这个时候全体成员都觉得直接回滚比较快，因为他们都有备份，覆盖了无所谓，这个时候用reset的话对队友的要求比较高，用revert的话呢要大面积的解决冲突，也很麻烦呀，怎么办呢？</p>
+<p>这个时候，可以使用简单粗暴的办法，直接从那个错误的提交的前一次拉取一份代码放到其他目录，然后将master代码全部删除，把那份新代码方进去，然后提交，果然简单粗暴啊，虽然这种方法不入流，但是，实践中发现很好使啊，所以，实践是检验真理的唯一标准。遇到问题还是要灵活应对。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>远程分支回滚的三种方法：</p>
+<ol>
+<li><p>自己的分支回滚直接用reset</p>
+</li>
+<li><p>公共分支回滚用revert</p>
+</li>
+<li><p>错的太远了直接将代码全部删掉，用正确代码替代</p>
+</li>
+</ol>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="http://blog.csdn.net/fuchaosz/article/details/52170105" target="_blank" rel="noopener">http://blog.csdn.net/fuchaosz/article/details/52170105</a></p>
 ]]></content>
   </entry>
   <entry>
@@ -1029,6 +1029,67 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 ]]></content>
   </entry>
   <entry>
+    <title>Java面试常见问题-1</title>
+    <url>/2020/05/04/Java%E9%9D%A2%E8%AF%95%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98-1/</url>
+    <content><![CDATA[<h2 id="1-String-StringBuilder-StringBuffer区别"><a href="#1-String-StringBuilder-StringBuffer区别" class="headerlink" title="1. String, StringBuilder, StringBuffer区别"></a>1. String, StringBuilder, StringBuffer区别</h2><p>这三个类的主要区别在两个方面：<strong>运算速度</strong>（运算性能或执行效率）和<strong>线程安全性</strong>。</p>
+<h3 id="1-运算速度比较（通常情况下）：StringBuilder-gt-StringBuffer-gt-String"><a href="#1-运算速度比较（通常情况下）：StringBuilder-gt-StringBuffer-gt-String" class="headerlink" title="1. 运算速度比较（通常情况下）：StringBuilder &gt; StringBuffer &gt; String"></a>1. <strong>运算速度</strong>比较（通常情况下）：<strong>StringBuilder &gt; StringBuffer &gt; String</strong></h3><a id="more"></a>
+
+<p>String是<strong>final</strong>类不能被继承且为字符串常量，而StringBuilder和StringBuffer均为<strong>字符串变量</strong>。String对象一旦创建便<strong>不可更改</strong>，而后两者是<strong>可更改</strong>的，它们只能通过构造函数来建立对象，且对象被建立以后将在内存中分配内存空间，并初始保存一个null，通过append方法向StringBuffer和StringBuilder中赋值。</p>
+<p>Java中对String对象进行的操作实际上是一个不断创建并回收对象的过程，因此在运行速度上很慢。</p>
+<h3 id="2-线程安全性"><a href="#2-线程安全性" class="headerlink" title="2. 线程安全性"></a>2. 线程安全性</h3><p>StringBuilder（<strong>非线程安全</strong>）</p>
+<p>而StringBuilder的方法没有该关键字修饰，所以不能保证线程安全性。</p>
+<p>StringBuffer（<strong>线程安全的</strong>）</p>
+<p>StringBuffer中大部分方法由<strong>synchronized</strong>关键字修饰，在必要时可对方法进行同步，因此任意特定实例上的所有操作就好像是以串行顺序发生的，该顺序与所涉及的每个线程进行的方法调用顺序一致，所以是线程安全的。</p>
+<h3 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a>3. 总结</h3><p>String：适用于<strong>少量</strong>的字符串操作。</p>
+<p>StringBuilder：适用于<strong>单线程</strong>下在字符串缓冲区进行大量操作。</p>
+<p>StringBuffer：适用于<strong>多线程</strong>下在字符串缓冲区进行大量操作。</p>
+<h2 id="2-Spring-Bean为什么是单例"><a href="#2-Spring-Bean为什么是单例" class="headerlink" title="2. Spring Bean为什么是单例"></a>2. Spring Bean为什么是单例</h2><h3 id="单例bean与原型bean的区别"><a href="#单例bean与原型bean的区别" class="headerlink" title="单例bean与原型bean的区别"></a>单例bean与原型bean的区别</h3><p><strong>单例：</strong>一个bean被声明为单例时，处理多次请求时spring容器里只实例化一个bean，后续的请求公用这个对象，这个对象存储在一个map中，当有请求时，先在缓存中（map）查找是否存在，存在则使用，不存在才实例化一个对象</p>
+<p><strong>原型：</strong>每当有请求来就实例化一个新的bean，没有缓存以及从缓存中查</p>
+<h4 id="单例bean的优势"><a href="#单例bean的优势" class="headerlink" title="单例bean的优势"></a>单例bean的优势</h4><p>由于不会每次都新创建新对象所以有一下几个性能上的优势：</p>
+<p><strong>减少了新生成实例的消耗</strong></p>
+<p>新生成实例消耗包括两方面，第一，spring会通过反射或者cglib来生成bean实例这都是耗性能的操作，其次给对象分配内存也会涉及复杂算法。</p>
+<p><strong>减少jvm垃圾回收</strong></p>
+<p>由于不会给每个请求都新生成bean实例，所以自然回收的对象少了。</p>
+<p><strong>可以快速获取到bean</strong></p>
+<p>因为单例的获取bean操作除了第一次生成之外其余的都是从缓存里获取的所以很快。</p>
+<h3 id="单例bean的劣势"><a href="#单例bean的劣势" class="headerlink" title="单例bean的劣势"></a>单例bean的劣势</h3><p>单例的bean一个很大的劣势就是他不能做到线程安全，由于所有请求都共享一个bean实例，所以这个bean要是有状态的一个bean的话可能在并发场景下出现问题，而原型的bean则不会有这样问题（但也有例外，比如他被单例bean依赖），因为给每个请求都新创建实例。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>面试题：Spring 为啥把bean默认设计成单例？</p>
+<p>答案：</p>
+<p>为了提高性能<br>少创建实例<br>垃圾回收<br>缓存快速获取</p>
+<p>单例有啥劣势？</p>
+<p>如果是有状态的话在并发环境下线程不安全。</p>
+<h2 id="3-项目中有用到多线程嘛"><a href="#3-项目中有用到多线程嘛" class="headerlink" title="3. 项目中有用到多线程嘛"></a>3. 项目中有用到多线程嘛</h2><p>用户注册完成送大礼包/积分之类，且积分等也是另一个系统并<strong>比较耗时</strong>；且这类任务即使失败也不是特别重要的。</p>
+<p>后台线程：比如<strong>定期执行</strong>一些特殊任务，如定期更新配置文件，任务调度（如quartz），一些监控用于定期信息采集等。</p>
+<p>特别耗时的操作，如备份数据库，可以开个线程执行备份，然后执行返回，前台不断向后台询问线程执行状态</p>
+<p>场景一:一个业务逻辑有很多次的循环，<strong>每次循环之间没有影响</strong>，比如验证1万条url路径是否存在，正常情况要循环1万次，逐个去验证每一条URL，这样效率会很低，假设验证一条需要1分钟，总共就需要1万分钟，有点恐怖。这时可以用多线程，将1万条URL分成50等份，开50个线程，没个线程只需验证200条，这样所有的线程执行完是远小于1万分钟的。</p>
+<p>场景二:需要知道一个任务的执行进度，比如我们常看到的进度条，实现方式可以是在任务中加入一个整型属性变量(这样不同方法可以共享)，任务执行一定程度就给变量值加1，另外开一个线程按时间间隔不断去访问这个变量，并反馈给用户。</p>
+<p>总之<strong>使用多线程就是为了充分利用cpu的资源，提高程序执行效率</strong>，当你发现一个业务逻辑执行效率特别低，耗时特别长，就可以考虑使用多线程。<strong>不过CPU执行哪个线程的时间和顺序是不确定的</strong>，即使设置了线程的优先级，因此使用多线程的风险也是比较大的，会出现很多预料不到的问题，一定要多熟悉概念，多构造不同的场景去测试才能够掌握!</p>
+<h2 id="4-HashMap为什么要重写hashCode和equals方法"><a href="#4-HashMap为什么要重写hashCode和equals方法" class="headerlink" title="4. HashMap为什么要重写hashCode和equals方法"></a>4. HashMap为什么要重写hashCode和equals方法</h2><p>HashMap和Hashtable的底层实现都是数组+链表结构实现的</p>
+<p>使用HashMap，如果key是自定义的类，就必须重写hashcode()和equals()。</p>
+<p>如果你重载了equals，比如说是基于对象的内容实现的，而保留hashCode的实现不变，那么很可能某两个对象明明是“相等”，而hashCode却不一样。</p>
+<p>这样，当你用其中的一个作为键保存到hashMap、hasoTable或hashSet中，再以“相等的”找另一个作为键值去查找他们的时候，则根本找不到。</p>
+<p>对于每一个对象，通过其hashCode()方法可为其生成一个整形值（散列码），该整型值被处理后，将会作为数组下标，存放该对象所对应的Entry（存放该对象及其对应值）。 </p>
+<p>equals()方法则是在HashMap中插入值或查询时会使用到。当HashMap中插入值或查询值对应的散列码与数组中的散列码相等时，则会通过equals方法比较key值是否相等</p>
+<p>所以想以自建对象作为HashMap的key，必须重写该对象继承object的hashCode和equals方法。</p>
+<h2 id="5-Java集合中为什么要使用设计迭代器"><a href="#5-Java集合中为什么要使用设计迭代器" class="headerlink" title="5. Java集合中为什么要使用设计迭代器"></a>5. Java集合中为什么要使用设计迭代器</h2><p>优点: </p>
+<pre><code>1. 可以不了解集合内部的数据结构,就可以直接遍历;
+
+2. **不暴露内部的数据**,可以直接外部遍历;
+
+3. 适用性强,基本上的集合都能使用迭代器;</code></pre><h2 id="6-为什么使用迭代器遍历删除是安全的"><a href="#6-为什么使用迭代器遍历删除是安全的" class="headerlink" title="6. 为什么使用迭代器遍历删除是安全的"></a>6. 为什么使用迭代器遍历删除是安全的</h2><p>基本上<strong>ArrayList采用size属性来维护自已的状态，而Iterator采用cursor来来维护自已的状态</strong>。</p>
+<p>当size出现变化时，cursor并不一定能够得到同步，除非这种变化是Iterator主动导致的。</p>
+<p>当Iterator.remove方法导致ArrayList列表发生变化时，他会更新cursor来同步这一变化。但其他方式导致的ArrayList变化，Iterator是无法感知的。ArrayList自然也不会主动通知Iterator们，那将是一个繁重的工作。Iterator到底还是做了努力：为了防止状态不一致可能引发的无法设想的后果，Iterator会经常做checkForComodification检查，以防有变。如果有变，则以异常抛出，所以就出现了上面的异常。</p>
+<h2 id="7-Spring事务传播机制"><a href="#7-Spring事务传播机制" class="headerlink" title="7. Spring事务传播机制"></a>7. Spring事务传播机制</h2><ul>
+<li>@Transactional(propagation=Propagation.REQUIRED)<br>如果有事务, 那么加入事务, 没有的话新建一个(默认情况下)</li>
+<li>@Transactional(propagation=Propagation.NOT_SUPPORTED)<br>容器不为这个方法开启事务</li>
+<li>@Transactional(propagation=Propagation.REQUIRES_NEW)<br>不管是否存在事务,都创建一个新的事务,原来的挂起,新的执行完毕,继续执行老的事务</li>
+<li>@Transactional(propagation=Propagation.MANDATORY)<br>必须在一个已有的事务中执行,否则抛出异常</li>
+<li>@Transactional(propagation=Propagation.NEVER)<br>必须在一个没有的事务中执行,否则抛出异常(与Propagation.MANDATORY相反)</li>
+<li>@Transactional(propagation=Propagation.SUPPORTS)<br>如果其他bean调用这个方法,在其他bean中声明事务,那就用事务.如果其他bean没有声明事务,那就不用事务.</li>
+</ul>
+]]></content>
+  </entry>
+  <entry>
     <title>Java面试题记录-1</title>
     <url>/2020/05/21/Java%E9%9D%A2%E8%AF%95%E9%A2%98%E8%AE%B0%E5%BD%95-1/</url>
     <content><![CDATA[<h2 id="根据exercise表写sql语句"><a href="#根据exercise表写sql语句" class="headerlink" title="根据exercise表写sql语句"></a>根据exercise表写sql语句</h2><h3 id="exercise表设计："><a href="#exercise表设计：" class="headerlink" title="exercise表设计："></a>exercise表设计：</h3><img src="/2020/05/21/Java%E9%9D%A2%E8%AF%95%E9%A2%98%E8%AE%B0%E5%BD%95-1/%E8%AE%BE%E8%AE%A1%E8%A1%A8.png" class="" title="设计表">
@@ -1094,67 +1155,6 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 <h2 id="和equals的区别"><a href="#和equals的区别" class="headerlink" title="==和equals的区别"></a>==和equals的区别</h2><p>==对于基本类型来说是值比较，对于引用类型来说是比较的是引用；</p>
 <p>而 equals 默认情况下是引用比较，只是很多类重写了 equals 方法，比如 String、Integer 等把它变成了值比较，所以一般情况下 equals 比较的是值是否相等。</p>
 <h2 id="Mysql查询性能优化"><a href="#Mysql查询性能优化" class="headerlink" title="Mysql查询性能优化"></a>Mysql查询性能优化</h2><p><a href="https://segmentfault.com/a/1190000011330649" target="_blank" rel="noopener">https://segmentfault.com/a/1190000011330649</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>Java面试常见问题-1</title>
-    <url>/2020/05/04/Java%E9%9D%A2%E8%AF%95%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98-1/</url>
-    <content><![CDATA[<h2 id="1-String-StringBuilder-StringBuffer区别"><a href="#1-String-StringBuilder-StringBuffer区别" class="headerlink" title="1. String, StringBuilder, StringBuffer区别"></a>1. String, StringBuilder, StringBuffer区别</h2><p>这三个类的主要区别在两个方面：<strong>运算速度</strong>（运算性能或执行效率）和<strong>线程安全性</strong>。</p>
-<h3 id="1-运算速度比较（通常情况下）：StringBuilder-gt-StringBuffer-gt-String"><a href="#1-运算速度比较（通常情况下）：StringBuilder-gt-StringBuffer-gt-String" class="headerlink" title="1. 运算速度比较（通常情况下）：StringBuilder &gt; StringBuffer &gt; String"></a>1. <strong>运算速度</strong>比较（通常情况下）：<strong>StringBuilder &gt; StringBuffer &gt; String</strong></h3><a id="more"></a>
-
-<p>String是<strong>final</strong>类不能被继承且为字符串常量，而StringBuilder和StringBuffer均为<strong>字符串变量</strong>。String对象一旦创建便<strong>不可更改</strong>，而后两者是<strong>可更改</strong>的，它们只能通过构造函数来建立对象，且对象被建立以后将在内存中分配内存空间，并初始保存一个null，通过append方法向StringBuffer和StringBuilder中赋值。</p>
-<p>Java中对String对象进行的操作实际上是一个不断创建并回收对象的过程，因此在运行速度上很慢。</p>
-<h3 id="2-线程安全性"><a href="#2-线程安全性" class="headerlink" title="2. 线程安全性"></a>2. 线程安全性</h3><p>StringBuilder（<strong>非线程安全</strong>）</p>
-<p>而StringBuilder的方法没有该关键字修饰，所以不能保证线程安全性。</p>
-<p>StringBuffer（<strong>线程安全的</strong>）</p>
-<p>StringBuffer中大部分方法由<strong>synchronized</strong>关键字修饰，在必要时可对方法进行同步，因此任意特定实例上的所有操作就好像是以串行顺序发生的，该顺序与所涉及的每个线程进行的方法调用顺序一致，所以是线程安全的。</p>
-<h3 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a>3. 总结</h3><p>String：适用于<strong>少量</strong>的字符串操作。</p>
-<p>StringBuilder：适用于<strong>单线程</strong>下在字符串缓冲区进行大量操作。</p>
-<p>StringBuffer：适用于<strong>多线程</strong>下在字符串缓冲区进行大量操作。</p>
-<h2 id="2-Spring-Bean为什么是单例"><a href="#2-Spring-Bean为什么是单例" class="headerlink" title="2. Spring Bean为什么是单例"></a>2. Spring Bean为什么是单例</h2><h3 id="单例bean与原型bean的区别"><a href="#单例bean与原型bean的区别" class="headerlink" title="单例bean与原型bean的区别"></a>单例bean与原型bean的区别</h3><p><strong>单例：</strong>一个bean被声明为单例时，处理多次请求时spring容器里只实例化一个bean，后续的请求公用这个对象，这个对象存储在一个map中，当有请求时，先在缓存中（map）查找是否存在，存在则使用，不存在才实例化一个对象</p>
-<p><strong>原型：</strong>每当有请求来就实例化一个新的bean，没有缓存以及从缓存中查</p>
-<h4 id="单例bean的优势"><a href="#单例bean的优势" class="headerlink" title="单例bean的优势"></a>单例bean的优势</h4><p>由于不会每次都新创建新对象所以有一下几个性能上的优势：</p>
-<p><strong>减少了新生成实例的消耗</strong></p>
-<p>新生成实例消耗包括两方面，第一，spring会通过反射或者cglib来生成bean实例这都是耗性能的操作，其次给对象分配内存也会涉及复杂算法。</p>
-<p><strong>减少jvm垃圾回收</strong></p>
-<p>由于不会给每个请求都新生成bean实例，所以自然回收的对象少了。</p>
-<p><strong>可以快速获取到bean</strong></p>
-<p>因为单例的获取bean操作除了第一次生成之外其余的都是从缓存里获取的所以很快。</p>
-<h3 id="单例bean的劣势"><a href="#单例bean的劣势" class="headerlink" title="单例bean的劣势"></a>单例bean的劣势</h3><p>单例的bean一个很大的劣势就是他不能做到线程安全，由于所有请求都共享一个bean实例，所以这个bean要是有状态的一个bean的话可能在并发场景下出现问题，而原型的bean则不会有这样问题（但也有例外，比如他被单例bean依赖），因为给每个请求都新创建实例。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>面试题：Spring 为啥把bean默认设计成单例？</p>
-<p>答案：</p>
-<p>为了提高性能<br>少创建实例<br>垃圾回收<br>缓存快速获取</p>
-<p>单例有啥劣势？</p>
-<p>如果是有状态的话在并发环境下线程不安全。</p>
-<h2 id="3-项目中有用到多线程嘛"><a href="#3-项目中有用到多线程嘛" class="headerlink" title="3. 项目中有用到多线程嘛"></a>3. 项目中有用到多线程嘛</h2><p>用户注册完成送大礼包/积分之类，且积分等也是另一个系统并<strong>比较耗时</strong>；且这类任务即使失败也不是特别重要的。</p>
-<p>后台线程：比如<strong>定期执行</strong>一些特殊任务，如定期更新配置文件，任务调度（如quartz），一些监控用于定期信息采集等。</p>
-<p>特别耗时的操作，如备份数据库，可以开个线程执行备份，然后执行返回，前台不断向后台询问线程执行状态</p>
-<p>场景一:一个业务逻辑有很多次的循环，<strong>每次循环之间没有影响</strong>，比如验证1万条url路径是否存在，正常情况要循环1万次，逐个去验证每一条URL，这样效率会很低，假设验证一条需要1分钟，总共就需要1万分钟，有点恐怖。这时可以用多线程，将1万条URL分成50等份，开50个线程，没个线程只需验证200条，这样所有的线程执行完是远小于1万分钟的。</p>
-<p>场景二:需要知道一个任务的执行进度，比如我们常看到的进度条，实现方式可以是在任务中加入一个整型属性变量(这样不同方法可以共享)，任务执行一定程度就给变量值加1，另外开一个线程按时间间隔不断去访问这个变量，并反馈给用户。</p>
-<p>总之<strong>使用多线程就是为了充分利用cpu的资源，提高程序执行效率</strong>，当你发现一个业务逻辑执行效率特别低，耗时特别长，就可以考虑使用多线程。<strong>不过CPU执行哪个线程的时间和顺序是不确定的</strong>，即使设置了线程的优先级，因此使用多线程的风险也是比较大的，会出现很多预料不到的问题，一定要多熟悉概念，多构造不同的场景去测试才能够掌握!</p>
-<h2 id="4-HashMap为什么要重写hashCode和equals方法"><a href="#4-HashMap为什么要重写hashCode和equals方法" class="headerlink" title="4. HashMap为什么要重写hashCode和equals方法"></a>4. HashMap为什么要重写hashCode和equals方法</h2><p>HashMap和Hashtable的底层实现都是数组+链表结构实现的</p>
-<p>使用HashMap，如果key是自定义的类，就必须重写hashcode()和equals()。</p>
-<p>如果你重载了equals，比如说是基于对象的内容实现的，而保留hashCode的实现不变，那么很可能某两个对象明明是“相等”，而hashCode却不一样。</p>
-<p>这样，当你用其中的一个作为键保存到hashMap、hasoTable或hashSet中，再以“相等的”找另一个作为键值去查找他们的时候，则根本找不到。</p>
-<p>对于每一个对象，通过其hashCode()方法可为其生成一个整形值（散列码），该整型值被处理后，将会作为数组下标，存放该对象所对应的Entry（存放该对象及其对应值）。 </p>
-<p>equals()方法则是在HashMap中插入值或查询时会使用到。当HashMap中插入值或查询值对应的散列码与数组中的散列码相等时，则会通过equals方法比较key值是否相等</p>
-<p>所以想以自建对象作为HashMap的key，必须重写该对象继承object的hashCode和equals方法。</p>
-<h2 id="5-Java集合中为什么要使用设计迭代器"><a href="#5-Java集合中为什么要使用设计迭代器" class="headerlink" title="5. Java集合中为什么要使用设计迭代器"></a>5. Java集合中为什么要使用设计迭代器</h2><p>优点: </p>
-<pre><code>1. 可以不了解集合内部的数据结构,就可以直接遍历;
-
-2. **不暴露内部的数据**,可以直接外部遍历;
-
-3. 适用性强,基本上的集合都能使用迭代器;</code></pre><h2 id="6-为什么使用迭代器遍历删除是安全的"><a href="#6-为什么使用迭代器遍历删除是安全的" class="headerlink" title="6. 为什么使用迭代器遍历删除是安全的"></a>6. 为什么使用迭代器遍历删除是安全的</h2><p>基本上<strong>ArrayList采用size属性来维护自已的状态，而Iterator采用cursor来来维护自已的状态</strong>。</p>
-<p>当size出现变化时，cursor并不一定能够得到同步，除非这种变化是Iterator主动导致的。</p>
-<p>当Iterator.remove方法导致ArrayList列表发生变化时，他会更新cursor来同步这一变化。但其他方式导致的ArrayList变化，Iterator是无法感知的。ArrayList自然也不会主动通知Iterator们，那将是一个繁重的工作。Iterator到底还是做了努力：为了防止状态不一致可能引发的无法设想的后果，Iterator会经常做checkForComodification检查，以防有变。如果有变，则以异常抛出，所以就出现了上面的异常。</p>
-<h2 id="7-Spring事务传播机制"><a href="#7-Spring事务传播机制" class="headerlink" title="7. Spring事务传播机制"></a>7. Spring事务传播机制</h2><ul>
-<li>@Transactional(propagation=Propagation.REQUIRED)<br>如果有事务, 那么加入事务, 没有的话新建一个(默认情况下)</li>
-<li>@Transactional(propagation=Propagation.NOT_SUPPORTED)<br>容器不为这个方法开启事务</li>
-<li>@Transactional(propagation=Propagation.REQUIRES_NEW)<br>不管是否存在事务,都创建一个新的事务,原来的挂起,新的执行完毕,继续执行老的事务</li>
-<li>@Transactional(propagation=Propagation.MANDATORY)<br>必须在一个已有的事务中执行,否则抛出异常</li>
-<li>@Transactional(propagation=Propagation.NEVER)<br>必须在一个没有的事务中执行,否则抛出异常(与Propagation.MANDATORY相反)</li>
-<li>@Transactional(propagation=Propagation.SUPPORTS)<br>如果其他bean调用这个方法,在其他bean中声明事务,那就用事务.如果其他bean没有声明事务,那就不用事务.</li>
-</ul>
 ]]></content>
   </entry>
   <entry>
@@ -1334,17 +1334,44 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 ]]></content>
   </entry>
   <entry>
-    <title>SpringBoot实现通过url下载pdf到本地</title>
-    <url>/2020/06/06/SpringBoot%E5%AE%9E%E7%8E%B0%E9%80%9A%E8%BF%87url%E4%B8%8B%E8%BD%BDpdf%E5%88%B0%E6%9C%AC%E5%9C%B0/</url>
-    <content><![CDATA[<p>最近有需求是点击下载按钮后下载指定url的pdf文件到本地</p>
-<p>下面通过<strong>SpringBoot</strong>来实现一下：</p>
+    <title>SpringBoot中-Async的用法与实践</title>
+    <url>/2020/08/27/SpringBoot%E4%B8%AD-Async%E7%9A%84%E7%94%A8%E6%B3%95%E4%B8%8E%E5%AE%9E%E8%B7%B5/</url>
+    <content><![CDATA[<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>在Java应用中，绝大多数情况下都是通过同步的方式来实现交互处理的；但是在处理与第三方系统交互的时候，容易造成响应迟缓的情况，之前大部分都是使用多线程来完成此类任务。其实，在Spring 3.x之后，就已经内置了@Async来完美解决这个问题，本文将完成介绍@Async的用法。</p>
 <a id="more"></a>
 
-<h4 id="思路就是："><a href="#思路就是：" class="headerlink" title="思路就是："></a><strong>思路</strong>就是：</h4><ol>
-<li>解析url，建立连接获取输入流</li>
-<li>copy输入流到输出流中，进行相关设置并返回</li>
-</ol>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@GetMapping</span>(<span class="string">"/download"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">download</span><span class="params">(@RequestParam(<span class="string">"url"</span>)</span> String urlStr, HttpServletResponse response) <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        URL url = <span class="keyword">new</span> URL(urlStr);</span><br><span class="line">        HttpURLConnection conn = (HttpURLConnection)url.openConnection();</span><br><span class="line">        <span class="comment">//设置超时间为5秒</span></span><br><span class="line"><span class="comment">//        conn.setConnectTimeout(5*1000);</span></span><br><span class="line">        <span class="comment">//防止屏蔽程序抓取而返回403错误</span></span><br><span class="line">        conn.setRequestProperty(<span class="string">"User-Agent"</span>, <span class="string">"Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)"</span>);</span><br><span class="line">        <span class="keyword">try</span>(InputStream inputStream = conn.getInputStream();</span><br><span class="line">            OutputStream outputStream = response.getOutputStream();) &#123;</span><br><span class="line">            response.setContentType(<span class="string">"application/x-download"</span>);</span><br><span class="line">            response.addHeader(<span class="string">"Content-Disposition"</span>, <span class="string">"attachment;filename=test.pdf"</span>);</span><br><span class="line">            <span class="comment">// 将输入流拷贝到输出流中</span></span><br><span class="line">            IOUtils.copy(inputStream, outputStream);</span><br><span class="line">            outputStream.flush();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Async的使用"><a href="#Async的使用" class="headerlink" title="@Async的使用"></a>@Async的使用</h3><h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>必须用在public方法上，且不能是static方法</li>
+<li>不能与调用的方法在同一个类中</li>
+<li>需要把该方法注入到Spring容器中，就是在一个类中添加异步方法，并在此类上使用@Component之类的注解加入到容器</li>
+</ul>
+<h4 id="注解配置开启"><a href="#注解配置开启" class="headerlink" title="注解配置开启"></a>注解配置开启</h4><p>在springboot启动类上添加 <strong>@EnableAsync</strong> 注解</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@EnableAsync</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CupidApplication</span> </span>&#123;</span><br></pre></td></tr></table></figure>
+
+<h4 id="基于-Async无返回值调用"><a href="#基于-Async无返回值调用" class="headerlink" title="基于@Async无返回值调用"></a>基于@Async无返回值调用</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 没有返回值的Async方法</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="meta">@Async</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">asyncMethodWithVoidReturnType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        log.info(<span class="string">"没有返回值的Async方法, ThreadName : &#123;&#125;"</span>, Thread.currentThread().getName());</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用的方式非常简单，一个标注即可解决所有的问题。</p>
+<p>调用结果：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2020-08-27 11:52:31.197  INFO 7311 --- [         task-5] c.w.cupid.service.impl.AsyncServiceImpl  : 没有返回值的Async方法, ThreadName : task-5</span><br></pre></td></tr></table></figure>
+
+<h4 id="基于-Async返回值的调用"><a href="#基于-Async返回值的调用" class="headerlink" title="基于@Async返回值的调用"></a>基于@Async返回值的调用</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 有返回值的Async方法</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span>    Future    new AsyncResult</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="meta">@Async</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Future&lt;String&gt; <span class="title">asyncMethodWithReturnType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        log.info(<span class="string">"有返回值的Async方法, ThreadName : &#123;&#125;"</span>, Thread.currentThread().getName());</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Thread.sleep(<span class="number">5000</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> AsyncResult&lt;String&gt;(<span class="string">"hello world !!!!"</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            log.error(<span class="string">"出问题了, &#123;&#125;"</span>, e.getMessage());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上示例可以发现，返回的数据类型为Future类型，其为一个接口。具体的结果类型为<strong>AsyncResult</strong>，这个是需要注意的地方。</p>
+<p>调用返回结果的异步方法示例：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@GetMapping</span>(<span class="string">"/future"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">futureAsync</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">        StringBuilder stringBuilder = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">        stringBuilder.append(<span class="string">"Invoking an asynchronous method. threadName : "</span> + Thread.currentThread().getName());</span><br><span class="line"></span><br><span class="line">        Future&lt;String&gt; stringFuture = asyncService.asyncMethodWithReturnType();</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (stringFuture.isDone()) &#123;</span><br><span class="line">                stringBuilder.append(<span class="string">"Result from asynchronous process - "</span> + stringFuture.get());</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            stringBuilder.append(<span class="string">"Continue doing something else."</span>);</span><br><span class="line">            Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> stringBuilder.toString();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>分析： 这些获取异步方法的结果信息，是通过不停的检查Future的状态来获取当前的异步方法是否执行完毕来实现的。</p>
+<h3 id="给-Async使用自定义的线程池"><a href="#给-Async使用自定义的线程池" class="headerlink" title="给@Async使用自定义的线程池"></a>给@Async使用自定义的线程池</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadPoolConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * logger</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> Logger logger = LoggerFactory.getLogger(ThreadPoolConfig<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;asyncThreadPool.corePoolSize&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> corePoolSize;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;asyncThreadPool.maxPoolSize&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> maxPoolSize;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;asyncThreadPool.queueCapacity&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> queueCapacity;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;asyncThreadPool.keepAliveSeconds&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> keepAliveSeconds;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;asyncThreadPool.awaitTerminationSeconds&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> awaitTerminationSeconds;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;asyncThreadPool.threadNamePrefix&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String threadNamePrefix;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 线程池配置</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span></span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> java.util.concurrent.Executor</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@author</span> wliduo</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@date</span> 2019/2/15 14:44</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span>(name = <span class="string">"threadPoolTaskExecutor"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ThreadPoolTaskExecutor <span class="title">threadPoolTaskExecutor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        logger.info(<span class="string">"---------- 线程池开始加载 ----------"</span>);</span><br><span class="line">        ThreadPoolTaskExecutor threadPoolTaskExecutor = <span class="keyword">new</span> ThreadPoolTaskExecutor();</span><br><span class="line">        <span class="comment">// 核心线程池大小</span></span><br><span class="line">        threadPoolTaskExecutor.setCorePoolSize(corePoolSize);</span><br><span class="line">        <span class="comment">// 最大线程数</span></span><br><span class="line">        threadPoolTaskExecutor.setMaxPoolSize(maxPoolSize);</span><br><span class="line">        <span class="comment">// 队列容量</span></span><br><span class="line">        threadPoolTaskExecutor.setQueueCapacity(keepAliveSeconds);</span><br><span class="line">        <span class="comment">// 活跃时间</span></span><br><span class="line">        threadPoolTaskExecutor.setKeepAliveSeconds(queueCapacity);</span><br><span class="line">        <span class="comment">// 主线程等待子线程执行时间</span></span><br><span class="line">        threadPoolTaskExecutor.setAwaitTerminationSeconds(awaitTerminationSeconds);</span><br><span class="line">        <span class="comment">// 线程名字前缀</span></span><br><span class="line">        threadPoolTaskExecutor.setThreadNamePrefix(threadNamePrefix);</span><br><span class="line">        <span class="comment">// RejectedExecutionHandler:当pool已经达到max-size的时候，如何处理新任务</span></span><br><span class="line">        <span class="comment">// CallerRunsPolicy:不在新线程中执行任务，而是由调用者所在的线程来执行</span></span><br><span class="line">        threadPoolTaskExecutor.setRejectedExecutionHandler(<span class="keyword">new</span> ThreadPoolExecutor.CallerRunsPolicy());</span><br><span class="line">        <span class="comment">// 初始化</span></span><br><span class="line">        threadPoolTaskExecutor.initialize();</span><br><span class="line">        logger.info(<span class="string">"---------- 线程池加载完成 ----------"</span>);</span><br><span class="line">        <span class="keyword">return</span> threadPoolTaskExecutor;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="使用自定义的线程池"><a href="#使用自定义的线程池" class="headerlink" title="使用自定义的线程池"></a>使用自定义的线程池</h4><p>@Async(“threadPoolTaskExecutor”)</p>
+<p>只需要在 @Async 注解的括号里加上自定义的线程池的bean即可</p>
+<h3 id="Async调用中的事务处理机制"><a href="#Async调用中的事务处理机制" class="headerlink" title="@Async调用中的事务处理机制"></a>@Async调用中的事务处理机制</h3><p>在@Async标注的方法，同时也适用了@Transactional进行了标注；在其调用数据库操作之时，将无法产生事务管理的控制，原因就在于其是基于异步处理的操作。</p>
+<p>那该如何给这些操作添加事务管理呢？可以将需要事务管理操作的方法放置到异步方法内部，在内部被调用的方法上添加@Transactional。</p>
+<p>例如：</p>
+<p>方法A，使用了@Async/@Transactional来标注，但是无法产生事务控制的目的。</p>
+<p>方法B，使用了@Async来标注，B中调用了C、D。C/D分别使用@Transactional做了标注，则可实现事务控制的目的。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://www.jianshu.com/p/0e61693860b7?utm_campaign=hugo&amp;utm_medium=reader_share&amp;utm_content=note&amp;utm_source=weixin-friends" target="_blank" rel="noopener">https://www.jianshu.com/p/0e61693860b7?utm_campaign=hugo&amp;utm_medium=reader_share&amp;utm_content=note&amp;utm_source=weixin-friends</a></p>
+<p><a href="https://blog.csdn.net/zhuyu19911016520/article/details/99992668" target="_blank" rel="noopener">https://blog.csdn.net/zhuyu19911016520/article/details/99992668</a></p>
+<p><a href="https://www.jianshu.com/p/49b9d15456d9?utm_campaign=hugo&amp;utm_medium=reader_share&amp;utm_content=note&amp;utm_source=weixin-friends" target="_blank" rel="noopener">https://www.jianshu.com/p/49b9d15456d9?utm_campaign=hugo&amp;utm_medium=reader_share&amp;utm_content=note&amp;utm_source=weixin-friends</a></p>
 ]]></content>
   </entry>
   <entry>
@@ -1389,44 +1416,17 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 ]]></content>
   </entry>
   <entry>
-    <title>SpringBoot中-Async的用法与实践</title>
-    <url>/2020/08/27/SpringBoot%E4%B8%AD-Async%E7%9A%84%E7%94%A8%E6%B3%95%E4%B8%8E%E5%AE%9E%E8%B7%B5/</url>
-    <content><![CDATA[<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>在Java应用中，绝大多数情况下都是通过同步的方式来实现交互处理的；但是在处理与第三方系统交互的时候，容易造成响应迟缓的情况，之前大部分都是使用多线程来完成此类任务。其实，在Spring 3.x之后，就已经内置了@Async来完美解决这个问题，本文将完成介绍@Async的用法。</p>
+    <title>SpringBoot实现通过url下载pdf到本地</title>
+    <url>/2020/06/06/SpringBoot%E5%AE%9E%E7%8E%B0%E9%80%9A%E8%BF%87url%E4%B8%8B%E8%BD%BDpdf%E5%88%B0%E6%9C%AC%E5%9C%B0/</url>
+    <content><![CDATA[<p>最近有需求是点击下载按钮后下载指定url的pdf文件到本地</p>
+<p>下面通过<strong>SpringBoot</strong>来实现一下：</p>
 <a id="more"></a>
 
-<h3 id="Async的使用"><a href="#Async的使用" class="headerlink" title="@Async的使用"></a>@Async的使用</h3><h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
-<li>必须用在public方法上，且不能是static方法</li>
-<li>不能与调用的方法在同一个类中</li>
-<li>需要把该方法注入到Spring容器中，就是在一个类中添加异步方法，并在此类上使用@Component之类的注解加入到容器</li>
-</ul>
-<h4 id="注解配置开启"><a href="#注解配置开启" class="headerlink" title="注解配置开启"></a>注解配置开启</h4><p>在springboot启动类上添加 <strong>@EnableAsync</strong> 注解</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@EnableAsync</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CupidApplication</span> </span>&#123;</span><br></pre></td></tr></table></figure>
-
-<h4 id="基于-Async无返回值调用"><a href="#基于-Async无返回值调用" class="headerlink" title="基于@Async无返回值调用"></a>基于@Async无返回值调用</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 没有返回值的Async方法</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="meta">@Async</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">asyncMethodWithVoidReturnType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        log.info(<span class="string">"没有返回值的Async方法, ThreadName : &#123;&#125;"</span>, Thread.currentThread().getName());</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<p>使用的方式非常简单，一个标注即可解决所有的问题。</p>
-<p>调用结果：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2020-08-27 11:52:31.197  INFO 7311 --- [         task-5] c.w.cupid.service.impl.AsyncServiceImpl  : 没有返回值的Async方法, ThreadName : task-5</span><br></pre></td></tr></table></figure>
-
-<h4 id="基于-Async返回值的调用"><a href="#基于-Async返回值的调用" class="headerlink" title="基于@Async返回值的调用"></a>基于@Async返回值的调用</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 有返回值的Async方法</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span>    Future    new AsyncResult</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="meta">@Async</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Future&lt;String&gt; <span class="title">asyncMethodWithReturnType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        log.info(<span class="string">"有返回值的Async方法, ThreadName : &#123;&#125;"</span>, Thread.currentThread().getName());</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Thread.sleep(<span class="number">5000</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> AsyncResult&lt;String&gt;(<span class="string">"hello world !!!!"</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            log.error(<span class="string">"出问题了, &#123;&#125;"</span>, e.getMessage());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<p>以上示例可以发现，返回的数据类型为Future类型，其为一个接口。具体的结果类型为<strong>AsyncResult</strong>，这个是需要注意的地方。</p>
-<p>调用返回结果的异步方法示例：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@GetMapping</span>(<span class="string">"/future"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">futureAsync</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">        StringBuilder stringBuilder = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">        stringBuilder.append(<span class="string">"Invoking an asynchronous method. threadName : "</span> + Thread.currentThread().getName());</span><br><span class="line"></span><br><span class="line">        Future&lt;String&gt; stringFuture = asyncService.asyncMethodWithReturnType();</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (stringFuture.isDone()) &#123;</span><br><span class="line">                stringBuilder.append(<span class="string">"Result from asynchronous process - "</span> + stringFuture.get());</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            stringBuilder.append(<span class="string">"Continue doing something else."</span>);</span><br><span class="line">            Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> stringBuilder.toString();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<p>分析： 这些获取异步方法的结果信息，是通过不停的检查Future的状态来获取当前的异步方法是否执行完毕来实现的。</p>
-<h3 id="给-Async使用自定义的线程池"><a href="#给-Async使用自定义的线程池" class="headerlink" title="给@Async使用自定义的线程池"></a>给@Async使用自定义的线程池</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadPoolConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * logger</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> Logger logger = LoggerFactory.getLogger(ThreadPoolConfig<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;asyncThreadPool.corePoolSize&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> corePoolSize;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;asyncThreadPool.maxPoolSize&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> maxPoolSize;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;asyncThreadPool.queueCapacity&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> queueCapacity;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;asyncThreadPool.keepAliveSeconds&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> keepAliveSeconds;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;asyncThreadPool.awaitTerminationSeconds&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> awaitTerminationSeconds;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;asyncThreadPool.threadNamePrefix&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String threadNamePrefix;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 线程池配置</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span></span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> java.util.concurrent.Executor</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@author</span> wliduo</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@date</span> 2019/2/15 14:44</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span>(name = <span class="string">"threadPoolTaskExecutor"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ThreadPoolTaskExecutor <span class="title">threadPoolTaskExecutor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        logger.info(<span class="string">"---------- 线程池开始加载 ----------"</span>);</span><br><span class="line">        ThreadPoolTaskExecutor threadPoolTaskExecutor = <span class="keyword">new</span> ThreadPoolTaskExecutor();</span><br><span class="line">        <span class="comment">// 核心线程池大小</span></span><br><span class="line">        threadPoolTaskExecutor.setCorePoolSize(corePoolSize);</span><br><span class="line">        <span class="comment">// 最大线程数</span></span><br><span class="line">        threadPoolTaskExecutor.setMaxPoolSize(maxPoolSize);</span><br><span class="line">        <span class="comment">// 队列容量</span></span><br><span class="line">        threadPoolTaskExecutor.setQueueCapacity(keepAliveSeconds);</span><br><span class="line">        <span class="comment">// 活跃时间</span></span><br><span class="line">        threadPoolTaskExecutor.setKeepAliveSeconds(queueCapacity);</span><br><span class="line">        <span class="comment">// 主线程等待子线程执行时间</span></span><br><span class="line">        threadPoolTaskExecutor.setAwaitTerminationSeconds(awaitTerminationSeconds);</span><br><span class="line">        <span class="comment">// 线程名字前缀</span></span><br><span class="line">        threadPoolTaskExecutor.setThreadNamePrefix(threadNamePrefix);</span><br><span class="line">        <span class="comment">// RejectedExecutionHandler:当pool已经达到max-size的时候，如何处理新任务</span></span><br><span class="line">        <span class="comment">// CallerRunsPolicy:不在新线程中执行任务，而是由调用者所在的线程来执行</span></span><br><span class="line">        threadPoolTaskExecutor.setRejectedExecutionHandler(<span class="keyword">new</span> ThreadPoolExecutor.CallerRunsPolicy());</span><br><span class="line">        <span class="comment">// 初始化</span></span><br><span class="line">        threadPoolTaskExecutor.initialize();</span><br><span class="line">        logger.info(<span class="string">"---------- 线程池加载完成 ----------"</span>);</span><br><span class="line">        <span class="keyword">return</span> threadPoolTaskExecutor;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="使用自定义的线程池"><a href="#使用自定义的线程池" class="headerlink" title="使用自定义的线程池"></a>使用自定义的线程池</h4><p>@Async(“threadPoolTaskExecutor”)</p>
-<p>只需要在 @Async 注解的括号里加上自定义的线程池的bean即可</p>
-<h3 id="Async调用中的事务处理机制"><a href="#Async调用中的事务处理机制" class="headerlink" title="@Async调用中的事务处理机制"></a>@Async调用中的事务处理机制</h3><p>在@Async标注的方法，同时也适用了@Transactional进行了标注；在其调用数据库操作之时，将无法产生事务管理的控制，原因就在于其是基于异步处理的操作。</p>
-<p>那该如何给这些操作添加事务管理呢？可以将需要事务管理操作的方法放置到异步方法内部，在内部被调用的方法上添加@Transactional。</p>
-<p>例如：</p>
-<p>方法A，使用了@Async/@Transactional来标注，但是无法产生事务控制的目的。</p>
-<p>方法B，使用了@Async来标注，B中调用了C、D。C/D分别使用@Transactional做了标注，则可实现事务控制的目的。</p>
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://www.jianshu.com/p/0e61693860b7?utm_campaign=hugo&amp;utm_medium=reader_share&amp;utm_content=note&amp;utm_source=weixin-friends" target="_blank" rel="noopener">https://www.jianshu.com/p/0e61693860b7?utm_campaign=hugo&amp;utm_medium=reader_share&amp;utm_content=note&amp;utm_source=weixin-friends</a></p>
-<p><a href="https://blog.csdn.net/zhuyu19911016520/article/details/99992668" target="_blank" rel="noopener">https://blog.csdn.net/zhuyu19911016520/article/details/99992668</a></p>
-<p><a href="https://www.jianshu.com/p/49b9d15456d9?utm_campaign=hugo&amp;utm_medium=reader_share&amp;utm_content=note&amp;utm_source=weixin-friends" target="_blank" rel="noopener">https://www.jianshu.com/p/49b9d15456d9?utm_campaign=hugo&amp;utm_medium=reader_share&amp;utm_content=note&amp;utm_source=weixin-friends</a></p>
+<h4 id="思路就是："><a href="#思路就是：" class="headerlink" title="思路就是："></a><strong>思路</strong>就是：</h4><ol>
+<li>解析url，建立连接获取输入流</li>
+<li>copy输入流到输出流中，进行相关设置并返回</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@GetMapping</span>(<span class="string">"/download"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">download</span><span class="params">(@RequestParam(<span class="string">"url"</span>)</span> String urlStr, HttpServletResponse response) <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        URL url = <span class="keyword">new</span> URL(urlStr);</span><br><span class="line">        HttpURLConnection conn = (HttpURLConnection)url.openConnection();</span><br><span class="line">        <span class="comment">//设置超时间为5秒</span></span><br><span class="line"><span class="comment">//        conn.setConnectTimeout(5*1000);</span></span><br><span class="line">        <span class="comment">//防止屏蔽程序抓取而返回403错误</span></span><br><span class="line">        conn.setRequestProperty(<span class="string">"User-Agent"</span>, <span class="string">"Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)"</span>);</span><br><span class="line">        <span class="keyword">try</span>(InputStream inputStream = conn.getInputStream();</span><br><span class="line">            OutputStream outputStream = response.getOutputStream();) &#123;</span><br><span class="line">            response.setContentType(<span class="string">"application/x-download"</span>);</span><br><span class="line">            response.addHeader(<span class="string">"Content-Disposition"</span>, <span class="string">"attachment;filename=test.pdf"</span>);</span><br><span class="line">            <span class="comment">// 将输入流拷贝到输出流中</span></span><br><span class="line">            IOUtils.copy(inputStream, outputStream);</span><br><span class="line">            outputStream.flush();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 ]]></content>
   </entry>
   <entry>
@@ -1467,6 +1467,137 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://segmentfault.com/a/1190000020906185" target="_blank" rel="noopener">https://segmentfault.com/a/1190000020906185</a></p>
 <p><a href="https://www.zhangjava.com/%E4%BD%BF%E7%94%A8Redis%E5%AE%8C%E6%88%90%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/" target="_blank" rel="noopener">https://www.zhangjava.com/%E4%BD%BF%E7%94%A8Redis%E5%AE%8C%E6%88%90%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>SpringBoot整合ELK实现日志收集</title>
+    <url>/2020/10/01/SpringBoot%E6%95%B4%E5%90%88ELK%E5%AE%9E%E7%8E%B0%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/</url>
+    <content><![CDATA[<h2 id="ELK简介"><a href="#ELK简介" class="headerlink" title="ELK简介"></a>ELK简介</h2><p>ELK是三个开源软件的缩写，分别表示：<strong>elasticsearch</strong>、<strong>logstash</strong>、<strong>kibana</strong></p>
+<p><code>Elasticsearch</code>是个开源分布式搜索引擎，它的特点有：分布式，零配置，自动发现，索引自动分片，索引副本机制，restful风格接口，多数据源，自动搜索负载等。</p>
+<p><code>Logstash</code>是一个完全开源的工具，他可以对你的日志进行收集、过滤，并将其存储供以后使用（如，搜索）。</p>
+<p><code>Kibana</code>也是一个开源和免费的工具，它Kibana可以为 Logstash 和 ElasticSearch 提供的日志分析友好的 Web 界面，可以帮助您汇总、分析和搜索重要数据日志。</p>
+<a id="more"></a>
+
+<h2 id="实现日志收集的方案"><a href="#实现日志收集的方案" class="headerlink" title="实现日志收集的方案"></a>实现日志收集的方案</h2><h3 id="方案一：logstash-gt-elasticsearch-gt-kibana"><a href="#方案一：logstash-gt-elasticsearch-gt-kibana" class="headerlink" title="方案一：logstash-&gt;elasticsearch-&gt;kibana"></a>方案一：logstash-&gt;elasticsearch-&gt;kibana</h3><img src="/2020/10/01/SpringBoot%E6%95%B4%E5%90%88ELK%E5%AE%9E%E7%8E%B0%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/plan_a.png" class="" title="planA">
+
+<p>将logstash部署到每个节点，收集相关的日志，并经过分析过滤后发送到elasticsearch进行存储，elasticsearch将数据以分片的形势进行压缩存储，通过kibana对日志进行图形化的展示。</p>
+<p>优点：此架构搭建简单，容易上手</p>
+<p>缺点：</p>
+<pre><code>- 1、每个节点部署logstash，运行时占用CPU，内存大，会对节点性能造成一定的影响
+
+- 2、没有将日志数据进行缓存，存在丢失的风险</code></pre><h3 id="方案二：logstash-gt-kafka-gt-elasticsearch-gt-kibana"><a href="#方案二：logstash-gt-kafka-gt-elasticsearch-gt-kibana" class="headerlink" title="方案二：logstash-&gt;kafka-&gt;elasticsearch-&gt;kibana"></a>方案二：logstash-&gt;kafka-&gt;elasticsearch-&gt;kibana</h3><img src="/2020/10/01/SpringBoot%E6%95%B4%E5%90%88ELK%E5%AE%9E%E7%8E%B0%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/plan_b.png" class="" title="planB">
+
+<p>logstash agent监控过滤日志，将过滤的日志内容发送给Kafka，logstash server将日志收集一起交给elasticsearch，引入了消息队列机制作为缓存池，即使logstash server出现异常，由于日志暂存在kafka消息队列中，能避免日志数据丢失，但是还是没有解决性能问题。</p>
+<p>这次选择的是第一种方案，比较简单，容易理解</p>
+<h2 id="使用docker-compose搭建ELK环境"><a href="#使用docker-compose搭建ELK环境" class="headerlink" title="使用docker compose搭建ELK环境"></a>使用docker compose搭建ELK环境</h2><h3 id="下载docker镜像"><a href="#下载docker镜像" class="headerlink" title="下载docker镜像"></a>下载docker镜像</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">docker pull elasticsearch:6.4.0</span><br><span class="line">docker pull logstash:6.4.0</span><br><span class="line">docker pull kibana:6.4.0</span><br></pre></td></tr></table></figure>
+
+<h3 id="在本地创建好存放文件的目录"><a href="#在本地创建好存放文件的目录" class="headerlink" title="在本地创建好存放文件的目录"></a>在本地创建好存放文件的目录</h3><p>创建elasticsearch和logstash目录，后面用于存放配置文件</p>
+<img src="/2020/10/01/SpringBoot%E6%95%B4%E5%90%88ELK%E5%AE%9E%E7%8E%B0%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/path1.png" class="" title="path1">
+
+<img src="/2020/10/01/SpringBoot%E6%95%B4%E5%90%88ELK%E5%AE%9E%E7%8E%B0%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/path2.png" class="" title="path2">
+
+<p>logstash.conf的内容：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">input &#123;</span><br><span class="line">  tcp &#123;</span><br><span class="line">    mode &#x3D;&gt; &quot;server&quot;</span><br><span class="line">    host &#x3D;&gt; &quot;0.0.0.0&quot;</span><br><span class="line">    port &#x3D;&gt; 4560</span><br><span class="line">    codec &#x3D;&gt; json_lines</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">output &#123;</span><br><span class="line">  elasticsearch &#123;</span><br><span class="line">    hosts &#x3D;&gt; &quot;es:9200&quot;</span><br><span class="line">    index &#x3D;&gt; &quot;springboot-%&#123;+YYYY.MM.dd&#125;&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用docker-compose-yml脚本启动ELK服务"><a href="#使用docker-compose-yml脚本启动ELK服务" class="headerlink" title="使用docker-compose.yml脚本启动ELK服务"></a>使用docker-compose.yml脚本启动ELK服务</h3><p>docker-compose.yml的内容为：</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">'3'</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">elasticsearch:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">elasticsearch:6.4.0</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">elasticsearch</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">"cluster.name=elasticsearch"</span> <span class="comment">#设置集群名称为elasticsearch</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">"discovery.type=single-node"</span> <span class="comment">#以单一节点模式启动</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">"ES_JAVA_OPTS=-Xms512m -Xmx512m"</span> <span class="comment">#设置使用jvm内存大小</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/Users/mango/Downloads/install/docker/elk/elasticsearch/plugins:/usr/share/elasticsearch/plugins</span> <span class="comment">#插件文件挂载</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/Users/mango/Downloads/install/docker/elk/elasticsearch/data:/usr/share/elasticsearch/data</span> <span class="comment">#数据文件挂载</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">9200</span><span class="string">:9200</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">9300</span><span class="string">:9300</span></span><br><span class="line">  <span class="attr">kibana:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">kibana:6.4.0</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">kibana</span></span><br><span class="line">    <span class="attr">links:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">elasticsearch:es</span> <span class="comment">#可以用es这个域名访问elasticsearch服务</span></span><br><span class="line">    <span class="attr">depends_on:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">elasticsearch</span> <span class="comment">#kibana在elasticsearch启动之后再启动</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">"elasticsearch.hosts=http://es:9200"</span> <span class="comment">#设置访问elasticsearch的地址</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">5601</span><span class="string">:5601</span></span><br><span class="line">  <span class="attr">logstash:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">logstash:6.4.0</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">logstash</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/Users/mango/Downloads/install/docker/elk/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf</span> <span class="comment">#挂载logstash的配置文件</span></span><br><span class="line">    <span class="attr">depends_on:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">elasticsearch</span> <span class="comment">#kibana在elasticsearch启动之后再启动</span></span><br><span class="line">    <span class="attr">links:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">elasticsearch:es</span> <span class="comment">#可以用es这个域名访问elasticsearch服务</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">4560</span><span class="string">:4560</span></span><br></pre></td></tr></table></figure>
+
+<p>在该文件的目录下执行docker-compose命令运行:</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
+
+<p>之后显示如下内容：</p>
+<img src="/2020/10/01/SpringBoot%E6%95%B4%E5%90%88ELK%E5%AE%9E%E7%8E%B0%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/install_success.png" class="" title="install_success">
+
+<h3 id="在logstash中安装json-lines插件"><a href="#在logstash中安装json-lines插件" class="headerlink" title="在logstash中安装json_lines插件"></a>在logstash中安装json_lines插件</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 进入logstash容器(e9c845c8d48e为容器id)</span></span><br><span class="line">docker <span class="built_in">exec</span> -it e9c845c8d48e /bin/bash</span><br><span class="line"><span class="comment"># 进入bin目录</span></span><br><span class="line"><span class="built_in">cd</span> /bin/</span><br><span class="line"><span class="comment"># 安装插件</span></span><br><span class="line">logstash-plugin install logstash-codec-json_lines</span><br><span class="line"><span class="comment"># 退出容器</span></span><br><span class="line"><span class="built_in">exit</span></span><br><span class="line"><span class="comment"># 重启logstash服务</span></span><br><span class="line">docker restart logstash</span><br></pre></td></tr></table></figure>
+
+<h3 id="查看界面"><a href="#查看界面" class="headerlink" title="查看界面"></a>查看界面</h3><p>访问地址：<a href="http://127.0.0.1:9200/" target="_blank" rel="noopener">http://127.0.0.1:9200/</a></p>
+<img src="/2020/10/01/SpringBoot%E6%95%B4%E5%90%88ELK%E5%AE%9E%E7%8E%B0%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/json.png" class="" title="json">
+
+<p>访问地址：<a href="http://127.0.0.1:5601" target="_blank" rel="noopener">http://127.0.0.1:5601</a></p>
+<img src="/2020/10/01/SpringBoot%E6%95%B4%E5%90%88ELK%E5%AE%9E%E7%8E%B0%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/kibana.png" class="" title="kibana">
+
+<h2 id="Springboot集成logstash"><a href="#Springboot集成logstash" class="headerlink" title="Springboot集成logstash"></a>Springboot集成logstash</h2><h3 id="在pom-xml中添加logstash-logback-encoder依赖"><a href="#在pom-xml中添加logstash-logback-encoder依赖" class="headerlink" title="在pom.xml中添加logstash-logback-encoder依赖"></a>在pom.xml中添加logstash-logback-encoder依赖</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--集成logstash--&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;net.logstash.logback&lt;&#x2F;groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;logstash-logback-encoder&lt;&#x2F;artifactId&gt;</span><br><span class="line">    &lt;version&gt;5.3&lt;&#x2F;version&gt;</span><br><span class="line">&lt;&#x2F;dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="添加配置文件logback-spring-xml让logback的日志输出到logstash"><a href="#添加配置文件logback-spring-xml让logback的日志输出到logstash" class="headerlink" title="添加配置文件logback-spring.xml让logback的日志输出到logstash"></a>添加配置文件logback-spring.xml让logback的日志输出到logstash</h3><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="comment">&lt;!--该日志将日志级别不同的log信息保存到不同的文件中 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">include</span> <span class="attr">resource</span>=<span class="string">"org/springframework/boot/logging/logback/defaults.xml"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">springProperty</span> <span class="attr">scope</span>=<span class="string">"context"</span> <span class="attr">name</span>=<span class="string">"springAppName"</span></span></span><br><span class="line"><span class="tag">                    <span class="attr">source</span>=<span class="string">"spring.application.name"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 日志在工程中的输出位置 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"LOG_FILE"</span> <span class="attr">value</span>=<span class="string">"$&#123;BUILD_FOLDER:-build&#125;/$&#123;springAppName&#125;"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 控制台的日志输出样式 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"CONSOLE_LOG_PATTERN"</span></span></span><br><span class="line"><span class="tag">              <span class="attr">value</span>=<span class="string">"%clr(%d&#123;yyyy-MM-dd HH:mm:ss.SSS&#125;)&#123;faint&#125; %clr($&#123;LOG_LEVEL_PATTERN:-%5p&#125;) %clr($&#123;PID:- &#125;)&#123;magenta&#125; %clr(---)&#123;faint&#125; %clr([%15.15t])&#123;faint&#125; %m%n$&#123;LOG_EXCEPTION_CONVERSION_WORD:-%wEx&#125;&#125;"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 控制台输出 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">appender</span> <span class="attr">name</span>=<span class="string">"console"</span> <span class="attr">class</span>=<span class="string">"ch.qos.logback.core.ConsoleAppender"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">filter</span> <span class="attr">class</span>=<span class="string">"ch.qos.logback.classic.filter.ThresholdFilter"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">level</span>&gt;</span>INFO<span class="tag">&lt;/<span class="name">level</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">filter</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 日志输出编码 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">encoder</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">pattern</span>&gt;</span>$&#123;CONSOLE_LOG_PATTERN&#125;<span class="tag">&lt;/<span class="name">pattern</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">charset</span>&gt;</span>utf8<span class="tag">&lt;/<span class="name">charset</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">encoder</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">appender</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 为logstash输出的JSON格式的Appender --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">appender</span> <span class="attr">name</span>=<span class="string">"logstash"</span></span></span><br><span class="line"><span class="tag">              <span class="attr">class</span>=<span class="string">"net.logstash.logback.appender.LogstashTcpSocketAppender"</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--可以访问的logstash日志收集端口--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">destination</span>&gt;</span>127.0.0.1:4560<span class="tag">&lt;/<span class="name">destination</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 日志输出编码 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">encoder</span></span></span><br><span class="line"><span class="tag">                <span class="attr">class</span>=<span class="string">"net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">providers</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">timestamp</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">timeZone</span>&gt;</span>UTC<span class="tag">&lt;/<span class="name">timeZone</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">timestamp</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">pattern</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">pattern</span>&gt;</span></span><br><span class="line">                        &#123;</span><br><span class="line">                        "severity": "%level",</span><br><span class="line">                        "service": "$&#123;springAppName:-&#125;",</span><br><span class="line">                        "trace": "%X&#123;X-B3-TraceId:-&#125;",</span><br><span class="line">                        "span": "%X&#123;X-B3-SpanId:-&#125;",</span><br><span class="line">                        "exportable": "%X&#123;X-Span-Export:-&#125;",</span><br><span class="line">                        "pid": "$&#123;PID:-&#125;",</span><br><span class="line">                        "thread": "%thread",</span><br><span class="line">                        "class": "%logger&#123;40&#125;",</span><br><span class="line">                        "rest": "%message"</span><br><span class="line">                        &#125;</span><br><span class="line">                    <span class="tag">&lt;/<span class="name">pattern</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">pattern</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">providers</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">encoder</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">appender</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 日志输出级别 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">root</span> <span class="attr">level</span>=<span class="string">"INFO"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">appender-ref</span> <span class="attr">ref</span>=<span class="string">"console"</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">appender-ref</span> <span class="attr">ref</span>=<span class="string">"logstash"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">root</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="在kibana中查看日志信息"><a href="#在kibana中查看日志信息" class="headerlink" title="在kibana中查看日志信息"></a>在kibana中查看日志信息</h2><h3 id="创建index-pattern"><a href="#创建index-pattern" class="headerlink" title="创建index pattern"></a>创建index pattern</h3><img src="/2020/10/01/SpringBoot%E6%95%B4%E5%90%88ELK%E5%AE%9E%E7%8E%B0%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/create.png" class="" title="create">
+
+<p>配置 pattern 输入springboot-*，匹配相关数据。</p>
+<img src="/2020/10/01/SpringBoot%E6%95%B4%E5%90%88ELK%E5%AE%9E%E7%8E%B0%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/step1.png" class="" title="step1">
+
+<p>选择时间@timestamp，这样数据展示会以时间排序</p>
+<img src="/2020/10/01/SpringBoot%E6%95%B4%E5%90%88ELK%E5%AE%9E%E7%8E%B0%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/step2.png" class="" title="step2">
+
+<h3 id="查看收集的日志"><a href="#查看收集的日志" class="headerlink" title="查看收集的日志"></a>查看收集的日志</h3><p>启动我们的项目就可以看到启动日志已经输出到elasticsearch中了:</p>
+<p>点击discover：</p>
+<img src="/2020/10/01/SpringBoot%E6%95%B4%E5%90%88ELK%E5%AE%9E%E7%8E%B0%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/log.png" class="" title="log">
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>搭建了ELK日志系统后，我们就可以直接在kibana上看系统的日志了，还可以进行搜索</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://juejin.im/post/6844903784632549390" target="_blank" rel="noopener">https://juejin.im/post/6844903784632549390</a></p>
+<p><a href="https://juejin.im/post/6844904008499331079" target="_blank" rel="noopener">https://juejin.im/post/6844904008499331079</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Spring定时任务-Scheduled注解使用方式</title>
+    <url>/2020/06/30/Spring%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1-Scheduled%E6%B3%A8%E8%A7%A3%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F/</url>
+    <content><![CDATA[<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>使用@Scheduled cron表达式标注任务方法</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">testTask</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Logger logger = LoggerFactory.getLogger(testTask<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Scheduled</span>(cron = <span class="string">"0/5 * * * * ?"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTask</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        logger.info(Thread.currentThread().getName()+<span class="string">"===task run"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<h2 id="cron表达式的语法"><a href="#cron表达式的语法" class="headerlink" title="cron表达式的语法"></a>cron表达式的语法</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"> 按顺序依次为</span><br><span class="line">1  秒（0~59）</span><br><span class="line">2  分钟（0~59）</span><br><span class="line">3 小时（0~23）</span><br><span class="line">4  天（0~31）</span><br><span class="line">5 月（0~11）</span><br><span class="line">6  星期（1~7 1&#x3D;SUN 或 SUN，MON，TUE，WED，THU，FRI，SAT）</span><br><span class="line">7.年份（1970－2099）</span><br><span class="line">其中每个元素可以是一个值(如6),一个连续区间(9-12),一个间隔时间(8-18&#x2F;4)(&#x2F;表示每隔4小时),一个列表(1,3,5),通配符。由于&quot;月份中的日期&quot;和&quot;星期中的日期&quot;这两个元素互斥的,必须要对其中一个设置?.</span><br><span class="line"> 0 0 10,14,16 * * ? 每天上午10点，下午2点，4点</span><br><span class="line"> 0 0&#x2F;30 9-17 * * ?   朝九晚五工作时间内每半小时</span><br><span class="line"> 0 0 12 ? * WED 表示每个星期三中午12点</span><br><span class="line"> &quot;0 0 12 * * ?&quot; 每天中午12点触发 </span><br><span class="line"> &quot;0 15 10 ? * *&quot; 每天上午10:15触发 </span><br><span class="line"> &quot;0 15 10 * * ?&quot; 每天上午10:15触发 </span><br><span class="line"> &quot;0 15 10 * * ? *&quot; 每天上午10:15触发 </span><br><span class="line"> &quot;0 15 10 * * ? 2005&quot; 2005年的每天上午10:15触发 </span><br><span class="line"> &quot;0 * 14 * * ?&quot; 在每天下午2点到下午2:59期间的每1分钟触发 </span><br><span class="line"> &quot;0 0&#x2F;5 14 * * ?&quot; 在每天下午2点到下午2:55期间的每5分钟触发 </span><br><span class="line"> &quot;0 0&#x2F;5 14,18 * * ?&quot; 在每天下午2点到2:55期间和下午6点到6:55期间的每5分钟触发 </span><br><span class="line"> &quot;0 0-5 14 * * ?&quot; 在每天下午2点到下午2:05期间的每1分钟触发 </span><br><span class="line"> &quot;0 10,44 14 ? 3 WED&quot; 每年三月的星期三的下午2:10和2:44触发 </span><br><span class="line"> &quot;0 15 10 ? * MON-FRI&quot; 周一至周五的上午10:15触发 </span><br><span class="line"> &quot;0 15 10 15 * ?&quot; 每月15日上午10:15触发 </span><br><span class="line"> &quot;0 15 10 L * ?&quot; 每月最后一日的上午10:15触发 </span><br><span class="line"> &quot;0 15 10 ? * 6L&quot; 每月的最后一个星期五上午10:15触发 </span><br><span class="line"> &quot;0 15 10 ? * 6L 2002-2005&quot; 2002年至2005年的每月的最后一个星期五上午10:15触发 </span><br><span class="line"> &quot;0 15 10 ? * 6#3&quot; 每月的第三个星期五上午10:15触发 </span><br><span class="line"> 有些子表达式能包含一些范围或列表</span><br><span class="line"> 例如：子表达式（天（星期））可以为 “MON-FRI”，“MON，WED，FRI”，“MON-WED,SAT”</span><br><span class="line"> “*”字符代表所有可能的值</span><br><span class="line"> “&#x2F;”字符用来指定数值的增量</span><br><span class="line"> 例如：在子表达式（分钟）里的“0&#x2F;15”表示从第0分钟开始，每15分钟</span><br><span class="line">          在子表达式（分钟）里的“3&#x2F;20”表示从第3分钟开始，每20分钟（它和“3，23，43”）的含义一样</span><br><span class="line"> “？”字符仅被用于天（月）和天（星期）两个子表达式，表示不指定值</span><br><span class="line"> 当2个子表达式其中之一被指定了值以后，为了避免冲突，需要将另一个子表达式的值设为“？”</span><br><span class="line"> “L” 字符仅被用于天（月）和天（星期）两个子表达式，它是单词“last”的缩写</span><br><span class="line"> 如果在“L”前有具体的内容，它就具有其他的含义了。例如：“6L”表示这个月的倒数第６天</span><br><span class="line"> 注意：在使用“L”参数时，不要指定列表或范围，因为这会导致问题</span><br><span class="line"> W 字符代表着平日(Mon-Fri)，并且仅能用于日域中。它用来指定离指定日的最近的一个平日。大部分的商业处理都是基于工作周的，所以 W 字符可能是非常重要的。</span><br><span class="line"> 例如，日域中的 15W 意味着 &quot;离该月15号的最近一个平日。&quot; 假如15号是星期六，那么 trigger 会在14号(星期五)触发，因为星期四比星期一离15号更近。</span><br><span class="line"> C：代表“Calendar”的意思。它的意思是计划所关联的日期，如果日期没有被关联，则相当于日历中所有日期。例如5C在日期字段中就相当于日历5日以后的第一天。1C在星期字段中相当于星期日后的第一天。</span><br><span class="line"> 字段   允许值   允许的特殊字符</span><br><span class="line"> 秒           0-59           , - * &#x2F;</span><br><span class="line"> 分           0-59           , - * &#x2F;</span><br><span class="line"> 小时           0-23           , - * &#x2F;</span><br><span class="line"> 日期           1-31           , - * ? &#x2F; L W C</span><br><span class="line"> 月份           1-12 或者 JAN-DEC           , - * &#x2F;</span><br><span class="line"> 星期           1-7 或者 SUN-SAT           , - * ? &#x2F; L C #</span><br><span class="line"> 年（可选）           留空, 1970-2099           , - * &#x2F;</span><br></pre></td></tr></table></figure>
+
+<h2 id="提出问题"><a href="#提出问题" class="headerlink" title="提出问题"></a>提出问题</h2><p>如果我的任务在5秒内没有执行完呢？spring会怎么处理呢？</p>
+<p>测试代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Scheduled</span>(cron = <span class="string">"*/5 * * * * ?"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTask</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task run"</span>);</span><br><span class="line">    Thread.sleep(<span class="number">6</span>*<span class="number">1000</span>);</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task end"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>结果日志：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2018-06-11 16:02:50.035 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:02:56.496 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 16:03:00.006 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:03:06.013 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 16:03:10.115 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:03:17.267 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 16:03:20.055 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:03:26.164 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br></pre></td></tr></table></figure>
+
+<p>我们可以发现，spring他的处理方式是等待上一个任务执行完成后，再去执行下一个任务，也就是说spring的定时任务<strong>默认是单线程</strong>的，而不会开启另一条线程去执行任务。</p>
+<p>眼尖的小伙伴应该发现任务执行的时间还是怪怪的，任务开始到结束的时间间隔确实是6s，但是下一个任务的开始时间和上一个任务的结束时间之间为什么差了4s呢？这个时间是怎么设定的呢？</p>
+<p>这个问题和spring处理cron表达式这种定时任务的机制有关，我们稍后再说，先讲讲@Scheduled注解的另外两个属性：<strong>fixedRate和fixedDelay</strong></p>
+<h2 id="fixedDelay"><a href="#fixedDelay" class="headerlink" title="fixedDelay"></a>fixedDelay</h2><p>测试代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Scheduled</span>(fixedDelay = <span class="number">5</span>*<span class="number">1000</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTask</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task run"</span>);</span><br><span class="line">    Thread.sleep(<span class="number">6</span>*<span class="number">1000</span>);</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task end"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>结果日志：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2018-06-11 16:30:56.246 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:31:03.114 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 16:31:08.122 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:31:14.139 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 16:31:19.149 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:31:25.261 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 16:31:30.269 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:31:36.385 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br></pre></td></tr></table></figure>
+
+<p>我们可以发现，这个结果和上一个使用cro表达式的结果好像啊。但是仔细看我们就会发现，这次所有的时间都是我们配置的：任务开始到结束间隔6s，上一个任务结束时间到下一个任务开始时间是5秒，这样看来是比较符合我们的设置的。</p>
+<p>fixedDelay是设定上一个任务结束后多久执行下一个任务，也就是<strong>fixedDelay只关心上一任务的结束时间和下一任务的开始时间</strong>。</p>
+<h2 id="fixedRate"><a href="#fixedRate" class="headerlink" title="fixedRate"></a>fixedRate</h2><p>测试代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Scheduled</span>(fixedRate = <span class="number">5</span>*<span class="number">1000</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTask</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task run"</span>);</span><br><span class="line">    Thread.sleep(<span class="number">6</span>*<span class="number">1000</span>);</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task end"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>结果日志：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2018-06-11 16:54:29.613 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:54:36.113 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 16:54:36.118 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:54:42.580 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 16:54:42.607 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:54:48.632 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 16:54:48.639 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:54:55.188 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br></pre></td></tr></table></figure>
+
+<p>这次我们可以看到，上一个任务结束后，下一个任务立刻开始执行了，结合第一次测试，我们就可以推断，<strong>fixedRate设置的上一个任务的开始时间到下一个任务开始时间的间隔</strong>，那我们的推断对不对呢？这次我们把任务执行时间改成2s，测试走起~</p>
+<p>测试代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Scheduled</span>(fixedRate = <span class="number">5</span>*<span class="number">1000</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTask</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task run"</span>);</span><br><span class="line">    Thread.sleep(<span class="number">2</span>*<span class="number">1000</span>);</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task end"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>结果日志：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2018-06-11 17:08:37.500 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 17:08:39.510 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 17:08:43.086 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 17:08:45.093 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 17:08:48.025 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 17:08:50.083 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 17:08:53.239 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 17:08:55.245 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br></pre></td></tr></table></figure>
+
+<p>结果和我们推断的一致，两个任务的开始时间间隔是5s，当到达任务的开始执行时间，但上一个任务却没有完成时，spring会等待上一个任务执行完，并立即开始执行本次任务。</p>
+<h2 id="Cron执行机制"><a href="#Cron执行机制" class="headerlink" title="Cron执行机制"></a>Cron执行机制</h2><p>上面介绍了cron表达式、fixedRate和fixedDelay三种方式，但还有一个遗留问题，那就是cron的执行机制，为什么使用它时两个任务间隔并不固定呢？其实spring在处理使用cron表达式这种定时任务时，其实依旧关注的是任务的开始时间，但是他和fixedDelay不同的是，<strong>他会在配置任务开始时判断任务是否可以执行，如果可以则执行，如果不可以，那么他将不执行此次任务，等待下一次执行</strong>。比如下图</p>
+<img src="/2020/06/30/Spring%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1-Scheduled%E6%B3%A8%E8%A7%A3%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F/cron.png" class="" title="cron">
+
+<p>AB两个任务配置的执行规则都是每隔5s执行，A任务执行时间是4s，而B任务执行时间是7s。</p>
+<p>A任务可以在执行内执行完任务，所以每隔5s他就会正常执行，0s开始，4s时结束，那么在5s的时候他会再次执行，如此反复。</p>
+<p>而B任务的执行时间是7s，执行时间超过了任务的间隔时间，就如图中例子，B任务在10s开始，执行时间持续了7s，当15s的时候本来应该是开始执行第二次，但由于第一次任务还未执行完成，所以第二次任务将不会执行，而是到20s要开始执行第三次任务的时候，再次判断，发现上一次B任务已经执行完毕，这时才开始再次执行B任务。</p>
+<p>还记得我们刚开始使用cron表达式做了一个执行时间为6s，间隔5s执行的测试任务吗？这次我们改一改，将执行时间改为8s，再次测试。</p>
+<p>测试代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Scheduled</span>(cron = <span class="string">"0/5 * * * * ?"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTask</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task run"</span>);</span><br><span class="line">    Thread.sleep(<span class="number">8</span>*<span class="number">1000</span>);</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task end"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>结果日志：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2018-06-11 17:54:30.014 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 17:54:38.033 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 17:54:40.488 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 17:54:49.617 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 17:54:50.260 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 17:54:58.270 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 17:55:00.845 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 17:55:08.856 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br></pre></td></tr></table></figure>
+
+<p>对比执行时间为6s的测试结果，可以发现两次任务开始的时间都是在下下一个5s的时候，也就是证实了之前等待的结论。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>1、fixedRate配置了上一次任务的开始时间到下一次任务的开始时间的间隔，每次任务都会执行；</p>
+<p>2、fixedDelay配置了上一次任务的结束时间到下一次任务的开始时间的间隔，每次任务都会执行；</p>
+<p>3、cron表达式配置了在哪一刻执行任务，会在配置的任务开始时间判断任务是否可以执行，如果能则执行，不能则会跳过本次执行；</p>
+<p>4、<strong>如果是强调任务间隔的定时任务，建议使用fixedRate和fixedDelay，如果是强调任务在某时某分某刻执行的定时任务，建议使用cron表达式。</strong></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://segmentfault.com/a/1190000015253688" target="_blank" rel="noopener">https://segmentfault.com/a/1190000015253688</a></p>
 ]]></content>
   </entry>
   <entry>
@@ -1591,69 +1722,6 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 ]]></content>
   </entry>
   <entry>
-    <title>Spring定时任务-Scheduled注解使用方式</title>
-    <url>/2020/06/30/Spring%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1-Scheduled%E6%B3%A8%E8%A7%A3%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F/</url>
-    <content><![CDATA[<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>使用@Scheduled cron表达式标注任务方法</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">testTask</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Logger logger = LoggerFactory.getLogger(testTask<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Scheduled</span>(cron = <span class="string">"0/5 * * * * ?"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTask</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        logger.info(Thread.currentThread().getName()+<span class="string">"===task run"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<a id="more"></a>
-
-<h2 id="cron表达式的语法"><a href="#cron表达式的语法" class="headerlink" title="cron表达式的语法"></a>cron表达式的语法</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"> 按顺序依次为</span><br><span class="line">1  秒（0~59）</span><br><span class="line">2  分钟（0~59）</span><br><span class="line">3 小时（0~23）</span><br><span class="line">4  天（0~31）</span><br><span class="line">5 月（0~11）</span><br><span class="line">6  星期（1~7 1&#x3D;SUN 或 SUN，MON，TUE，WED，THU，FRI，SAT）</span><br><span class="line">7.年份（1970－2099）</span><br><span class="line">其中每个元素可以是一个值(如6),一个连续区间(9-12),一个间隔时间(8-18&#x2F;4)(&#x2F;表示每隔4小时),一个列表(1,3,5),通配符。由于&quot;月份中的日期&quot;和&quot;星期中的日期&quot;这两个元素互斥的,必须要对其中一个设置?.</span><br><span class="line"> 0 0 10,14,16 * * ? 每天上午10点，下午2点，4点</span><br><span class="line"> 0 0&#x2F;30 9-17 * * ?   朝九晚五工作时间内每半小时</span><br><span class="line"> 0 0 12 ? * WED 表示每个星期三中午12点</span><br><span class="line"> &quot;0 0 12 * * ?&quot; 每天中午12点触发 </span><br><span class="line"> &quot;0 15 10 ? * *&quot; 每天上午10:15触发 </span><br><span class="line"> &quot;0 15 10 * * ?&quot; 每天上午10:15触发 </span><br><span class="line"> &quot;0 15 10 * * ? *&quot; 每天上午10:15触发 </span><br><span class="line"> &quot;0 15 10 * * ? 2005&quot; 2005年的每天上午10:15触发 </span><br><span class="line"> &quot;0 * 14 * * ?&quot; 在每天下午2点到下午2:59期间的每1分钟触发 </span><br><span class="line"> &quot;0 0&#x2F;5 14 * * ?&quot; 在每天下午2点到下午2:55期间的每5分钟触发 </span><br><span class="line"> &quot;0 0&#x2F;5 14,18 * * ?&quot; 在每天下午2点到2:55期间和下午6点到6:55期间的每5分钟触发 </span><br><span class="line"> &quot;0 0-5 14 * * ?&quot; 在每天下午2点到下午2:05期间的每1分钟触发 </span><br><span class="line"> &quot;0 10,44 14 ? 3 WED&quot; 每年三月的星期三的下午2:10和2:44触发 </span><br><span class="line"> &quot;0 15 10 ? * MON-FRI&quot; 周一至周五的上午10:15触发 </span><br><span class="line"> &quot;0 15 10 15 * ?&quot; 每月15日上午10:15触发 </span><br><span class="line"> &quot;0 15 10 L * ?&quot; 每月最后一日的上午10:15触发 </span><br><span class="line"> &quot;0 15 10 ? * 6L&quot; 每月的最后一个星期五上午10:15触发 </span><br><span class="line"> &quot;0 15 10 ? * 6L 2002-2005&quot; 2002年至2005年的每月的最后一个星期五上午10:15触发 </span><br><span class="line"> &quot;0 15 10 ? * 6#3&quot; 每月的第三个星期五上午10:15触发 </span><br><span class="line"> 有些子表达式能包含一些范围或列表</span><br><span class="line"> 例如：子表达式（天（星期））可以为 “MON-FRI”，“MON，WED，FRI”，“MON-WED,SAT”</span><br><span class="line"> “*”字符代表所有可能的值</span><br><span class="line"> “&#x2F;”字符用来指定数值的增量</span><br><span class="line"> 例如：在子表达式（分钟）里的“0&#x2F;15”表示从第0分钟开始，每15分钟</span><br><span class="line">          在子表达式（分钟）里的“3&#x2F;20”表示从第3分钟开始，每20分钟（它和“3，23，43”）的含义一样</span><br><span class="line"> “？”字符仅被用于天（月）和天（星期）两个子表达式，表示不指定值</span><br><span class="line"> 当2个子表达式其中之一被指定了值以后，为了避免冲突，需要将另一个子表达式的值设为“？”</span><br><span class="line"> “L” 字符仅被用于天（月）和天（星期）两个子表达式，它是单词“last”的缩写</span><br><span class="line"> 如果在“L”前有具体的内容，它就具有其他的含义了。例如：“6L”表示这个月的倒数第６天</span><br><span class="line"> 注意：在使用“L”参数时，不要指定列表或范围，因为这会导致问题</span><br><span class="line"> W 字符代表着平日(Mon-Fri)，并且仅能用于日域中。它用来指定离指定日的最近的一个平日。大部分的商业处理都是基于工作周的，所以 W 字符可能是非常重要的。</span><br><span class="line"> 例如，日域中的 15W 意味着 &quot;离该月15号的最近一个平日。&quot; 假如15号是星期六，那么 trigger 会在14号(星期五)触发，因为星期四比星期一离15号更近。</span><br><span class="line"> C：代表“Calendar”的意思。它的意思是计划所关联的日期，如果日期没有被关联，则相当于日历中所有日期。例如5C在日期字段中就相当于日历5日以后的第一天。1C在星期字段中相当于星期日后的第一天。</span><br><span class="line"> 字段   允许值   允许的特殊字符</span><br><span class="line"> 秒           0-59           , - * &#x2F;</span><br><span class="line"> 分           0-59           , - * &#x2F;</span><br><span class="line"> 小时           0-23           , - * &#x2F;</span><br><span class="line"> 日期           1-31           , - * ? &#x2F; L W C</span><br><span class="line"> 月份           1-12 或者 JAN-DEC           , - * &#x2F;</span><br><span class="line"> 星期           1-7 或者 SUN-SAT           , - * ? &#x2F; L C #</span><br><span class="line"> 年（可选）           留空, 1970-2099           , - * &#x2F;</span><br></pre></td></tr></table></figure>
-
-<h2 id="提出问题"><a href="#提出问题" class="headerlink" title="提出问题"></a>提出问题</h2><p>如果我的任务在5秒内没有执行完呢？spring会怎么处理呢？</p>
-<p>测试代码：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Scheduled</span>(cron = <span class="string">"*/5 * * * * ?"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTask</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task run"</span>);</span><br><span class="line">    Thread.sleep(<span class="number">6</span>*<span class="number">1000</span>);</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task end"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>结果日志：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2018-06-11 16:02:50.035 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:02:56.496 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 16:03:00.006 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:03:06.013 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 16:03:10.115 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:03:17.267 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 16:03:20.055 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:03:26.164 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br></pre></td></tr></table></figure>
-
-<p>我们可以发现，spring他的处理方式是等待上一个任务执行完成后，再去执行下一个任务，也就是说spring的定时任务<strong>默认是单线程</strong>的，而不会开启另一条线程去执行任务。</p>
-<p>眼尖的小伙伴应该发现任务执行的时间还是怪怪的，任务开始到结束的时间间隔确实是6s，但是下一个任务的开始时间和上一个任务的结束时间之间为什么差了4s呢？这个时间是怎么设定的呢？</p>
-<p>这个问题和spring处理cron表达式这种定时任务的机制有关，我们稍后再说，先讲讲@Scheduled注解的另外两个属性：<strong>fixedRate和fixedDelay</strong></p>
-<h2 id="fixedDelay"><a href="#fixedDelay" class="headerlink" title="fixedDelay"></a>fixedDelay</h2><p>测试代码：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Scheduled</span>(fixedDelay = <span class="number">5</span>*<span class="number">1000</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTask</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task run"</span>);</span><br><span class="line">    Thread.sleep(<span class="number">6</span>*<span class="number">1000</span>);</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task end"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>结果日志：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2018-06-11 16:30:56.246 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:31:03.114 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 16:31:08.122 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:31:14.139 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 16:31:19.149 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:31:25.261 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 16:31:30.269 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:31:36.385 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br></pre></td></tr></table></figure>
-
-<p>我们可以发现，这个结果和上一个使用cro表达式的结果好像啊。但是仔细看我们就会发现，这次所有的时间都是我们配置的：任务开始到结束间隔6s，上一个任务结束时间到下一个任务开始时间是5秒，这样看来是比较符合我们的设置的。</p>
-<p>fixedDelay是设定上一个任务结束后多久执行下一个任务，也就是<strong>fixedDelay只关心上一任务的结束时间和下一任务的开始时间</strong>。</p>
-<h2 id="fixedRate"><a href="#fixedRate" class="headerlink" title="fixedRate"></a>fixedRate</h2><p>测试代码：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Scheduled</span>(fixedRate = <span class="number">5</span>*<span class="number">1000</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTask</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task run"</span>);</span><br><span class="line">    Thread.sleep(<span class="number">6</span>*<span class="number">1000</span>);</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task end"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>结果日志：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2018-06-11 16:54:29.613 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:54:36.113 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 16:54:36.118 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:54:42.580 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 16:54:42.607 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:54:48.632 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 16:54:48.639 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 16:54:55.188 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br></pre></td></tr></table></figure>
-
-<p>这次我们可以看到，上一个任务结束后，下一个任务立刻开始执行了，结合第一次测试，我们就可以推断，<strong>fixedRate设置的上一个任务的开始时间到下一个任务开始时间的间隔</strong>，那我们的推断对不对呢？这次我们把任务执行时间改成2s，测试走起~</p>
-<p>测试代码：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Scheduled</span>(fixedRate = <span class="number">5</span>*<span class="number">1000</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTask</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task run"</span>);</span><br><span class="line">    Thread.sleep(<span class="number">2</span>*<span class="number">1000</span>);</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task end"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>结果日志：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2018-06-11 17:08:37.500 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 17:08:39.510 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 17:08:43.086 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 17:08:45.093 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 17:08:48.025 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 17:08:50.083 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 17:08:53.239 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 17:08:55.245 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br></pre></td></tr></table></figure>
-
-<p>结果和我们推断的一致，两个任务的开始时间间隔是5s，当到达任务的开始执行时间，但上一个任务却没有完成时，spring会等待上一个任务执行完，并立即开始执行本次任务。</p>
-<h2 id="Cron执行机制"><a href="#Cron执行机制" class="headerlink" title="Cron执行机制"></a>Cron执行机制</h2><p>上面介绍了cron表达式、fixedRate和fixedDelay三种方式，但还有一个遗留问题，那就是cron的执行机制，为什么使用它时两个任务间隔并不固定呢？其实spring在处理使用cron表达式这种定时任务时，其实依旧关注的是任务的开始时间，但是他和fixedDelay不同的是，<strong>他会在配置任务开始时判断任务是否可以执行，如果可以则执行，如果不可以，那么他将不执行此次任务，等待下一次执行</strong>。比如下图</p>
-<img src="/2020/06/30/Spring%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1-Scheduled%E6%B3%A8%E8%A7%A3%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F/cron.png" class="" title="cron">
-
-<p>AB两个任务配置的执行规则都是每隔5s执行，A任务执行时间是4s，而B任务执行时间是7s。</p>
-<p>A任务可以在执行内执行完任务，所以每隔5s他就会正常执行，0s开始，4s时结束，那么在5s的时候他会再次执行，如此反复。</p>
-<p>而B任务的执行时间是7s，执行时间超过了任务的间隔时间，就如图中例子，B任务在10s开始，执行时间持续了7s，当15s的时候本来应该是开始执行第二次，但由于第一次任务还未执行完成，所以第二次任务将不会执行，而是到20s要开始执行第三次任务的时候，再次判断，发现上一次B任务已经执行完毕，这时才开始再次执行B任务。</p>
-<p>还记得我们刚开始使用cron表达式做了一个执行时间为6s，间隔5s执行的测试任务吗？这次我们改一改，将执行时间改为8s，再次测试。</p>
-<p>测试代码：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Scheduled</span>(cron = <span class="string">"0/5 * * * * ?"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTask</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task run"</span>);</span><br><span class="line">    Thread.sleep(<span class="number">8</span>*<span class="number">1000</span>);</span><br><span class="line">    logger.info(Thread.currentThread().getName()+<span class="string">"===task end"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>结果日志：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2018-06-11 17:54:30.014 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 17:54:38.033 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 17:54:40.488 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 17:54:49.617 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 17:54:50.260 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 17:54:58.270 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br><span class="line">2018-06-11 17:55:00.845 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task run</span><br><span class="line">2018-06-11 17:55:08.856 [pool-12-thread-1] INFO  service.task.testTask -pool-12-thread-1&#x3D;&#x3D;&#x3D;task end</span><br></pre></td></tr></table></figure>
-
-<p>对比执行时间为6s的测试结果，可以发现两次任务开始的时间都是在下下一个5s的时候，也就是证实了之前等待的结论。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>1、fixedRate配置了上一次任务的开始时间到下一次任务的开始时间的间隔，每次任务都会执行；</p>
-<p>2、fixedDelay配置了上一次任务的结束时间到下一次任务的开始时间的间隔，每次任务都会执行；</p>
-<p>3、cron表达式配置了在哪一刻执行任务，会在配置的任务开始时间判断任务是否可以执行，如果能则执行，不能则会跳过本次执行；</p>
-<p>4、<strong>如果是强调任务间隔的定时任务，建议使用fixedRate和fixedDelay，如果是强调任务在某时某分某刻执行的定时任务，建议使用cron表达式。</strong></p>
-<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://segmentfault.com/a/1190000015253688" target="_blank" rel="noopener">https://segmentfault.com/a/1190000015253688</a></p>
-]]></content>
-  </entry>
-  <entry>
     <title>Spring自动注入单例和多例如何选择</title>
     <url>/2020/05/03/Spring%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5%E5%8D%95%E4%BE%8B%E5%92%8C%E5%A4%9A%E4%BE%8B%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9/</url>
     <content><![CDATA[<h3 id="Spring中bean的scope属性，有如下5种类型："><a href="#Spring中bean的scope属性，有如下5种类型：" class="headerlink" title="Spring中bean的scope属性，有如下5种类型："></a>Spring中bean的scope属性，有如下5种类型：</h3><p><strong>singleton</strong> 表示在spring容器中的单例，通过spring容器获得该bean时总是返回唯一的实例</p>
@@ -1753,6 +1821,81 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 ]]></content>
   </entry>
   <entry>
+    <title>三句话搞懂Redis-缓存穿透、击穿、雪崩</title>
+    <url>/2020/08/28/%E4%B8%89%E5%8F%A5%E8%AF%9D%E6%90%9E%E6%87%82Redis-%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E3%80%81%E5%87%BB%E7%A9%BF%E3%80%81%E9%9B%AA%E5%B4%A9/</url>
+    <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>如何有效的理解并且区分 Redis <strong>穿透、击穿和雪崩</strong>之间的区别，一直以来都挺困扰我的。特别是穿透和击穿，过一段时间就稀里糊涂的分不清了。</p>
+<p>为了有效的帮助自己，以及拥有同样烦恼的朋友们区分这三种场景。我总结了一些关键词，希望大家可以和我一样通过联想的方式来区分并理解这三种场景的区别！</p>
+<a id="more"></a>
+
+<h3 id="一-缓存穿透"><a href="#一-缓存穿透" class="headerlink" title="一. 缓存穿透"></a>一. 缓存穿透</h3><h4 id="关键词：穿过-Redis-和数据库"><a href="#关键词：穿过-Redis-和数据库" class="headerlink" title="关键词：穿过 Redis 和数据库"></a>关键词：穿过 Redis 和数据库</h4><p>当 Redis 和数据库中都没有我们想要的数据时，就需要考虑缓存穿透的问题了。下面这段逻辑大家用的会比较多：先去 Redis 中查找某资源，Redis 中查不到就去 DB 中查，DB 中查到后回写一份数据到 Redis 中。</p>
+<img src="/2020/08/28/%E4%B8%89%E5%8F%A5%E8%AF%9D%E6%90%9E%E6%87%82Redis-%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E3%80%81%E5%87%BB%E7%A9%BF%E3%80%81%E9%9B%AA%E5%B4%A9/chuantou.png" class="" title="缓存穿透">
+
+<p>这段逻辑正常情况下问题并不大，但是如果用户恶意重复请求资源 X，该资源在 Redis 和 DB 中都不存在。那么每次请求都会直接打到 DB 上，甚至导致物理 DB 宕机。</p>
+<h4 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h4><ol>
+<li><strong>缓存空结果</strong></li>
+</ol>
+<p>如果系统发现 Redis 及 DB 中都不存在该资源，就缓存空结果一段时间。需要注意哈，这次的失效时间不能设置的太长，否则数据的实效性会产生很大的问题。</p>
+<ol start="2">
+<li><strong>用户合法性校验</strong></li>
+</ol>
+<p>对用户的请求合法性进行校验，拦截恶意重复请求。</p>
+<ol start="3">
+<li><strong>布隆过滤器</strong></li>
+</ol>
+<p>看到这个名词不要慌。简单来说布隆过滤器的用途就是帮助你判断某个值是否存在。</p>
+<p>布隆过滤器（英语：Bloom Filter）是1970年由布隆提出的。它实际上是一个很长的二进制向量和一系列随机映射函数。布隆过滤器可以用于检索一个元素是否在一个集合中。它的优点是空间效率和查询时间都远远超过一般的算法，缺点是有一定的误识别率和删除困难。</p>
+<p>把数据库中的数据的key都在布隆过滤器中过一遍，能帮助我们挡掉大部分不存在的key的请求</p>
+<h3 id="二-缓存击穿"><a href="#二-缓存击穿" class="headerlink" title="二. 缓存击穿"></a>二. 缓存击穿</h3><h4 id="关键词：定点打击"><a href="#关键词：定点打击" class="headerlink" title="关键词：定点打击"></a>关键词：定点打击</h4><p>试想如果所有请求对着一个 key 照死里搞，这是不是就是一种定点打击呢？</p>
+<p>怎么理解呢？举个极端的例子：比如某某明星爆出一个惊天狠料，海量吃瓜群众同时访问微博去查看该八卦新闻，而微博 Redis 集群中数据在此刻正好过期了，那么无数的请求则直接打到了微博系统的物理 DB 上，DB 瞬间挂了。</p>
+<h4 id="解决方案-1"><a href="#解决方案-1" class="headerlink" title="解决方案"></a>解决方案</h4><ol>
+<li><strong>热点数据永远不过期</strong></li>
+</ol>
+<p>比如我们可以将某个 key 的缓存时间设置为 25 小时，然后后台有个 JOB 每隔 24 小时就去批量刷新一下热点数据。就可以解决这个问题了。</p>
+<ol start="2">
+<li><strong>使用互斥锁</strong></li>
+</ol>
+<p>容易影响吞吐量，大部分项目设置热点 key 永不过期就妥妥的了。</p>
+<h3 id="三-缓存雪崩"><a href="#三-缓存雪崩" class="headerlink" title="三. 缓存雪崩"></a>三. 缓存雪崩</h3><h4 id="关键词：Redis-崩了，没有数据了"><a href="#关键词：Redis-崩了，没有数据了" class="headerlink" title="关键词：Redis 崩了，没有数据了"></a>关键词：Redis 崩了，没有数据了</h4><p>这里的 Redis 崩了指的并不是 Redis 集群宕机了。而是说在某个时刻 Redis 集群中的热点 key 都失效了。如果集群中的热点 key 在某一时刻同时失效了的话，试想海量的请求都将直接打到 DB 上，DB 可能在瞬间就被打爆了。</p>
+<h4 id="解决方案-2"><a href="#解决方案-2" class="headerlink" title="解决方案"></a>解决方案</h4><ol>
+<li><strong>Redis 失效时间加上随机数</strong></li>
+</ol>
+<p>Redis 失效时间加上随机数，是一种比较取巧的解决方案。在一定程度上减轻了 DB 的瞬时压力，但是这种方案也在一定程度上增加了维护的成本。</p>
+<ol start="2">
+<li><strong>Redis 永不过期</strong></li>
+</ol>
+<p>实现方案在上文中简单提过了。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>最后我们再回归到主题！如何轻松的通过联想的方式来区分 Redis 缓存穿透、击穿、雪崩的区别？</p>
+<ul>
+<li><p><strong>缓存穿透</strong>—穿过（绕过） Redis 和 DB 来搞你</p>
+</li>
+<li><p><strong>缓存击穿</strong>—定点打击来搞你</p>
+</li>
+<li><p><strong>缓存雪崩</strong>—热点 key 在某一个时刻同时失效</p>
+</li>
+</ul>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://mp.weixin.qq.com/s/AmxDAhbUpO0awG5mieyAjQ" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/AmxDAhbUpO0awG5mieyAjQ</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>cookie和session的区别</title>
+    <url>/2020/04/30/cookie%E5%92%8Csession%E7%9A%84%E5%8C%BA%E5%88%AB/</url>
+    <content><![CDATA[<h2 id="http无状态和session"><a href="#http无状态和session" class="headerlink" title="http无状态和session"></a>http无状态和session</h2><p>由于HTTP协议是<strong>无状态</strong>的协议，所以服务端需要记录用户的状态时，就需要用某种机制来识具体的用户，这个机制就是Session.</p>
+<a id="more"></a>
+
+<p>典型的场景比如购物车，当你点击下单按钮时，由于HTTP协议无状态，所以并不知道是哪个用户操作的，所以服务端要为特定的用户创建了特定的Session，用用于标识这个用户，并且跟踪用户，这样才知道购物车里面有几本书。</p>
+<p>这个Session是保存在服务端的，有一个唯一标识。在服务端保存Session的方法很多，内存、数据库、文件都有。</p>
+<p>集群的时候也要考虑Session的转移，在大型的网站，一般会有专门的Session服务器集群，用来保存用户会话，这个时候Session信息都是放在内存的，使用一些缓存服务比如Memcached之类的来放Session。</p>
+<h2 id="cookie"><a href="#cookie" class="headerlink" title="cookie"></a>cookie</h2><p>思考一下服务端如何识别特定的客户？这个时候Cookie就登场了。每次HTTP请求的时候，客户端都会发送相应的Cookie信息到服务端。</p>
+<p>实际上大多数的应用都是用 Cookie 来实现Session跟踪的，第一次创建Session的时候，服务端会在HTTP协议中告诉客户端，需要在 Cookie 里面记录一个Session ID，以后每次请求把这个会话ID发送到服务器，我就知道你是谁了。</p>
+<p>有人问，如果客户端的浏览器禁用了Cookie怎么办？一般这种情况下，会使用一种叫做URL重写的技术来进行会话跟踪，即每次HTTP交互，URL后面都会被附加上一个诸如 sid=xxxxx 这样的参数，服务端据此来识别用户。</p>
+<p>Cookie其实还可以用在一些方便用户的场景下，设想你某次登陆过一个网站，下次登录的时候不想再次输入账号了，怎么办？这个信息可以写到Cookie里面，访问网站的时候，网站页面的脚本可以读取这个信息，就自动帮你把用户名给填了，能够方便一下用户。这也是Cookie名称的由来，给用户的一点甜头。</p>
+<h2 id="cookie和session"><a href="#cookie和session" class="headerlink" title="cookie和session"></a>cookie和session</h2><p>所以，总结一下：<em>Session是在服务端保存的一个数据结构，用来跟踪用户的状态，这个数据可以保存在集群、数据库、文件中；Cookie是客户端保存用户信息的一种机制，用来记录用户的一些信息，也是实现Session的一种方式</em>。</p>
+<p>cookie和session的<strong>共同之处</strong>在于：cookie和session都是用来<strong>跟踪浏览器用户身份</strong>的会话方式。</p>
+<p>cookie 和session的<strong>区别</strong>是：cookie数据保存在<strong>客户端</strong>，session数据保存在<strong>服务器端</strong>。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://www.imooc.com/article/3369" target="_blank" rel="noopener">https://www.imooc.com/article/3369</a><br><a href="https://www.zhihu.com/question/19786827/answer/28752144" target="_blank" rel="noopener">https://www.zhihu.com/question/19786827/answer/28752144</a></p>
+]]></content>
+  </entry>
+  <entry>
     <title>为什么阿里巴巴禁止使用BigDecimal的equals方法做等值比较</title>
     <url>/2020/09/22/%E4%B8%BA%E4%BB%80%E4%B9%88%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E7%A6%81%E6%AD%A2%E4%BD%BF%E7%94%A8BigDecimal%E7%9A%84equals%E6%96%B9%E6%B3%95%E5%81%9A%E7%AD%89%E5%80%BC%E6%AF%94%E8%BE%83/</url>
     <content><![CDATA[<h3 id="BigDecimal介绍"><a href="#BigDecimal介绍" class="headerlink" title="BigDecimal介绍"></a>BigDecimal介绍</h3><p><code>BigDecimal</code>，相信对于很多人来说都不陌生，很多人都知道他的用法，这是一种java.math包中提供的一种可以用来进行精确运算的类型。</p>
@@ -1833,81 +1976,6 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 <p>如果想要对两个BigDecimal的数值进行比较的话，可以使用compareTo方法。</p>
 <h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.im/post/6874754180058185736" target="_blank" rel="noopener">https://juejin.im/post/6874754180058185736</a></p>
 <p><a href="http://www.heartthinkdo.com/?p=829" target="_blank" rel="noopener">http://www.heartthinkdo.com/?p=829</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>三句话搞懂Redis-缓存穿透、击穿、雪崩</title>
-    <url>/2020/08/28/%E4%B8%89%E5%8F%A5%E8%AF%9D%E6%90%9E%E6%87%82Redis-%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E3%80%81%E5%87%BB%E7%A9%BF%E3%80%81%E9%9B%AA%E5%B4%A9/</url>
-    <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>如何有效的理解并且区分 Redis <strong>穿透、击穿和雪崩</strong>之间的区别，一直以来都挺困扰我的。特别是穿透和击穿，过一段时间就稀里糊涂的分不清了。</p>
-<p>为了有效的帮助自己，以及拥有同样烦恼的朋友们区分这三种场景。我总结了一些关键词，希望大家可以和我一样通过联想的方式来区分并理解这三种场景的区别！</p>
-<a id="more"></a>
-
-<h3 id="一-缓存穿透"><a href="#一-缓存穿透" class="headerlink" title="一. 缓存穿透"></a>一. 缓存穿透</h3><h4 id="关键词：穿过-Redis-和数据库"><a href="#关键词：穿过-Redis-和数据库" class="headerlink" title="关键词：穿过 Redis 和数据库"></a>关键词：穿过 Redis 和数据库</h4><p>当 Redis 和数据库中都没有我们想要的数据时，就需要考虑缓存穿透的问题了。下面这段逻辑大家用的会比较多：先去 Redis 中查找某资源，Redis 中查不到就去 DB 中查，DB 中查到后回写一份数据到 Redis 中。</p>
-<img src="/2020/08/28/%E4%B8%89%E5%8F%A5%E8%AF%9D%E6%90%9E%E6%87%82Redis-%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E3%80%81%E5%87%BB%E7%A9%BF%E3%80%81%E9%9B%AA%E5%B4%A9/chuantou.png" class="" title="缓存穿透">
-
-<p>这段逻辑正常情况下问题并不大，但是如果用户恶意重复请求资源 X，该资源在 Redis 和 DB 中都不存在。那么每次请求都会直接打到 DB 上，甚至导致物理 DB 宕机。</p>
-<h4 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h4><ol>
-<li><strong>缓存空结果</strong></li>
-</ol>
-<p>如果系统发现 Redis 及 DB 中都不存在该资源，就缓存空结果一段时间。需要注意哈，这次的失效时间不能设置的太长，否则数据的实效性会产生很大的问题。</p>
-<ol start="2">
-<li><strong>用户合法性校验</strong></li>
-</ol>
-<p>对用户的请求合法性进行校验，拦截恶意重复请求。</p>
-<ol start="3">
-<li><strong>布隆过滤器</strong></li>
-</ol>
-<p>看到这个名词不要慌。简单来说布隆过滤器的用途就是帮助你判断某个值是否存在。</p>
-<p>布隆过滤器（英语：Bloom Filter）是1970年由布隆提出的。它实际上是一个很长的二进制向量和一系列随机映射函数。布隆过滤器可以用于检索一个元素是否在一个集合中。它的优点是空间效率和查询时间都远远超过一般的算法，缺点是有一定的误识别率和删除困难。</p>
-<p>把数据库中的数据的key都在布隆过滤器中过一遍，能帮助我们挡掉大部分不存在的key的请求</p>
-<h3 id="二-缓存击穿"><a href="#二-缓存击穿" class="headerlink" title="二. 缓存击穿"></a>二. 缓存击穿</h3><h4 id="关键词：定点打击"><a href="#关键词：定点打击" class="headerlink" title="关键词：定点打击"></a>关键词：定点打击</h4><p>试想如果所有请求对着一个 key 照死里搞，这是不是就是一种定点打击呢？</p>
-<p>怎么理解呢？举个极端的例子：比如某某明星爆出一个惊天狠料，海量吃瓜群众同时访问微博去查看该八卦新闻，而微博 Redis 集群中数据在此刻正好过期了，那么无数的请求则直接打到了微博系统的物理 DB 上，DB 瞬间挂了。</p>
-<h4 id="解决方案-1"><a href="#解决方案-1" class="headerlink" title="解决方案"></a>解决方案</h4><ol>
-<li><strong>热点数据永远不过期</strong></li>
-</ol>
-<p>比如我们可以将某个 key 的缓存时间设置为 25 小时，然后后台有个 JOB 每隔 24 小时就去批量刷新一下热点数据。就可以解决这个问题了。</p>
-<ol start="2">
-<li><strong>使用互斥锁</strong></li>
-</ol>
-<p>容易影响吞吐量，大部分项目设置热点 key 永不过期就妥妥的了。</p>
-<h3 id="三-缓存雪崩"><a href="#三-缓存雪崩" class="headerlink" title="三. 缓存雪崩"></a>三. 缓存雪崩</h3><h4 id="关键词：Redis-崩了，没有数据了"><a href="#关键词：Redis-崩了，没有数据了" class="headerlink" title="关键词：Redis 崩了，没有数据了"></a>关键词：Redis 崩了，没有数据了</h4><p>这里的 Redis 崩了指的并不是 Redis 集群宕机了。而是说在某个时刻 Redis 集群中的热点 key 都失效了。如果集群中的热点 key 在某一时刻同时失效了的话，试想海量的请求都将直接打到 DB 上，DB 可能在瞬间就被打爆了。</p>
-<h4 id="解决方案-2"><a href="#解决方案-2" class="headerlink" title="解决方案"></a>解决方案</h4><ol>
-<li><strong>Redis 失效时间加上随机数</strong></li>
-</ol>
-<p>Redis 失效时间加上随机数，是一种比较取巧的解决方案。在一定程度上减轻了 DB 的瞬时压力，但是这种方案也在一定程度上增加了维护的成本。</p>
-<ol start="2">
-<li><strong>Redis 永不过期</strong></li>
-</ol>
-<p>实现方案在上文中简单提过了。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>最后我们再回归到主题！如何轻松的通过联想的方式来区分 Redis 缓存穿透、击穿、雪崩的区别？</p>
-<ul>
-<li><p><strong>缓存穿透</strong>—穿过（绕过） Redis 和 DB 来搞你</p>
-</li>
-<li><p><strong>缓存击穿</strong>—定点打击来搞你</p>
-</li>
-<li><p><strong>缓存雪崩</strong>—热点 key 在某一个时刻同时失效</p>
-</li>
-</ul>
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://mp.weixin.qq.com/s/AmxDAhbUpO0awG5mieyAjQ" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/AmxDAhbUpO0awG5mieyAjQ</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>cookie和session的区别</title>
-    <url>/2020/04/30/cookie%E5%92%8Csession%E7%9A%84%E5%8C%BA%E5%88%AB/</url>
-    <content><![CDATA[<h2 id="http无状态和session"><a href="#http无状态和session" class="headerlink" title="http无状态和session"></a>http无状态和session</h2><p>由于HTTP协议是<strong>无状态</strong>的协议，所以服务端需要记录用户的状态时，就需要用某种机制来识具体的用户，这个机制就是Session.</p>
-<a id="more"></a>
-
-<p>典型的场景比如购物车，当你点击下单按钮时，由于HTTP协议无状态，所以并不知道是哪个用户操作的，所以服务端要为特定的用户创建了特定的Session，用用于标识这个用户，并且跟踪用户，这样才知道购物车里面有几本书。</p>
-<p>这个Session是保存在服务端的，有一个唯一标识。在服务端保存Session的方法很多，内存、数据库、文件都有。</p>
-<p>集群的时候也要考虑Session的转移，在大型的网站，一般会有专门的Session服务器集群，用来保存用户会话，这个时候Session信息都是放在内存的，使用一些缓存服务比如Memcached之类的来放Session。</p>
-<h2 id="cookie"><a href="#cookie" class="headerlink" title="cookie"></a>cookie</h2><p>思考一下服务端如何识别特定的客户？这个时候Cookie就登场了。每次HTTP请求的时候，客户端都会发送相应的Cookie信息到服务端。</p>
-<p>实际上大多数的应用都是用 Cookie 来实现Session跟踪的，第一次创建Session的时候，服务端会在HTTP协议中告诉客户端，需要在 Cookie 里面记录一个Session ID，以后每次请求把这个会话ID发送到服务器，我就知道你是谁了。</p>
-<p>有人问，如果客户端的浏览器禁用了Cookie怎么办？一般这种情况下，会使用一种叫做URL重写的技术来进行会话跟踪，即每次HTTP交互，URL后面都会被附加上一个诸如 sid=xxxxx 这样的参数，服务端据此来识别用户。</p>
-<p>Cookie其实还可以用在一些方便用户的场景下，设想你某次登陆过一个网站，下次登录的时候不想再次输入账号了，怎么办？这个信息可以写到Cookie里面，访问网站的时候，网站页面的脚本可以读取这个信息，就自动帮你把用户名给填了，能够方便一下用户。这也是Cookie名称的由来，给用户的一点甜头。</p>
-<h2 id="cookie和session"><a href="#cookie和session" class="headerlink" title="cookie和session"></a>cookie和session</h2><p>所以，总结一下：<em>Session是在服务端保存的一个数据结构，用来跟踪用户的状态，这个数据可以保存在集群、数据库、文件中；Cookie是客户端保存用户信息的一种机制，用来记录用户的一些信息，也是实现Session的一种方式</em>。</p>
-<p>cookie和session的<strong>共同之处</strong>在于：cookie和session都是用来<strong>跟踪浏览器用户身份</strong>的会话方式。</p>
-<p>cookie 和session的<strong>区别</strong>是：cookie数据保存在<strong>客户端</strong>，session数据保存在<strong>服务器端</strong>。</p>
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://www.imooc.com/article/3369" target="_blank" rel="noopener">https://www.imooc.com/article/3369</a><br><a href="https://www.zhihu.com/question/19786827/answer/28752144" target="_blank" rel="noopener">https://www.zhihu.com/question/19786827/answer/28752144</a></p>
 ]]></content>
   </entry>
   <entry>
