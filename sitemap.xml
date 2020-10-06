@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://www.wangguolong.top/categories/index.html</loc>
+    
+    <lastmod>2020-10-06T05:53:00.721Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.wangguolong.top/tags/index.html</loc>
+    
+    <lastmod>2020-10-06T05:52:53.551Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://www.wangguolong.top/2020/10/01/SpringBoot%E6%95%B4%E5%90%88ELK%E5%AE%9E%E7%8E%B0%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/</loc>
     
     <lastmod>2020-10-01T10:10:31.767Z</lastmod>
