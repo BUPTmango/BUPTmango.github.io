@@ -288,7 +288,7 @@
 
 <p>断点如愿停在了第2句诗。</p>
 <h2 id="四、远程调试"><a href="#四、远程调试" class="headerlink" title="四、远程调试"></a>四、远程调试</h2><p>这也是一个装B的利器，本机不用启动项目，只要有源代码，可以在本机直接远程调试服务器上的代码，打开姿势如下：</p>
-<h3 id="4-1-项目启动时，先允许远程调试"><a href="#4-1-项目启动时，先允许远程调试" class="headerlink" title="4.1 项目启动时，先允许远程调试"></a>4.1 项目启动时，先允许远程调试</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -server -Xms512m -Xmx512m -Xdebug -Xnoagent -Djava.compiler&#x3D;NONE -Xrunjdwp:transport&#x3D;dt_socket,server&#x3D;y,suspend&#x3D;n,address&#x3D;9081 -Djava.ext.dirs&#x3D;. $&#123;main_class&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="4-1-项目启动时，先允许远程调试"><a href="#4-1-项目启动时，先允许远程调试" class="headerlink" title="4.1 项目启动时，先允许远程调试"></a>4.1 项目启动时，先允许远程调试</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">java -server -Xms512m -Xmx512m -Xdebug -Xnoagent -Djava.compiler&#x3D;NONE -Xrunjdwp:transport&#x3D;dt_socket,server&#x3D;y,suspend&#x3D;n,address&#x3D;9081 -Djava.ext.dirs&#x3D;. $&#123;main_class&#125;</span><br></pre></td></tr></table></figure>
 
 <p>起作用的就是</p>
 <p>-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=9081</p>
@@ -490,7 +490,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共54.3k字</span>
+  <span class="post-count">博客全站共54.2k字</span>
 </div>
 
 

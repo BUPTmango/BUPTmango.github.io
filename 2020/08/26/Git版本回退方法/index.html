@@ -241,22 +241,22 @@
 
 <h3 id="本地分支版本回退的方法"><a href="#本地分支版本回退的方法" class="headerlink" title="本地分支版本回退的方法"></a>本地分支版本回退的方法</h3><p>如果你在本地做了错误提交，那么回退版本的方法很简单</p>
 <p>先用下面命令找到要回退的版本的commit id：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reflog</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git reflog</span><br></pre></td></tr></table></figure>
 
 <p>接着回退版本:</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reset --hard Obfafd</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git reset --hard Obfafd</span><br></pre></td></tr></table></figure>
 
 <p>0bfafd就是你要回退的版本的commit id的前面几位</p>
 <h3 id="自己的远程分支版本回退的方法"><a href="#自己的远程分支版本回退的方法" class="headerlink" title="自己的远程分支版本回退的方法"></a>自己的远程分支版本回退的方法</h3><p>如果你的错误提交已经推送到自己的远程分支了，那么就需要回滚远程分支了。<br>首先要回退本地分支：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git reflog</span><br><span class="line">git reset --hard Obfafd</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git reflog</span><br><span class="line">git reset --hard Obfafd</span><br></pre></td></tr></table></figure>
 
 <p>紧接着强制推送到远程分支：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push -f origin develop</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git push -f origin develop</span><br></pre></td></tr></table></figure>
 
 <p><strong>注意：本地分支回滚后，版本将落后远程分支，必须使用强制推送覆盖远程分支，否则无法推送到远程分支</strong></p>
 <h3 id="公共远程分支版本回退的方法"><a href="#公共远程分支版本回退的方法" class="headerlink" title="公共远程分支版本回退的方法"></a>公共远程分支版本回退的方法</h3><p>使用git reset回退公共远程分支的版本后，需要其他所有人手动用远程master分支覆盖本地master分支，</p>
 <p>显然，这不是优雅的回退方法，下面我们使用另个一个命令来回退版本：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git revert HEAD                     //撤销最近一次提交</span><br><span class="line">git revert HEAD~1                   //撤销上上次的提交，注意：数字从0开始</span><br><span class="line">git revert 0ffaacc                  //撤销0ffaacc这次提交</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git revert HEAD                     //撤销最近一次提交</span><br><span class="line">git revert HEAD~1                   //撤销上上次的提交，注意：数字从0开始</span><br><span class="line">git revert 0ffaacc                  //撤销0ffaacc这次提交</span><br></pre></td></tr></table></figure>
 
 <p>git revert 命令意思是撤销某次提交。它会产生一个新的提交，虽然代码回退了，但是<strong>版本依然是向前的</strong>，</p>
 <p>所以，当你用revert回退之后，所有人pull之后，他们的代码也自动的回退了。</p>
@@ -462,7 +462,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共54.3k字</span>
+  <span class="post-count">博客全站共54.2k字</span>
 </div>
 
 
