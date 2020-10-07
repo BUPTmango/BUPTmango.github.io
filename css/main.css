@@ -440,7 +440,7 @@ code {
 }
 code {
   background: #87daff;
-  border-radius: 3px;
+  border-radius: 5px;
   color: #555;
   padding: 2px 4px;
   overflow-wrap: break-word;
@@ -1220,7 +1220,7 @@ pre .javascript .function {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #c4ac47;
+  background: #1cf400;
   border-radius: 50%;
   content: ' ';
   display: inline-block;
