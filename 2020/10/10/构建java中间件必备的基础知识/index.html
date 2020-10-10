@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.wangguolong.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="说之前谈一个之前一直有疑问的地方： 反向代理和负载均衡有何区别？ 反向代理，是把一些静态资源存储在服务器上，当用户有请求的时候，就直接返回反向代理服务器上的资源给用户，而如果反向代理服务器上没有的资源，就转发给后面的负载均衡服务器，负载均衡服务器再将请求分发给后端的web服务器。         区别就是： 反向代理服务器是需要存储资源的，让用户更快速的接收到资源。 负载均衡就是，为了保证后端we">
+<meta property="og:type" content="article">
+<meta property="og:title" content="构建java中间件必备的基础知识">
+<meta property="og:url" content="http://www.wangguolong.top/2020/10/10/%E6%9E%84%E5%BB%BAjava%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%BF%85%E5%A4%87%E7%9A%84%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/index.html">
+<meta property="og:site_name" content="王国隆的技术博客">
+<meta property="og:description" content="说之前谈一个之前一直有疑问的地方： 反向代理和负载均衡有何区别？ 反向代理，是把一些静态资源存储在服务器上，当用户有请求的时候，就直接返回反向代理服务器上的资源给用户，而如果反向代理服务器上没有的资源，就转发给后面的负载均衡服务器，负载均衡服务器再将请求分发给后端的web服务器。         区别就是： 反向代理服务器是需要存储资源的，让用户更快速的接收到资源。 负载均衡就是，为了保证后端we">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://www.wangguolong.top/2020/10/10/%E6%9E%84%E5%BB%BAjava%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%BF%85%E5%A4%87%E7%9A%84%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/jvm.png">
+<meta property="article:published_time" content="2020-10-10T08:27:02.677Z">
+<meta property="article:modified_time" content="2020-10-10T10:50:35.627Z">
+<meta property="article:author" content="Guolong Wang">
+<meta property="article:tag" content="中间件基础">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.wangguolong.top/2020/10/10/%E6%9E%84%E5%BB%BAjava%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%BF%85%E5%A4%87%E7%9A%84%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/jvm.png">
+
+<link rel="canonical" href="http://www.wangguolong.top/2020/10/10/%E6%9E%84%E5%BB%BAjava%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%BF%85%E5%A4%87%E7%9A%84%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>构建java中间件必备的基础知识 | 王国隆的技术博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+    <a href="https://github.com/BUPTmango" target="_blank" rel="noopener" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">王国隆的技术博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/10/10/%E6%9E%84%E5%BB%BAjava%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%BF%85%E5%A4%87%E7%9A%84%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
+      <meta itemprop="name" content="Guolong Wang">
+      <meta itemprop="description" content="爱玩，爱技术">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王国隆的技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          构建java中间件必备的基础知识
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-10-10 16:27:02 / 修改时间：18:50:35" itemprop="dateCreated datePublished" datetime="2020-10-10T16:27:02+08:00">2020-10-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">中间件</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+      
+        <p>说之前谈一个之前一直有疑问的地方：</p>
+<p><strong>反向代理和负载均衡有何区别？</strong></p>
+<p><code>反向代理</code>，是<strong>把一些静态资源存储在服务器上</strong>，当用户有请求的时候，就直接返回反向代理服务器上的资源给用户，而如果反向代理服务器上没有的资源，就转发给后面的<code>负载均衡服务器</code>，<strong>负载均衡服务器再将请求分发给后端的web服务器</strong>。        </p>
+<p><strong>区别</strong>就是：</p>
+<p>反向代理服务器是需要存储资源的，让用户更快速的接收到资源。</p>
+<p>负载均衡就是，为了保证后端web服务器的高可用，高并发，是不需要要存储资源，只需要转发用户的请求。</p>
+<a id="more"></a>
+
+<h2 id="跨平台的Java运行环境—JVM"><a href="#跨平台的Java运行环境—JVM" class="headerlink" title="跨平台的Java运行环境—JVM"></a>跨平台的Java运行环境—JVM</h2><p>不同平台有不同的Java虚拟机，但是不同Java虚拟机所识别的是统一格式的中间代码，也就是我们常说的<code>Java Byte Code</code>（Java字节码），如下图所示：</p>
+<img src="/2020/10/10/%E6%9E%84%E5%BB%BAjava%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%BF%85%E5%A4%87%E7%9A%84%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/jvm.png" class="" title="jvm">
+
+<p>从上图可以看到从源码到Java字节码再到具体不同平台JVM执行的过程。</p>
+<h2 id="垃圾回收与内存堆布局"><a href="#垃圾回收与内存堆布局" class="headerlink" title="垃圾回收与内存堆布局"></a>垃圾回收与内存堆布局</h2><h3 id="Hotspot-JVM-划分"><a href="#Hotspot-JVM-划分" class="headerlink" title="Hotspot JVM 划分"></a>Hotspot JVM 划分</h3><p>虚拟机中的共划分为三个代：<code>年轻代</code>（Young Generation）、<code>老年代</code>（Old Generation）和<code>持久代</code>（Permanent Generation）。</p>
+<p>其中持久代主要<strong>存放的是Java类的类信息</strong>，与垃圾收集要收集的Java对象关系不大。年轻代和年老代的划分是对垃圾收集影响比较大的。</p>
+<h3 id="内存泄漏-vs-内存溢出"><a href="#内存泄漏-vs-内存溢出" class="headerlink" title="内存泄漏 vs 内存溢出"></a>内存泄漏 vs 内存溢出</h3><p><code>内存溢出</code> out of memory，是指程序在申请内存时，<strong>没有足够的内存空间</strong>供其使用，出现out of memory；比如申请了一个integer,但给它存了long才能存下的数，那就是内存溢出。</p>
+<p><code>内存泄露</code> memory leak，是指程序在申请内存后，<strong>无法释放已申请的内存空间</strong>，一次内存泄露危害可以忽略，但内存泄露堆积后果很严重，无论多少内存,迟早会被占光。</p>
+<p><strong>memory leak会最终会导致out of memory！</strong></p>
+<h2 id="Java并发编程的类，接口和方法"><a href="#Java并发编程的类，接口和方法" class="headerlink" title="Java并发编程的类，接口和方法"></a>Java并发编程的类，接口和方法</h2><h3 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h3><p>在Java中，我们主要使用的线程池就是<code>TreadPoolExecutor</code>，此外还有定时的线程池<code>ScheduledTreadPoolExecutor</code>。</p>
+<p>需要注意的是对于Executors.newCachedThreadPool()方法返回的线程池的使用，该方法返回的线程池是<strong>没有线程上限</strong>的，在使用时一定要当心，因为没有办法控制总体的线程数量，而每个线程都是消耗内存的，这可能会导致过多的内存被占用。</p>
+<p>建议尽量不要用这个方法返回的线程池，而要<strong>使用有固定线程上限的线程池</strong>。</p>
+<h4 id="ExecutorService——shutdown方法和awaitTermination方法"><a href="#ExecutorService——shutdown方法和awaitTermination方法" class="headerlink" title="ExecutorService——shutdown方法和awaitTermination方法"></a>ExecutorService——shutdown方法和awaitTermination方法</h4><p>ExecutorService的关闭</p>
+<p>shutdown和awaitTermination为接口ExecutorService定义的两个方法，一般情况<strong>配合使用</strong>来关闭线程池。</p>
+<p>方法简介</p>
+<p><code>shutdown方法</code>：平滑的关闭ExecutorService，当此方法被调用时，ExecutorService停止接收新的任务并且等待已经提交的任务（包含提交正在执行和提交未执行）执行完成。当所有提交任务执行完毕，线程池即被关闭。</p>
+<p><code>awaitTermination方法</code>：接收人timeout和TimeUnit两个参数，用于设定超时时间及单位。当等待超过设定时间时，会监测ExecutorService是否已经关闭，若关闭则返回true，否则返回false。一般情况下会和shutdown方法组合使用。</p>
+<p>具体实例</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">service.shutdown();</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (!service.awaitTermination(<span class="number">1</span>, TimeUnit.SECONDS)) &#123;</span><br><span class="line">            System.out.println(<span class="string">"线程池没有关闭"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">System.out.println(<span class="string">"线程池已经关闭"</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="volatile-和-synchronized"><a href="#volatile-和-synchronized" class="headerlink" title="volatile 和 synchronized"></a>volatile 和 synchronized</h3><p>(1)<code>Synchronized</code>：保证<strong>可见性和原子性</strong></p>
+<pre><code>Synchronized能够实现原子性和可见性；
+
+在Java内存模型中，synchronized规定，线程在加锁时，**先清空工作内存→在主内存中拷贝最新变量的副本到工作内存→执行完代码→将更改后的共享变量的值刷新到主内存中→释放互斥锁**。</code></pre><p>(2)<code>Volatile</code>：<strong>保证可见性，但不保证操作的原子性</strong></p>
+<pre><code>Volatile实现内存可见性是通过`store和load`指令完成的；
+
+也就是对volatile变量执行写操作时，会在写操作后加入一条store指令，即强迫线程将最新的值刷新到主内存中；
+
+而在读操作时，会加入一条load指令，即强迫从主内存中读入变量的值。**但volatile不保证volatile变量的原子性**，例如：</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Private int Num&#x3D;0;</span><br><span class="line">Num++;&#x2F;&#x2F;Num不是原子操作</span><br><span class="line">Num不是原子操作，因为其可以分为：读取Num的值，将Num的值+1，写入最新的Num的值。</span><br><span class="line">对于Num++;操作，线程1和线程2都执行一次，最后输出Num的值可能是：1或者2</span><br></pre></td></tr></table></figure>
+
+<p>3)Synchronized和Volatile的比较</p>
+<pre><code>1）Synchronized保证内存可见性和操作的原子性
+
+2）Volatile只能保证内存可见性
+
+3）Volatile不需要加锁，比Synchronized更`轻量级`，并不会阻塞线程（volatile不会造成线程的阻塞；synchronized可能会造成线程的阻塞。）
+
+4）volatile标记的变量不会被编译器优化,而synchronized标记的变量可以`被编译器优化`（如编译器重排序的优化）.
+
+5）volatile是变量修饰符，仅能用于`变量`，而synchronized是一个方法或块的`修饰符`。</code></pre><p>大型网站系统书上内容:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> i1;    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">geti1</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> i1;&#125;</span><br><span class="line"><span class="keyword">volatile</span> <span class="keyword">int</span> i2;    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">geti2</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> i2;&#125;</span><br><span class="line"><span class="keyword">int</span> i3;    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">int</span> <span class="title">geti3</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> i3;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>代码中对于geti1的调用获取的是当前线程中的副本，这个值不一定是最新的值。</p>
+<p>对于geti2，因为i2被<strong>修饰为volatile，因此对于JVM来说这个变量不会有线程的本地副本，只会放在主存中，所以得到的值一定是最新的</strong>。</p>
+<p>而对于geti3，因为<strong>有synchronized关键字修饰，保证了线程的本地副本与主存的同步</strong>，所以也会得到最新的值。</p>
+<p>上面的对比是在读的层面。</p>
+<p>下面来看看写的情况。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> i1;    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">seti1</span><span class="params">(<span class="keyword">int</span> v)</span> </span>&#123;i1 = v;&#125;</span><br><span class="line"><span class="keyword">volatile</span> <span class="keyword">int</span> i2;    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">seti2</span><span class="params">(<span class="keyword">int</span> v)</span> </span>&#123;i2 = v;&#125;</span><br><span class="line"><span class="keyword">int</span> i3;    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">seti3</span><span class="params">(<span class="keyword">int</span> v)</span> </span>&#123;i3 = v;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同样的，对于seti1，当前线程在调用了seti1后会得到最新的i1值，而另外的线程获取不一定可以立刻看到最新的值。</p>
+<p>对于seti2，则可以立刻在其他线程看到新的值，因为<strong>volatile保证了只有一份主存中的数据</strong>。</p>
+<p>对于seti3，调用后必须在synchronized修饰的方法或者代码块中读取i3的值才可以看到最新值，因为<strong>sunchronized不仅会把当前线程修改的变量的本地副本同步给主存，还会从主存读取数据更新本地副本</strong>。</p>
+<h3 id="wait-notify"><a href="#wait-notify" class="headerlink" title="wait notify"></a>wait notify</h3><p>java的wait/notify的<code>通知机制</code>可以用来实现线程间通信。</p>
+<p>wait表示线程的等待，调用该方法会导致线程阻塞，直至另一线程调用notify或notifyAll方法才可另其继续执行。</p>
+<p>经典的生产者、消费者模式即是使用wait/notify机制得以完成。</p>
+<p>需要注意，对wait， notify和notifyAll的调用都<strong>必须是在对象的<code>synchronized块</code>中</strong></p>
+<p>在实践中，对wait的使用一般是嵌在一个循环中，并且会判断相关的数据状态是否达到预期，吐过没有则会继续等待，这么做主要是为了防止<code>虚假唤醒</code>。</p>
+<p>下面看一下while中wait的使用以及虚假唤醒的情况说明</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//消费者线程</span></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Consume</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">synchronized</span> (obj) &#123;</span><br><span class="line">                System.out.println(<span class="string">"进入消费者线程"</span>);</span><br><span class="line">                System.out.println(<span class="string">"wait flag 1:"</span> + flag);</span><br><span class="line">                <span class="keyword">while</span> (!flag) &#123;  <span class="comment">//判断条件是否满足，若不满足则等待</span></span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        System.out.println(<span class="string">"还没生产，进入等待"</span>);</span><br><span class="line">                        obj.wait();</span><br><span class="line">                        System.out.println(<span class="string">"结束等待"</span>);</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                System.out.println(<span class="string">"wait flag 2:"</span> + flag);</span><br><span class="line">                System.out.println(<span class="string">"消费"</span>);</span><br><span class="line">                System.out.println(<span class="string">"退出消费者线程"</span>);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="虚假唤醒"><a href="#虚假唤醒" class="headerlink" title="虚假唤醒"></a>虚假唤醒</h4><p>一般而言线程调用wait()方法后，需要其他线程调用notify,notifyAll方法后，线程才会从wait方法中返回， 而虚假唤醒(spurious wakeup)是指线程通过其他方式，从wait方法中返回。</p>
+<p>下面是一个买票退票的操作例子，买票时，线程A买票，如果发现没有余票，则会调用wait方法，线程进入等待队列中，线程B进行退票操作，余票数量加一，然后调用notify 方法通知等待线程，此时线程A被唤醒执行购票操作。</p>
+<p>从程序的顺序性来看 if (remainTicketNum&lt;=0)没有问题，但是为什么会出现虚假唤醒呢？</p>
+<p>因为wait方法可以分为三个操作：</p>
+<p>（1）释放锁并阻塞</p>
+<p>（2）等待条件cond发生</p>
+<p>（3）获取通知后，竞争获取锁</p>
+<p>假设此时有线程A,C买票，线程A调用wait方法进入等待队列，线程C买票时发现线程B在退票，获取锁失败，线程C阻塞，进入阻塞队列，线程B退票时，余票数量+1（满足条件2 等待条件发生），线程B调用notify方法后，线程C马上竞争获取到锁，购票成功后余票为0，而线程A此时正处于wait方法醒来过程中的第三步（竞争获取锁获取锁），当线程C释放锁，线程A获取锁后，会执行购买的操作，而此时是没有余票的。</p>
+<p>解决的办法是条件判断通过<code>while</code>(remainTicketNum&lt;=0)来解决，但是有个问题是如果一直没有退票操作线程Notify，while语句会一直循环执行下去，<code>CPU消耗巨大</code></p>
+<h3 id="Exchanger"><a href="#Exchanger" class="headerlink" title="Exchanger"></a>Exchanger</h3><p>常见的有CyclicBarrier、CountDownLatch、Semaphore，现在介绍并发工具类中的最后一个<code>Exchange</code>。</p>
+<p>Exchanger，它允许在并发任务之间交换数据。具体来说，Exchanger类允许在两个线程之间定义<code>同步点</code>。当两个线程都到达同步点时，他们<code>交换数据结构</code>，因此第一个线程的数据结构进入到第二个线程中，第二个线程的数据结构进入到第一个线程中。</p>
+<h3 id="Future和FutureTask"><a href="#Future和FutureTask" class="headerlink" title="Future和FutureTask"></a>Future和FutureTask</h3><p><code>Future</code>是一个接口，<code>FutureTask</code>是一个具体实现类。</p>
+<p>例如，现在通过调用一个方法从远程获取一些计算结果，假设有这样一个方法：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function">HashMap <span class="title">getDataFromRemote</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>如果是最传统的同步方式使用，代码大概是这样的：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">HashMap data = getDataFromRemote();</span><br></pre></td></tr></table></figure>
+
+<p>我们一直等待方法的返回，然后才能继续后面的工作。 但是如果时间很长，<code>阻塞</code>在这里很浪费时间。那么我们如何改进呢？</p>
+<p>能够想到的办法就是调用函数后马上返回，然后继续向下执行，等需要勇敢数据时再来用，或者说再来等待这个数据。</p>
+<p>这时候就轮到Future出场了！！</p>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Future&lt;HashMap&gt; future = getDataFromRemote2();</span><br><span class="line"><span class="comment">// do something</span></span><br><span class="line">HashMap data = (HashMap) future.get();</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，返回的是一个future对象，之后通过调用<code>get()</code>方法来获取真正的返回值。</p>
+<p>也就是说，在调用了getDataFromRemote2()后，就已经启动了对远程计算结果的获取，同时自己的线程还在继续处理，直到需要时再获取数据。</p>
+<p>下面来看一下getDataFromRemote2()的实现：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Future&lt;HashMap&gt; <span class="title">getDataFromRemote2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> threadPool.submit(<span class="keyword">new</span> Callable&lt;HashMap&gt;) &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> HashMap <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> getDataFromRemote();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用到了线程池：<strong>把任务加入线程池中，把Future对象返回出去</strong>。</p>
+<p>我们调用了getDataFromRemote2()的线程，然后返回来继续下面的执行，而背后是另外的线程在进行远程调用以及等待的工作。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p>《大型网站系统与Java中间件实践》</p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+  
+</div>
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Guolong Wang 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.png" alt="Guolong Wang 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%9F%BA%E7%A1%80/" rel="tag"><i class="fa fa-tag"></i> 中间件基础</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/07/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%EF%BC%8C%E8%BF%99%E4%B8%80%E7%AF%87%E5%B0%B1%E5%A4%9F%E4%BA%86/" rel="prev" title="分布式事务，这一篇就够了">
+      <i class="fa fa-chevron-left"></i> 分布式事务，这一篇就够了
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#跨平台的Java运行环境—JVM"><span class="nav-number">1.</span> <span class="nav-text">跨平台的Java运行环境—JVM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#垃圾回收与内存堆布局"><span class="nav-number">2.</span> <span class="nav-text">垃圾回收与内存堆布局</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hotspot-JVM-划分"><span class="nav-number">2.1.</span> <span class="nav-text">Hotspot JVM 划分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存泄漏-vs-内存溢出"><span class="nav-number">2.2.</span> <span class="nav-text">内存泄漏 vs 内存溢出</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java并发编程的类，接口和方法"><span class="nav-number">3.</span> <span class="nav-text">Java并发编程的类，接口和方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#线程池"><span class="nav-number">3.1.</span> <span class="nav-text">线程池</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ExecutorService——shutdown方法和awaitTermination方法"><span class="nav-number">3.1.1.</span> <span class="nav-text">ExecutorService——shutdown方法和awaitTermination方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#volatile-和-synchronized"><span class="nav-number">3.2.</span> <span class="nav-text">volatile 和 synchronized</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wait-notify"><span class="nav-number">3.3.</span> <span class="nav-text">wait notify</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#虚假唤醒"><span class="nav-number">3.3.1.</span> <span class="nav-text">虚假唤醒</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exchanger"><span class="nav-number">3.4.</span> <span class="nav-text">Exchanger</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Future和FutureTask"><span class="nav-number">3.5.</span> <span class="nav-text">Future和FutureTask</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Guolong Wang"
+      src="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
+  <p class="site-author-name" itemprop="name">Guolong Wang</p>
+  <div class="site-description" itemprop="description">爱玩，爱技术</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">33</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/BUPTmango" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;BUPTmango" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:13121593633@163.com" title="E-Mail → mailto:13121593633@163.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guolong Wang</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+-->
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共61.8k字</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
