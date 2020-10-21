@@ -29,7 +29,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://www.wangguolong.top/2020/10/21/%E4%BB%A3%E7%A0%81%E6%95%B4%E6%B4%81%E4%B9%8B%E9%81%93/mind.png">
 <meta property="article:published_time" content="2020-10-21T11:16:20.836Z">
-<meta property="article:modified_time" content="2020-10-21T11:26:51.179Z">
+<meta property="article:modified_time" content="2020-10-21T11:33:42.800Z">
 <meta property="article:author" content="Guolong Wang">
 <meta property="article:tag" content="代码风格">
 <meta name="twitter:card" content="summary">
@@ -216,7 +216,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-10-21 19:16:20 / 修改时间：19:26:51" itemprop="dateCreated datePublished" datetime="2020-10-21T19:16:20+08:00">2020-10-21</time>
+              <time title="创建时间：2020-10-21 19:16:20 / 修改时间：19:33:42" itemprop="dateCreated datePublished" datetime="2020-10-21T19:16:20+08:00">2020-10-21</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -245,7 +245,7 @@
     
     <div class="post-body" itemprop="articleBody">
       
-        <p>最近阅读了《代码整洁之道》这本书，感觉副标题说的不错，细节之中自有天地，整洁成就卓越代码。</p>
+        <p>最近阅读了《代码整洁之道》这本书，感觉副标题说的不错，<strong>细节之中自有天地，整洁成就卓越代码</strong>。</p>
 <h2 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h2><p>文不如表，表不如图，奉上一张思维导图：</p>
 <a id="more"></a>
 
@@ -254,7 +254,7 @@
 <p>下面是我看书的过程中记录的感觉我自己掌握度不够的知识点：（也就算是读后感吧）</p>
 <h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><h3 id="每个函数一个抽象层级"><a href="#每个函数一个抽象层级" class="headerlink" title="每个函数一个抽象层级"></a>每个函数一个抽象层级</h3><p>要确保函数<code>只做一件事</code>，函数中的语句都要在<code>同一抽象层级</code>上。</p>
 <p>举一个违反了这条规矩的例子。</p>
-<p>比如里面有getHtml(）等位于<strong>较高抽象层</strong>的概念，也有String pagePathName = PathParser.render(pagePath）等位于<strong>中间抽象层</strong>的概念，还有.append(“\n”）等位于<strong>相当低的抽象层</strong>的概念。</p>
+<p>比如里面有getHtml()等位于<strong>较高抽象层</strong>的概念，也有String pagePathName = PathParser.render(pagePath）等位于<strong>中间抽象层</strong>的概念，还有.append(“\n”）等位于<strong>相当低的抽象层</strong>的概念。</p>
 <h3 id="函数参数"><a href="#函数参数" class="headerlink" title="函数参数"></a>函数参数</h3><p>最理想的参数数量是零（零参数函数），其次是一（单参数函数），再次是二（双参数函数）</p>
 <p><strong>应尽量避免三（<code>三参数函数</code>）</strong>。有足够特殊的理由才能用三个以上参数（多参数函数）</p>
 <p>所以无论如何也不要这么做。</p>
@@ -273,7 +273,7 @@
 <p>每个测试都清晰拆分为三个环节。第一个环节<strong>构造测试数据</strong>，第二个环节<strong>操作测试数据</strong>，第三个部分<strong>检验操作是否得到期望的结果</strong>。</p>
 <h2 id="并发编程"><a href="#并发编程" class="headerlink" title="并发编程"></a>并发编程</h2><h3 id="测试线程代码"><a href="#测试线程代码" class="headerlink" title="测试线程代码"></a>测试线程代码</h3><h4 id="在不同平台上运行"><a href="#在不同平台上运行" class="headerlink" title="在不同平台上运行"></a>在不同平台上运行</h4><p>不同操作系统有着不同的<code>线程策略</code>。</p>
 <p>在不同的环境中，多线程代码的行为也不一样。</p>
-<p><strong>建议</strong>： 尽早并经常地在所有目标平台上运行线程代码。</p>
+<p><strong>建议</strong>： 尽早并经常地在<strong>所有目标平台</strong>上运行线程代码。</p>
 <h4 id="硬编码"><a href="#硬编码" class="headerlink" title="硬编码"></a>硬编码</h4><p>可以手工向代码中插入<code>wait()</code>、<code>sleep()</code>、<code>yield()</code>和<code>priority()</code>的调用。</p>
 <p>比如，插入对yield()的调用，将<strong>改变代码的执行路径</strong>，因此可能导致代码在以前未失败过的地方失败。</p>
 <h3 id="非线程安全类"><a href="#非线程安全类" class="headerlink" title="非线程安全类"></a>非线程安全类</h3><p>有些类<strong>天生不是线程安全</strong>的。下面是几个例子：</p>
