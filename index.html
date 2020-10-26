@@ -186,6 +186,132 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/10/26/%E8%AF%A6%E8%A7%A3Java%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
+      <meta itemprop="name" content="Guolong Wang">
+      <meta itemprop="description" content="爱玩，爱技术">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王国隆的技术博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/26/%E8%AF%A6%E8%A7%A3Java%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" class="post-title-link" itemprop="url">详解Java单例模式</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-10-26 13:57:42 / 修改时间：14:20:01" itemprop="dateCreated datePublished" datetime="2020-10-26T13:57:42+08:00">2020-10-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+      
+          <h2 id="单例模式介绍"><a href="#单例模式介绍" class="headerlink" title="单例模式介绍"></a>单例模式介绍</h2><h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p><code>单例模式</code>（Singleton Pattern）是 Java 中最简单的设计模式之一。这种类型的设计模式属于<code>创建型模式</code>，它<strong>提供了一种创建对象的最佳方式</strong>。</p>
+<p>这种模式涉及到一个单一的类，该类负责创建自己的对象，同时<strong>确保只有单个对象被创建</strong>。这个类提供了一种访问其唯一的对象的方式，可以直接访问，不需要实例化该类的对象。</p>
+<p>注意：</p>
+<ol>
+<li>单例类<strong>只能有一个实例</strong>。</li>
+<li>单例类必须<strong>自己创建自己的</strong>唯一实例。</li>
+<li>单例类必须<strong>给所有其他对象提供</strong>这一实例。</li>
+</ol>
+<h3 id="意图"><a href="#意图" class="headerlink" title="意图"></a>意图</h3><p><strong>意图</strong>：保证一个类仅有一个实例，并提供一个访问它的全局访问点。</p>
+<p><strong>主要解决</strong>：一个全局使用的类频繁地创建与销毁。</p>
+<p><strong>何时使用</strong>：当您想控制实例数目，节省系统资源的时候。</p>
+<p><strong>如何解决</strong>：判断系统是否已经有这个单例，如果有则返回，如果没有则创建。</p>
+<p><strong>关键代码</strong>：构造函数是私有的。</p>
+<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><ol>
+<li>要求生产<strong>唯一序列号</strong>。</li>
+<li>WEB 中的<strong>计数器</strong>，不用每次刷新都在数据库里加一次，用单例先缓存起来。</li>
+<li>创建的一个对象需要消耗的资源过多，比如 <strong>I/O 与数据库的连接</strong>等。</li>
+</ol>
+<h2 id="Java单例模式的几种实现方式"><a href="#Java单例模式的几种实现方式" class="headerlink" title="Java单例模式的几种实现方式"></a>Java单例模式的几种实现方式</h2><h3 id="1、懒汉式，线程不安全"><a href="#1、懒汉式，线程不安全" class="headerlink" title="1、懒汉式，线程不安全"></a>1、<code>懒汉式</code>，线程不安全</h3><p><strong>是否 Lazy 初始化</strong>：是</p>
+<p><strong>是否多线程安全</strong>：否</p>
+<p><strong>描述</strong>：</p>
+<p>这种方式是最基本的实现方式，这种实现最大的问题就是<strong>不支持多线程</strong>。</p>
+<p>因为没有加锁 synchronized，所以严格意义上它并不算单例模式。</p>
+<p>这种方式 lazy loading 很明显，不要求线程安全，在多线程不能正常工作。</p>
+<p><strong>实例</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Singleton instance;  </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span> <span class="params">()</span></span>&#123;&#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">if</span> (instance == <span class="keyword">null</span>) &#123;  </span><br><span class="line">        instance = <span class="keyword">new</span> Singleton();  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="keyword">return</span> instance;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来介绍的几种实现方式都支持多线程，但是在性能上有所差异。</p>
+<h3 id="2、懒汉式，线程安全"><a href="#2、懒汉式，线程安全" class="headerlink" title="2、懒汉式，线程安全"></a>2、懒汉式，线程安全</h3><p><strong>是否 Lazy 初始化</strong>：是</p>
+<p><strong>是否多线程安全</strong>：是</p>
+<p><strong>实现难度</strong>：易</p>
+<p>描述：这种方式具备很好的 lazy loading，能够在多线程中很好的工作，但是，效率很低，99% 情况下不需要同步。<br>优点：第一次调用才初始化，避免内存浪费。<br>缺点：必须加锁 synchronized 才能保证单例，但加锁会影响效率。<br>getInstance() 的性能对应用程序不是很关键（该方法使用不太频繁）。</p>
+<p>实例<br>public class Singleton {<br>    private static Singleton instance;<br>    private Singleton (){}<br>    public static synchronized Singleton getInstance() {<br>    if (instance == null) {<br>        instance = new Singleton();<br>    }<br>    return instance;<br>    }<br>}</p>
+<h3 id="3、饿汉式"><a href="#3、饿汉式" class="headerlink" title="3、饿汉式"></a>3、饿汉式</h3><p><strong>是否 Lazy 初始化</strong>：否</p>
+<p><strong>是否多线程安全</strong>：是</p>
+<p><strong>实现难度</strong>：易</p>
+<p>描述：这种方式比较常用，但容易产生垃圾对象。<br>优点：没有加锁，执行效率会提高。<br>缺点：类加载时就初始化，浪费内存。<br>它基于 classloader 机制避免了多线程的同步问题，不过，instance 在类装载时就实例化，虽然导致类装载的原因有很多种，在单例模式中大多数都是调用 getInstance 方法， 但是也不能确定有其他的方式（或者其他的静态方法）导致类装载，这时候初始化 instance 显然没有达到 lazy loading 的效果。</p>
+<p>实例<br>public class Singleton {<br>    private static Singleton instance = new Singleton();<br>    private Singleton (){}<br>    public static Singleton getInstance() {<br>    return instance;<br>    }<br>}</p>
+<h3 id="4、双检锁-双重校验锁（DCL，即-double-checked-locking）"><a href="#4、双检锁-双重校验锁（DCL，即-double-checked-locking）" class="headerlink" title="4、双检锁/双重校验锁（DCL，即 double-checked locking）"></a>4、双检锁/双重校验锁（DCL，即 double-checked locking）</h3><p>JDK 版本：JDK1.5 起</p>
+<p><strong>是否 Lazy 初始化</strong>：是</p>
+<p><strong>是否多线程安全</strong>：是</p>
+<p><strong>实现难度</strong>：较复杂</p>
+<p>描述：这种方式采用双锁机制，安全且在多线程情况下能保持高性能。<br>getInstance() 的性能对应用程序很关键。</p>
+<p>实例<br>public class Singleton {<br>    private volatile static Singleton singleton;<br>    private Singleton (){}<br>    public static Singleton getSingleton() {<br>    if (singleton == null) {<br>        synchronized (Singleton.class) {<br>        if (singleton == null) {<br>            singleton = new Singleton();<br>        }<br>        }<br>    }<br>    return singleton;<br>    }<br>}</p>
+<h3 id="5、登记式-静态内部类"><a href="#5、登记式-静态内部类" class="headerlink" title="5、登记式/静态内部类"></a>5、登记式/静态内部类</h3><p><strong>是否 Lazy 初始化</strong>：是</p>
+<p><strong>是否多线程安全</strong>：是</p>
+<p><strong>实现难度</strong>：一般</p>
+<p>描述：这种方式能达到双检锁方式一样的功效，但实现更简单。对静态域使用延迟初始化，应使用这种方式而不是双检锁方式。这种方式只适用于静态域的情况，双检锁方式可在实例域需要延迟初始化时使用。<br>这种方式同样利用了 classloader 机制来保证初始化 instance 时只有一个线程，它跟第 3 种方式不同的是：第 3 种方式只要 Singleton 类被装载了，那么 instance 就会被实例化（没有达到 lazy loading 效果），而这种方式是 Singleton 类被装载了，instance 不一定被初始化。因为 SingletonHolder 类没有被主动使用，只有通过显式调用 getInstance 方法时，才会显式装载 SingletonHolder 类，从而实例化 instance。想象一下，如果实例化 instance 很消耗资源，所以想让它延迟加载，另外一方面，又不希望在 Singleton 类加载时就实例化，因为不能确保 Singleton 类还可能在其他的地方被主动使用从而被加载，那么这个时候实例化 instance 显然是不合适的。这个时候，这种方式相比第 3 种方式就显得很合理。</p>
+<p>实例<br>public class Singleton {<br>    private static class SingletonHolder {<br>    private static final Singleton INSTANCE = new Singleton();<br>    }<br>    private Singleton (){}<br>    public static final Singleton getInstance() {<br>    return SingletonHolder.INSTANCE;<br>    }<br>}</p>
+<h3 id="6、枚举"><a href="#6、枚举" class="headerlink" title="6、枚举"></a>6、枚举</h3><p>JDK 版本：JDK1.5 起</p>
+<p><strong>是否 Lazy 初始化</strong>：否</p>
+<p><strong>是否多线程安全</strong>：是</p>
+<p><strong>实现难度</strong>：易</p>
+<p>描述：这种实现方式还没有被广泛采用，但这是实现单例模式的最佳方法。它更简洁，自动支持序列化机制，绝对防止多次实例化。<br>这种方式是 Effective Java 作者 Josh Bloch 提倡的方式，它不仅能避免多线程同步问题，而且还自动支持序列化机制，防止反序列化重新创建新的对象，绝对防止多次实例化。不过，由于 JDK1.5 之后才加入 enum 特性，用这种方式写不免让人感觉生疏，在实际工作中，也很少用。<br>不能通过 reflection attack 来调用私有构造方法。</p>
+<p>实例<br>public enum Singleton {<br>    INSTANCE;<br>    public void whateverMethod() {<br>    }<br>}<br>经验之谈：一般情况下，不建议使用第 1 种和第 2 种懒汉方式，建议使用第 3 种饿汉方式。只有在要明确实现 lazy loading 效果时，才会使用第 5 种登记方式。如果涉及到反序列化创建对象时，可以尝试使用第 6 种枚举方式。如果有其他特殊的需求，可以考虑使用第 4 种双检锁方式。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://www.runoob.com/design-pattern/singleton-pattern.html" target="_blank" rel="noopener">https://www.runoob.com/design-pattern/singleton-pattern.html</a></p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <div>
+  
+</div>
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/10/24/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E7%B1%BB%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E5%92%8C%E5%AE%9E%E4%BE%8B%E5%8C%96/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -876,81 +1002,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.wangguolong.top/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-java-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://4e-test.oss-cn-beijing.aliyuncs.com/blog/blog_avatar.jpeg">
-      <meta itemprop="name" content="Guolong Wang">
-      <meta itemprop="description" content="爱玩，爱技术">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王国隆的技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-java-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/" class="post-title-link" itemprop="url">Java方向-基础知识体系及结构-java-持续更新中</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-09-02 15:32:29" itemprop="dateCreated datePublished" datetime="2020-09-02T15:32:29+08:00">2020-09-02</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-09-14 21:00:59" itemprop="dateModified" datetime="2020-09-14T21:00:59+08:00">2020-09-14</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-      
-          <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>牛客网-java方向-基础知识体系及结构-java-面试常考知识点</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-java-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1022,20 +1073,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-count">37</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1084,7 +1135,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共65.7k字</span>
+  <span class="post-count">博客全站共67.4k字</span>
 </div>
 
 
