@@ -1,6 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Git版本回退方法</title>
+    <url>/2020/08/26/Git%E7%89%88%E6%9C%AC%E5%9B%9E%E9%80%80%E6%96%B9%E6%B3%95/</url>
+    <content><![CDATA[<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>今天在公司犯了错误，在公司公共的develop分支上push了错误的代码，顺便研究了一下git如何回退版本，参考了大佬的做法，记录下了这篇博客。</p>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>如果提交了一个错误的版本，怎么回退版本？</p>
+<p>如果提交了一个错误的版本到远程分支，怎么回退远程分支版本？</p>
+<p>如果提交了一个错误的版本到公共远程分支，又该怎么回退版本？</p>
+<a id="more"></a>
+
+<h3 id="本地分支版本回退的方法"><a href="#本地分支版本回退的方法" class="headerlink" title="本地分支版本回退的方法"></a>本地分支版本回退的方法</h3><p>如果你在本地做了错误提交，那么回退版本的方法很简单</p>
+<p>先用下面命令找到要回退的版本的commit id：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git reflog</span><br></pre></td></tr></table></figure>
+
+<p>接着回退版本:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git reset --hard Obfafd</span><br></pre></td></tr></table></figure>
+
+<p>0bfafd就是你要回退的版本的commit id的前面几位</p>
+<h3 id="自己的远程分支版本回退的方法"><a href="#自己的远程分支版本回退的方法" class="headerlink" title="自己的远程分支版本回退的方法"></a>自己的远程分支版本回退的方法</h3><p>如果你的错误提交已经推送到自己的远程分支了，那么就需要回滚远程分支了。<br>首先要回退本地分支：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git reflog</span><br><span class="line">git reset --hard Obfafd</span><br></pre></td></tr></table></figure>
+
+<p>紧接着强制推送到远程分支：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git push -f origin develop</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：本地分支回滚后，版本将落后远程分支，必须使用强制推送覆盖远程分支，否则无法推送到远程分支</strong></p>
+<h3 id="公共远程分支版本回退的方法"><a href="#公共远程分支版本回退的方法" class="headerlink" title="公共远程分支版本回退的方法"></a>公共远程分支版本回退的方法</h3><p>使用git reset回退公共远程分支的版本后，需要其他所有人手动用远程master分支覆盖本地master分支，</p>
+<p>显然，这不是优雅的回退方法，下面我们使用另个一个命令来回退版本：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git revert HEAD                     //撤销最近一次提交</span><br><span class="line">git revert HEAD~1                   //撤销上上次的提交，注意：数字从0开始</span><br><span class="line">git revert 0ffaacc                  //撤销0ffaacc这次提交</span><br></pre></td></tr></table></figure>
+
+<p>git revert 命令意思是撤销某次提交。它会产生一个新的提交，虽然代码回退了，但是<strong>版本依然是向前的</strong>，</p>
+<p>所以，当你用revert回退之后，所有人pull之后，他们的代码也自动的回退了。</p>
+<p>但是，要注意以下几点：</p>
+<ol>
+<li><p>revert 是撤销一次提交，所以后面的commit id是你需要回滚到的版本的前一次提交</p>
+</li>
+<li><p>使用revert HEAD是撤销最近的一次提交，如果你最近一次提交是用revert命令产生的，那么你再执行一次，就相当于撤销了上次的撤销操作，换句话说，你连续执行两次revert HEAD命令，就跟没执行是一样的</p>
+</li>
+<li><p>使用revert HEAD~1 表示撤销最近2次提交，这个数字是从0开始的，如果你之前撤销过产生了commi id，那么也会计算在内的。</p>
+</li>
+<li><p>如果使用 revert 撤销的不是最近一次提交，那么一定会有代码冲突，需要你合并代码，合并代码只需要把当前的代码全部去掉，保留之前版本的代码就可以了.</p>
+</li>
+</ol>
+<p>git revert 命令的好处就是<strong>不会丢掉别人的提交</strong>，即使你撤销后覆盖了别人的提交，他更新代码后，可以在本地用 reset 向前回滚，找到自己的代码，然后拉一下分支，再回来合并上去就可以找回被你覆盖的提交了。</p>
+<h3 id="继续扩展，简单粗暴的回滚方法"><a href="#继续扩展，简单粗暴的回滚方法" class="headerlink" title="继续扩展，简单粗暴的回滚方法"></a>继续扩展，简单粗暴的回滚方法</h3><p>看到这里也许你已经觉得学会了远程仓库版本回滚方法了，但是实践中总是会遇到很多不按套路来的问题，考虑下面一种情况：</p>
+<p>如果你们开发中，忽然发现前面很远的地方有一次错误的合并代码，把本来下一次才能发的功能的代码合并到了这一次来了，这个时候全体成员都觉得直接回滚比较快，因为他们都有备份，覆盖了无所谓，这个时候用reset的话对队友的要求比较高，用revert的话呢要大面积的解决冲突，也很麻烦呀，怎么办呢？</p>
+<p>这个时候，可以使用简单粗暴的办法，直接从那个错误的提交的前一次拉取一份代码放到其他目录，然后将master代码全部删除，把那份新代码方进去，然后提交，果然简单粗暴啊，虽然这种方法不入流，但是，实践中发现很好使啊，所以，实践是检验真理的唯一标准。遇到问题还是要灵活应对。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>远程分支回滚的三种方法：</p>
+<ol>
+<li><p>自己的分支回滚直接用reset</p>
+</li>
+<li><p>公共分支回滚用revert</p>
+</li>
+<li><p>错的太远了直接将代码全部删掉，用正确代码替代</p>
+</li>
+</ol>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="http://blog.csdn.net/fuchaosz/article/details/52170105" target="_blank" rel="noopener">http://blog.csdn.net/fuchaosz/article/details/52170105</a></p>
+]]></content>
+  </entry>
+  <entry>
     <title>ControllerAdvice和ErrorController的用法</title>
     <url>/2020/07/14/ControllerAdvice%E5%92%8CErrorController%E7%9A%84%E7%94%A8%E6%B3%95/</url>
     <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>在Java中异常可以分为Error和Exception，<strong>@ControllerAdvice</strong>用来处理系统中的<strong>Exception</strong>，<strong>Error</strong>Controller处理系统中的<strong>Error</strong>。</p>
@@ -76,63 +133,6 @@
 
 <p>善用上述调试技巧，相当大家撸起代码来会更有感觉，祝大家端午节愉快！</p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://www.cnblogs.com/jun1019/p/9741224.html" target="_blank" rel="noopener">https://www.cnblogs.com/jun1019/p/9741224.html</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>Git版本回退方法</title>
-    <url>/2020/08/26/Git%E7%89%88%E6%9C%AC%E5%9B%9E%E9%80%80%E6%96%B9%E6%B3%95/</url>
-    <content><![CDATA[<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>今天在公司犯了错误，在公司公共的develop分支上push了错误的代码，顺便研究了一下git如何回退版本，参考了大佬的做法，记录下了这篇博客。</p>
-<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>如果提交了一个错误的版本，怎么回退版本？</p>
-<p>如果提交了一个错误的版本到远程分支，怎么回退远程分支版本？</p>
-<p>如果提交了一个错误的版本到公共远程分支，又该怎么回退版本？</p>
-<a id="more"></a>
-
-<h3 id="本地分支版本回退的方法"><a href="#本地分支版本回退的方法" class="headerlink" title="本地分支版本回退的方法"></a>本地分支版本回退的方法</h3><p>如果你在本地做了错误提交，那么回退版本的方法很简单</p>
-<p>先用下面命令找到要回退的版本的commit id：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git reflog</span><br></pre></td></tr></table></figure>
-
-<p>接着回退版本:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git reset --hard Obfafd</span><br></pre></td></tr></table></figure>
-
-<p>0bfafd就是你要回退的版本的commit id的前面几位</p>
-<h3 id="自己的远程分支版本回退的方法"><a href="#自己的远程分支版本回退的方法" class="headerlink" title="自己的远程分支版本回退的方法"></a>自己的远程分支版本回退的方法</h3><p>如果你的错误提交已经推送到自己的远程分支了，那么就需要回滚远程分支了。<br>首先要回退本地分支：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git reflog</span><br><span class="line">git reset --hard Obfafd</span><br></pre></td></tr></table></figure>
-
-<p>紧接着强制推送到远程分支：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git push -f origin develop</span><br></pre></td></tr></table></figure>
-
-<p><strong>注意：本地分支回滚后，版本将落后远程分支，必须使用强制推送覆盖远程分支，否则无法推送到远程分支</strong></p>
-<h3 id="公共远程分支版本回退的方法"><a href="#公共远程分支版本回退的方法" class="headerlink" title="公共远程分支版本回退的方法"></a>公共远程分支版本回退的方法</h3><p>使用git reset回退公共远程分支的版本后，需要其他所有人手动用远程master分支覆盖本地master分支，</p>
-<p>显然，这不是优雅的回退方法，下面我们使用另个一个命令来回退版本：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git revert HEAD                     //撤销最近一次提交</span><br><span class="line">git revert HEAD~1                   //撤销上上次的提交，注意：数字从0开始</span><br><span class="line">git revert 0ffaacc                  //撤销0ffaacc这次提交</span><br></pre></td></tr></table></figure>
-
-<p>git revert 命令意思是撤销某次提交。它会产生一个新的提交，虽然代码回退了，但是<strong>版本依然是向前的</strong>，</p>
-<p>所以，当你用revert回退之后，所有人pull之后，他们的代码也自动的回退了。</p>
-<p>但是，要注意以下几点：</p>
-<ol>
-<li><p>revert 是撤销一次提交，所以后面的commit id是你需要回滚到的版本的前一次提交</p>
-</li>
-<li><p>使用revert HEAD是撤销最近的一次提交，如果你最近一次提交是用revert命令产生的，那么你再执行一次，就相当于撤销了上次的撤销操作，换句话说，你连续执行两次revert HEAD命令，就跟没执行是一样的</p>
-</li>
-<li><p>使用revert HEAD~1 表示撤销最近2次提交，这个数字是从0开始的，如果你之前撤销过产生了commi id，那么也会计算在内的。</p>
-</li>
-<li><p>如果使用 revert 撤销的不是最近一次提交，那么一定会有代码冲突，需要你合并代码，合并代码只需要把当前的代码全部去掉，保留之前版本的代码就可以了.</p>
-</li>
-</ol>
-<p>git revert 命令的好处就是<strong>不会丢掉别人的提交</strong>，即使你撤销后覆盖了别人的提交，他更新代码后，可以在本地用 reset 向前回滚，找到自己的代码，然后拉一下分支，再回来合并上去就可以找回被你覆盖的提交了。</p>
-<h3 id="继续扩展，简单粗暴的回滚方法"><a href="#继续扩展，简单粗暴的回滚方法" class="headerlink" title="继续扩展，简单粗暴的回滚方法"></a>继续扩展，简单粗暴的回滚方法</h3><p>看到这里也许你已经觉得学会了远程仓库版本回滚方法了，但是实践中总是会遇到很多不按套路来的问题，考虑下面一种情况：</p>
-<p>如果你们开发中，忽然发现前面很远的地方有一次错误的合并代码，把本来下一次才能发的功能的代码合并到了这一次来了，这个时候全体成员都觉得直接回滚比较快，因为他们都有备份，覆盖了无所谓，这个时候用reset的话对队友的要求比较高，用revert的话呢要大面积的解决冲突，也很麻烦呀，怎么办呢？</p>
-<p>这个时候，可以使用简单粗暴的办法，直接从那个错误的提交的前一次拉取一份代码放到其他目录，然后将master代码全部删除，把那份新代码方进去，然后提交，果然简单粗暴啊，虽然这种方法不入流，但是，实践中发现很好使啊，所以，实践是检验真理的唯一标准。遇到问题还是要灵活应对。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>远程分支回滚的三种方法：</p>
-<ol>
-<li><p>自己的分支回滚直接用reset</p>
-</li>
-<li><p>公共分支回滚用revert</p>
-</li>
-<li><p>错的太远了直接将代码全部删掉，用正确代码替代</p>
-</li>
-</ol>
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="http://blog.csdn.net/fuchaosz/article/details/52170105" target="_blank" rel="noopener">http://blog.csdn.net/fuchaosz/article/details/52170105</a></p>
 ]]></content>
   </entry>
   <entry>
@@ -294,6 +294,109 @@
 
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>通过本篇文章，我们演示了如何使用easyexcel进行一些excel的操作，在实际的项目应用中，可以对以上示例代码进行进一步的封装，使其不管是读取、导出等操作都能几行代码搞定，这个就得根据情况大家自由发挥了。</p>
 <h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://mp.weixin.qq.com/s/PyblQA4I9Wp9JT4ll2WcQA" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/PyblQA4I9Wp9JT4ll2WcQA</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Java异常处理的十条建议</title>
+    <url>/2020/06/15/Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%9A%84%E5%8D%81%E6%9D%A1%E5%BB%BA%E8%AE%AE/</url>
+    <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>Java异常处理的十个建议，希望对大家有帮助~</p>
+<h3 id="一、尽量不要使用e-printStackTrace-而是使用log打印。"><a href="#一、尽量不要使用e-printStackTrace-而是使用log打印。" class="headerlink" title="一、尽量不要使用e.printStackTrace(),而是使用log打印。"></a>一、尽量不要使用e.printStackTrace(),而是使用log打印。</h3><p><strong>反例:</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">  <span class="comment">// do what you want  </span></span><br><span class="line">&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">  e.printStackTrace();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<p><strong>正例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">  <span class="comment">// do what you want  </span></span><br><span class="line">&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">  log.info(<span class="string">"你的程序有异常啦,&#123;&#125;"</span>,e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>理由：</strong></p>
+<ul>
+<li>printStackTrace()打印出的堆栈日志跟业务代码日志是交错混合在一起的，通常排查异常日志不太方便。</li>
+<li>e.printStackTrace()语句产生的字符串记录的是堆栈信息，如果信息太长太多，字符串常量池所在的内存块没有空间了,即内存满了，那么，用户的请求就卡住啦~</li>
+</ul>
+<h3 id="二、catch了异常，但是没有打印出具体的exception，无法更好定位问题"><a href="#二、catch了异常，但是没有打印出具体的exception，无法更好定位问题" class="headerlink" title="二、catch了异常，但是没有打印出具体的exception，无法更好定位问题"></a>二、catch了异常，但是没有打印出具体的exception，无法更好定位问题</h3><p><strong>反例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">  <span class="comment">// do what you want  </span></span><br><span class="line">&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">  log.info(<span class="string">"你的程序有异常啦"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>正例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">  <span class="comment">// do what you want  </span></span><br><span class="line">&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">  log.info(<span class="string">"你的程序有异常啦，&#123;&#125;"</span>,e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>理由：</strong></p>
+<ul>
+<li>反例中，并没有把exception出来，到时候排查问题就不好查了啦，到底是SQl写错的异常还是IO异常，还是其他呢？所以应该把exception打印到日志中哦~</li>
+</ul>
+<h3 id="三、不要用一个Exception捕捉所有可能的异常"><a href="#三、不要用一个Exception捕捉所有可能的异常" class="headerlink" title="三、不要用一个Exception捕捉所有可能的异常"></a>三、不要用一个Exception捕捉所有可能的异常</h3><p><strong>反例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">try</span>&#123;</span><br><span class="line">        <span class="comment">//…抛出 IOException 的代码调用</span></span><br><span class="line">        <span class="comment">//…抛出 SQLException 的代码调用</span></span><br><span class="line">    &#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">        <span class="comment">//用基类 Exception 捕捉的所有可能的异常，如果多个层次都这样捕捉，会丢失原始异常的有效信息哦</span></span><br><span class="line">        log.info(“Exception in test,exception:&#123;&#125;”, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>正例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">try</span>&#123;</span><br><span class="line">        <span class="comment">//…抛出 IOException 的代码调用</span></span><br><span class="line">        <span class="comment">//…抛出 SQLException 的代码调用</span></span><br><span class="line">    &#125;<span class="keyword">catch</span>(IOException e)&#123;</span><br><span class="line">        <span class="comment">//仅仅捕捉 IOException</span></span><br><span class="line">        log.info(“IOException in test,exception:&#123;&#125;”, e);</span><br><span class="line">    &#125;<span class="keyword">catch</span>(SQLException e)&#123;</span><br><span class="line">        <span class="comment">//仅仅捕捉 SQLException</span></span><br><span class="line">        log.info(“SQLException in test,exception:&#123;&#125;”, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>理由：</p>
+<ul>
+<li>用基类 Exception 捕捉的所有可能的异常，如果多个层次都这样捕捉，会丢失原始异常的有效信息哦</li>
+</ul>
+<h3 id="四、记得使用finally关闭流资源或者直接使用try-with-resource"><a href="#四、记得使用finally关闭流资源或者直接使用try-with-resource" class="headerlink" title="四、记得使用finally关闭流资源或者直接使用try-with-resource"></a>四、记得使用finally关闭流资源或者直接使用try-with-resource</h3><p><strong>反例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">FileInputStream fdIn = <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    fdIn = <span class="keyword">new</span> FileInputStream(<span class="keyword">new</span> File(<span class="string">"/jay.txt"</span>));</span><br><span class="line">    <span class="comment">//在这里关闭流资源？有没有问题呢？如果发生异常了呢？</span></span><br><span class="line">    fdIn.close();</span><br><span class="line">&#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>正例1：</strong></p>
+<p>需要使用finally关闭流资源，如下</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">FileInputStream fdIn = <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    fdIn = <span class="keyword">new</span> FileInputStream(<span class="keyword">new</span> File(<span class="string">"/jay.txt"</span>));</span><br><span class="line">&#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (fdIn != <span class="keyword">null</span>) &#123;</span><br><span class="line">            fdIn.close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        log.error(e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>正例2：</strong></p>
+<p>当然，也可以使用JDK7的新特性try-with-resource来处理，它是Java7提供的一个新功能，它用于自动资源管理。</p>
+<ul>
+<li>资源是指在程序用完了之后必须要关闭的对象。</li>
+<li>try-with-resources保证了每个声明了的资源在语句结束的时候会被关闭</li>
+<li>什么样的对象才能当做资源使用呢？只要实现了java.lang.AutoCloseable接口或者java.io.Closeable接口的对象，都OK。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span> (FileInputStream inputStream = <span class="keyword">new</span> FileInputStream(<span class="keyword">new</span> File(<span class="string">"jay.txt"</span>)) &#123;</span><br><span class="line">    <span class="comment">// use resources   </span></span><br><span class="line">&#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>理由：</strong></p>
+<ul>
+<li>如果不使用finally或者try-with-resource，当程序发生异常，IO资源流没关闭，那么这个IO资源就会被他一直占着，这样别人就没有办法用了，这就造成资源浪费。</li>
+</ul>
+<h3 id="五、捕获异常与抛出异常必须是完全匹配，或者捕获异常是抛异常的父类"><a href="#五、捕获异常与抛出异常必须是完全匹配，或者捕获异常是抛异常的父类" class="headerlink" title="五、捕获异常与抛出异常必须是完全匹配，或者捕获异常是抛异常的父类"></a>五、捕获异常与抛出异常必须是完全匹配，或者捕获异常是抛异常的父类</h3><p><strong>反例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//BizException 是 Exception 的子类</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BizException</span> <span class="keyword">extends</span> <span class="title">Exception</span> </span>&#123;&#125;</span><br><span class="line"><span class="comment">//抛出父类Exception</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    test(); <span class="comment">//编译错误</span></span><br><span class="line">&#125; <span class="keyword">catch</span> (BizException e) &#123; <span class="comment">//捕获异常子类是没法匹配的哦</span></span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>正例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//抛出子类Exception</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> <span class="keyword">throws</span> BizException </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    test();</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="六、捕获到的异常，不能忽略它，至少打点日志吧"><a href="#六、捕获到的异常，不能忽略它，至少打点日志吧" class="headerlink" title="六、捕获到的异常，不能忽略它，至少打点日志吧"></a>六、捕获到的异常，不能忽略它，至少打点日志吧</h3><p><strong>反例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">testIgnoreException</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;       </span><br><span class="line">        <span class="comment">// 搞事情</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;     <span class="comment">//一般不会有这个异常</span></span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>正例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">testIgnoreException</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 搞事情</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;     <span class="comment">//一般不会有这个异常</span></span><br><span class="line">        log.error(<span class="string">"这个异常不应该在这里出现的,&#123;&#125;"</span>,e); </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>理由：</strong></p>
+<ul>
+<li>虽然一个正常情况都不会发生的异常，但是如果你捕获到它，就不要忽略呀，至少打个日志吧~</li>
+</ul>
+<h3 id="七、注意异常对你的代码层次结构的侵染（早发现早处理）"><a href="#七、注意异常对你的代码层次结构的侵染（早发现早处理）" class="headerlink" title="七、注意异常对你的代码层次结构的侵染（早发现早处理）"></a>七、注意异常对你的代码层次结构的侵染（早发现早处理）</h3><p><strong>反例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> UserInfo <span class="title">queryUserInfoByUserId</span><span class="params">(Long userid)</span> throw SQLException </span>&#123;</span><br><span class="line">    <span class="comment">//根据用户Id查询数据库</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>正例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> UserInfo <span class="title">queryUserInfoByUserId</span><span class="params">(Long userid)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span>&#123;</span><br><span class="line">        <span class="comment">//根据用户Id查询数据库</span></span><br><span class="line">    &#125;<span class="keyword">catch</span>(SQLException e)&#123;</span><br><span class="line">        log.error(<span class="string">"查询数据库异常啦，&#123;&#125;"</span>,e);</span><br><span class="line">    &#125;<span class="keyword">finally</span>&#123;</span><br><span class="line">        <span class="comment">//关闭连接，清理资源</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>理由：</strong></p>
+<ul>
+<li>我们的项目，一般都会把代码分 Action、Service、Dao 等不同的层次结构，如果你是DAO层处理的异常，尽早处理吧，如果往上 throw SQLException，上层代码就还是要try catch处理啦，这就污染了你的代码~</li>
+</ul>
+<h3 id="八、自定义封装异常，不要丢弃原始异常的信息Throwable-cause"><a href="#八、自定义封装异常，不要丢弃原始异常的信息Throwable-cause" class="headerlink" title="八、自定义封装异常，不要丢弃原始异常的信息Throwable cause"></a>八、自定义封装异常，不要丢弃原始异常的信息Throwable cause</h3><p>我们常常会想要在捕获一个异常后抛出另一个异常，并且希望把原始异常的信息保存下来，这被称为异常链。公司的框架提供统一异常处理就用到异常链，我们自定义封装异常，不要丢弃原始异常的信息，否则排查问题就头疼啦</p>
+<p><strong>反例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestChainException</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">readFile</span><span class="params">()</span> <span class="keyword">throws</span> MyException</span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            InputStream is = <span class="keyword">new</span> FileInputStream(<span class="string">"jay.txt"</span>);</span><br><span class="line">            Scanner in = <span class="keyword">new</span> Scanner(is);</span><br><span class="line">            <span class="keyword">while</span> (in.hasNext()) &#123;</span><br><span class="line">                System.out.println(in.next());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">            <span class="comment">//e 保存异常信息</span></span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> MyException(<span class="string">"文件在哪里呢"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">invokeReadFile</span><span class="params">()</span> <span class="keyword">throws</span> MyException</span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            readFile();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (MyException e) &#123;</span><br><span class="line">            <span class="comment">//e 保存异常信息</span></span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> MyException(<span class="string">"文件找不到"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        TestChainException t = <span class="keyword">new</span> TestChainException();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            t.invokeReadFile();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (MyException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//MyException 构造器</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">MyException</span><span class="params">(String message)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(message);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下，没有了Throwable cause，不好排查是什么异常了啦</p>
+<img src="/2020/06/15/Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%9A%84%E5%8D%81%E6%9D%A1%E5%BB%BA%E8%AE%AE/exception1.png" class="" title="exception before">
+
+<p><strong>正例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestChainException</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">readFile</span><span class="params">()</span> <span class="keyword">throws</span> MyException</span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            InputStream is = <span class="keyword">new</span> FileInputStream(<span class="string">"jay.txt"</span>);</span><br><span class="line">            Scanner in = <span class="keyword">new</span> Scanner(is);</span><br><span class="line">            <span class="keyword">while</span> (in.hasNext()) &#123;</span><br><span class="line">                System.out.println(in.next());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">            <span class="comment">//e 保存异常信息</span></span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> MyException(<span class="string">"文件在哪里呢"</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">invokeReadFile</span><span class="params">()</span> <span class="keyword">throws</span> MyException</span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            readFile();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (MyException e) &#123;</span><br><span class="line">            <span class="comment">//e 保存异常信息</span></span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> MyException(<span class="string">"文件找不到"</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        TestChainException t = <span class="keyword">new</span> TestChainException();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            t.invokeReadFile();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (MyException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//MyException 构造器</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">MyException</span><span class="params">(String message, Throwable cause)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(message, cause);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/2020/06/15/Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%9A%84%E5%8D%81%E6%9D%A1%E5%BB%BA%E8%AE%AE/exception2.png" class="" title="exception after">
+
+
+<h3 id="九、运行时异常RuntimeException-，不应该通过catch-的方式来处理，而是先预检查，比如：NullPointerException处理"><a href="#九、运行时异常RuntimeException-，不应该通过catch-的方式来处理，而是先预检查，比如：NullPointerException处理" class="headerlink" title="九、运行时异常RuntimeException ，不应该通过catch 的方式来处理，而是先预检查，比如：NullPointerException处理"></a>九、运行时异常RuntimeException ，不应该通过catch 的方式来处理，而是先预检查，比如：NullPointerException处理</h3><p><strong>反例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  obj.method() </span><br><span class="line">&#125; <span class="keyword">catch</span> (NullPointerException e) &#123;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>正例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (obj != <span class="keyword">null</span>)&#123;</span><br><span class="line">   ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="十、注意异常匹配的顺序，优先捕获具体的异常"><a href="#十、注意异常匹配的顺序，优先捕获具体的异常" class="headerlink" title="十、注意异常匹配的顺序，优先捕获具体的异常"></a>十、注意异常匹配的顺序，优先捕获具体的异常</h3><p>注意异常的匹配顺序，因为只有第一个匹配到异常的catch块才会被执行。如果你希望看到，是NumberFormatException异常，就抛出NumberFormatException，如果是IllegalArgumentException就抛出IllegalArgumentException。</p>
+<p><strong>反例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    doSomething(<span class="string">"test exception"</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (IllegalArgumentException e) &#123;       </span><br><span class="line">    log.error(e);</span><br><span class="line">&#125; <span class="keyword">catch</span> (NumberFormatException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>正例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    doSomething(<span class="string">"test exception"</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (NumberFormatException e) &#123;       </span><br><span class="line">    log.error(e);</span><br><span class="line">&#125; <span class="keyword">catch</span> (IllegalArgumentException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>理由：</p>
+<ul>
+<li>因为NumberFormatException是IllegalArgumentException 的子类，反例中，不管是哪个异常，都会匹配到IllegalArgumentException，就不会再往下执行啦，因此不知道是否是NumberFormatException。所以需要优先捕获具体的异常，把NumberFormatException放前面~</li>
+</ul>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.im/post/5ee45107f265da770952788f" target="_blank" rel="noopener">https://juejin.im/post/5ee45107f265da770952788f</a></p>
 ]]></content>
   </entry>
   <entry>
@@ -487,109 +590,6 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 <p>Linux中的权限有r(读) w(写) x(执行)，分别用数字4,2,1代表。</p>
 <p>Umask是设置系统创建文件时的默认权限，是创建文件权限<strong>补码</strong>，对文件来说最大值是6</p>
 <p>Umask设为为244，则创建的文件默认权限是422，文件的第一位是‘-’也就是-r—w–w-</p>
-]]></content>
-  </entry>
-  <entry>
-    <title>Java异常处理的十条建议</title>
-    <url>/2020/06/15/Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%9A%84%E5%8D%81%E6%9D%A1%E5%BB%BA%E8%AE%AE/</url>
-    <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>Java异常处理的十个建议，希望对大家有帮助~</p>
-<h3 id="一、尽量不要使用e-printStackTrace-而是使用log打印。"><a href="#一、尽量不要使用e-printStackTrace-而是使用log打印。" class="headerlink" title="一、尽量不要使用e.printStackTrace(),而是使用log打印。"></a>一、尽量不要使用e.printStackTrace(),而是使用log打印。</h3><p><strong>反例:</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">  <span class="comment">// do what you want  </span></span><br><span class="line">&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">  e.printStackTrace();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<a id="more"></a>
-
-<p><strong>正例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">  <span class="comment">// do what you want  </span></span><br><span class="line">&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">  log.info(<span class="string">"你的程序有异常啦,&#123;&#125;"</span>,e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>理由：</strong></p>
-<ul>
-<li>printStackTrace()打印出的堆栈日志跟业务代码日志是交错混合在一起的，通常排查异常日志不太方便。</li>
-<li>e.printStackTrace()语句产生的字符串记录的是堆栈信息，如果信息太长太多，字符串常量池所在的内存块没有空间了,即内存满了，那么，用户的请求就卡住啦~</li>
-</ul>
-<h3 id="二、catch了异常，但是没有打印出具体的exception，无法更好定位问题"><a href="#二、catch了异常，但是没有打印出具体的exception，无法更好定位问题" class="headerlink" title="二、catch了异常，但是没有打印出具体的exception，无法更好定位问题"></a>二、catch了异常，但是没有打印出具体的exception，无法更好定位问题</h3><p><strong>反例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">  <span class="comment">// do what you want  </span></span><br><span class="line">&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">  log.info(<span class="string">"你的程序有异常啦"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>正例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">  <span class="comment">// do what you want  </span></span><br><span class="line">&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">  log.info(<span class="string">"你的程序有异常啦，&#123;&#125;"</span>,e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>理由：</strong></p>
-<ul>
-<li>反例中，并没有把exception出来，到时候排查问题就不好查了啦，到底是SQl写错的异常还是IO异常，还是其他呢？所以应该把exception打印到日志中哦~</li>
-</ul>
-<h3 id="三、不要用一个Exception捕捉所有可能的异常"><a href="#三、不要用一个Exception捕捉所有可能的异常" class="headerlink" title="三、不要用一个Exception捕捉所有可能的异常"></a>三、不要用一个Exception捕捉所有可能的异常</h3><p><strong>反例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">try</span>&#123;</span><br><span class="line">        <span class="comment">//…抛出 IOException 的代码调用</span></span><br><span class="line">        <span class="comment">//…抛出 SQLException 的代码调用</span></span><br><span class="line">    &#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">        <span class="comment">//用基类 Exception 捕捉的所有可能的异常，如果多个层次都这样捕捉，会丢失原始异常的有效信息哦</span></span><br><span class="line">        log.info(“Exception in test,exception:&#123;&#125;”, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>正例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">try</span>&#123;</span><br><span class="line">        <span class="comment">//…抛出 IOException 的代码调用</span></span><br><span class="line">        <span class="comment">//…抛出 SQLException 的代码调用</span></span><br><span class="line">    &#125;<span class="keyword">catch</span>(IOException e)&#123;</span><br><span class="line">        <span class="comment">//仅仅捕捉 IOException</span></span><br><span class="line">        log.info(“IOException in test,exception:&#123;&#125;”, e);</span><br><span class="line">    &#125;<span class="keyword">catch</span>(SQLException e)&#123;</span><br><span class="line">        <span class="comment">//仅仅捕捉 SQLException</span></span><br><span class="line">        log.info(“SQLException in test,exception:&#123;&#125;”, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>理由：</p>
-<ul>
-<li>用基类 Exception 捕捉的所有可能的异常，如果多个层次都这样捕捉，会丢失原始异常的有效信息哦</li>
-</ul>
-<h3 id="四、记得使用finally关闭流资源或者直接使用try-with-resource"><a href="#四、记得使用finally关闭流资源或者直接使用try-with-resource" class="headerlink" title="四、记得使用finally关闭流资源或者直接使用try-with-resource"></a>四、记得使用finally关闭流资源或者直接使用try-with-resource</h3><p><strong>反例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">FileInputStream fdIn = <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    fdIn = <span class="keyword">new</span> FileInputStream(<span class="keyword">new</span> File(<span class="string">"/jay.txt"</span>));</span><br><span class="line">    <span class="comment">//在这里关闭流资源？有没有问题呢？如果发生异常了呢？</span></span><br><span class="line">    fdIn.close();</span><br><span class="line">&#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>正例1：</strong></p>
-<p>需要使用finally关闭流资源，如下</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">FileInputStream fdIn = <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    fdIn = <span class="keyword">new</span> FileInputStream(<span class="keyword">new</span> File(<span class="string">"/jay.txt"</span>));</span><br><span class="line">&#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (fdIn != <span class="keyword">null</span>) &#123;</span><br><span class="line">            fdIn.close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        log.error(e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>正例2：</strong></p>
-<p>当然，也可以使用JDK7的新特性try-with-resource来处理，它是Java7提供的一个新功能，它用于自动资源管理。</p>
-<ul>
-<li>资源是指在程序用完了之后必须要关闭的对象。</li>
-<li>try-with-resources保证了每个声明了的资源在语句结束的时候会被关闭</li>
-<li>什么样的对象才能当做资源使用呢？只要实现了java.lang.AutoCloseable接口或者java.io.Closeable接口的对象，都OK。</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span> (FileInputStream inputStream = <span class="keyword">new</span> FileInputStream(<span class="keyword">new</span> File(<span class="string">"jay.txt"</span>)) &#123;</span><br><span class="line">    <span class="comment">// use resources   </span></span><br><span class="line">&#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>理由：</strong></p>
-<ul>
-<li>如果不使用finally或者try-with-resource，当程序发生异常，IO资源流没关闭，那么这个IO资源就会被他一直占着，这样别人就没有办法用了，这就造成资源浪费。</li>
-</ul>
-<h3 id="五、捕获异常与抛出异常必须是完全匹配，或者捕获异常是抛异常的父类"><a href="#五、捕获异常与抛出异常必须是完全匹配，或者捕获异常是抛异常的父类" class="headerlink" title="五、捕获异常与抛出异常必须是完全匹配，或者捕获异常是抛异常的父类"></a>五、捕获异常与抛出异常必须是完全匹配，或者捕获异常是抛异常的父类</h3><p><strong>反例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//BizException 是 Exception 的子类</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BizException</span> <span class="keyword">extends</span> <span class="title">Exception</span> </span>&#123;&#125;</span><br><span class="line"><span class="comment">//抛出父类Exception</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    test(); <span class="comment">//编译错误</span></span><br><span class="line">&#125; <span class="keyword">catch</span> (BizException e) &#123; <span class="comment">//捕获异常子类是没法匹配的哦</span></span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>正例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//抛出子类Exception</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> <span class="keyword">throws</span> BizException </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    test();</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="六、捕获到的异常，不能忽略它，至少打点日志吧"><a href="#六、捕获到的异常，不能忽略它，至少打点日志吧" class="headerlink" title="六、捕获到的异常，不能忽略它，至少打点日志吧"></a>六、捕获到的异常，不能忽略它，至少打点日志吧</h3><p><strong>反例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">testIgnoreException</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;       </span><br><span class="line">        <span class="comment">// 搞事情</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;     <span class="comment">//一般不会有这个异常</span></span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>正例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">testIgnoreException</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 搞事情</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;     <span class="comment">//一般不会有这个异常</span></span><br><span class="line">        log.error(<span class="string">"这个异常不应该在这里出现的,&#123;&#125;"</span>,e); </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>理由：</strong></p>
-<ul>
-<li>虽然一个正常情况都不会发生的异常，但是如果你捕获到它，就不要忽略呀，至少打个日志吧~</li>
-</ul>
-<h3 id="七、注意异常对你的代码层次结构的侵染（早发现早处理）"><a href="#七、注意异常对你的代码层次结构的侵染（早发现早处理）" class="headerlink" title="七、注意异常对你的代码层次结构的侵染（早发现早处理）"></a>七、注意异常对你的代码层次结构的侵染（早发现早处理）</h3><p><strong>反例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> UserInfo <span class="title">queryUserInfoByUserId</span><span class="params">(Long userid)</span> throw SQLException </span>&#123;</span><br><span class="line">    <span class="comment">//根据用户Id查询数据库</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>正例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> UserInfo <span class="title">queryUserInfoByUserId</span><span class="params">(Long userid)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span>&#123;</span><br><span class="line">        <span class="comment">//根据用户Id查询数据库</span></span><br><span class="line">    &#125;<span class="keyword">catch</span>(SQLException e)&#123;</span><br><span class="line">        log.error(<span class="string">"查询数据库异常啦，&#123;&#125;"</span>,e);</span><br><span class="line">    &#125;<span class="keyword">finally</span>&#123;</span><br><span class="line">        <span class="comment">//关闭连接，清理资源</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>理由：</strong></p>
-<ul>
-<li>我们的项目，一般都会把代码分 Action、Service、Dao 等不同的层次结构，如果你是DAO层处理的异常，尽早处理吧，如果往上 throw SQLException，上层代码就还是要try catch处理啦，这就污染了你的代码~</li>
-</ul>
-<h3 id="八、自定义封装异常，不要丢弃原始异常的信息Throwable-cause"><a href="#八、自定义封装异常，不要丢弃原始异常的信息Throwable-cause" class="headerlink" title="八、自定义封装异常，不要丢弃原始异常的信息Throwable cause"></a>八、自定义封装异常，不要丢弃原始异常的信息Throwable cause</h3><p>我们常常会想要在捕获一个异常后抛出另一个异常，并且希望把原始异常的信息保存下来，这被称为异常链。公司的框架提供统一异常处理就用到异常链，我们自定义封装异常，不要丢弃原始异常的信息，否则排查问题就头疼啦</p>
-<p><strong>反例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestChainException</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">readFile</span><span class="params">()</span> <span class="keyword">throws</span> MyException</span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            InputStream is = <span class="keyword">new</span> FileInputStream(<span class="string">"jay.txt"</span>);</span><br><span class="line">            Scanner in = <span class="keyword">new</span> Scanner(is);</span><br><span class="line">            <span class="keyword">while</span> (in.hasNext()) &#123;</span><br><span class="line">                System.out.println(in.next());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">            <span class="comment">//e 保存异常信息</span></span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> MyException(<span class="string">"文件在哪里呢"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">invokeReadFile</span><span class="params">()</span> <span class="keyword">throws</span> MyException</span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            readFile();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (MyException e) &#123;</span><br><span class="line">            <span class="comment">//e 保存异常信息</span></span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> MyException(<span class="string">"文件找不到"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        TestChainException t = <span class="keyword">new</span> TestChainException();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            t.invokeReadFile();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (MyException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//MyException 构造器</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">MyException</span><span class="params">(String message)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(message);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p>运行结果如下，没有了Throwable cause，不好排查是什么异常了啦</p>
-<img src="/2020/06/15/Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%9A%84%E5%8D%81%E6%9D%A1%E5%BB%BA%E8%AE%AE/exception1.png" class="" title="exception before">
-
-<p><strong>正例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestChainException</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">readFile</span><span class="params">()</span> <span class="keyword">throws</span> MyException</span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            InputStream is = <span class="keyword">new</span> FileInputStream(<span class="string">"jay.txt"</span>);</span><br><span class="line">            Scanner in = <span class="keyword">new</span> Scanner(is);</span><br><span class="line">            <span class="keyword">while</span> (in.hasNext()) &#123;</span><br><span class="line">                System.out.println(in.next());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">            <span class="comment">//e 保存异常信息</span></span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> MyException(<span class="string">"文件在哪里呢"</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">invokeReadFile</span><span class="params">()</span> <span class="keyword">throws</span> MyException</span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            readFile();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (MyException e) &#123;</span><br><span class="line">            <span class="comment">//e 保存异常信息</span></span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> MyException(<span class="string">"文件找不到"</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        TestChainException t = <span class="keyword">new</span> TestChainException();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            t.invokeReadFile();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (MyException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//MyException 构造器</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">MyException</span><span class="params">(String message, Throwable cause)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(message, cause);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<img src="/2020/06/15/Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%9A%84%E5%8D%81%E6%9D%A1%E5%BB%BA%E8%AE%AE/exception2.png" class="" title="exception after">
-
-
-<h3 id="九、运行时异常RuntimeException-，不应该通过catch-的方式来处理，而是先预检查，比如：NullPointerException处理"><a href="#九、运行时异常RuntimeException-，不应该通过catch-的方式来处理，而是先预检查，比如：NullPointerException处理" class="headerlink" title="九、运行时异常RuntimeException ，不应该通过catch 的方式来处理，而是先预检查，比如：NullPointerException处理"></a>九、运行时异常RuntimeException ，不应该通过catch 的方式来处理，而是先预检查，比如：NullPointerException处理</h3><p><strong>反例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  obj.method() </span><br><span class="line">&#125; <span class="keyword">catch</span> (NullPointerException e) &#123;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>正例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (obj != <span class="keyword">null</span>)&#123;</span><br><span class="line">   ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="十、注意异常匹配的顺序，优先捕获具体的异常"><a href="#十、注意异常匹配的顺序，优先捕获具体的异常" class="headerlink" title="十、注意异常匹配的顺序，优先捕获具体的异常"></a>十、注意异常匹配的顺序，优先捕获具体的异常</h3><p>注意异常的匹配顺序，因为只有第一个匹配到异常的catch块才会被执行。如果你希望看到，是NumberFormatException异常，就抛出NumberFormatException，如果是IllegalArgumentException就抛出IllegalArgumentException。</p>
-<p><strong>反例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    doSomething(<span class="string">"test exception"</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (IllegalArgumentException e) &#123;       </span><br><span class="line">    log.error(e);</span><br><span class="line">&#125; <span class="keyword">catch</span> (NumberFormatException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>正例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    doSomething(<span class="string">"test exception"</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (NumberFormatException e) &#123;       </span><br><span class="line">    log.error(e);</span><br><span class="line">&#125; <span class="keyword">catch</span> (IllegalArgumentException e) &#123;</span><br><span class="line">    log.error(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>理由：</p>
-<ul>
-<li>因为NumberFormatException是IllegalArgumentException 的子类，反例中，不管是哪个异常，都会匹配到IllegalArgumentException，就不会再往下执行啦，因此不知道是否是NumberFormatException。所以需要优先捕获具体的异常，把NumberFormatException放前面~</li>
-</ul>
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.im/post/5ee45107f265da770952788f" target="_blank" rel="noopener">https://juejin.im/post/5ee45107f265da770952788f</a></p>
 ]]></content>
   </entry>
   <entry>
@@ -810,6 +810,30 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 <h3 id="45-76"><a href="#45-76" class="headerlink" title="45. 76"></a>45. 76</h3>]]></content>
   </entry>
   <entry>
+    <title>Java编写单词小游戏</title>
+    <url>/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/</url>
+    <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>公司最近有一个竞技场项目，里面有一个单词小游戏。</p>
+<p>游戏大概就是随机生成一个5*5的棋盘，上面有单词的字母，通过滑动连出正确的单词。</p>
+<a id="more"></a>
+
+<h2 id="棋盘生成算法"><a href="#棋盘生成算法" class="headerlink" title="棋盘生成算法"></a>棋盘生成算法</h2><h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>首先随机选个一个起点，从这个点开始铺单词。</p>
+<p>分别选取上下左右四个方向作为下一个字母的摆放位置，不能触边也不能走重复路，直到平铺完所有的单词。</p>
+<p>如果在棋盘能平铺下单词的情况下，找不到路径，就从四个角作为起点，必能找到路径。</p>
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Wang Guolong</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@version</span> 1.0</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2020/7/31 5:50 下午</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GenerateWordBoard</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">char</span>[][] board;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        GenerateWordBoard g = <span class="keyword">new</span> GenerateWordBoard();</span><br><span class="line">        g.generateCharBoard(<span class="string">"vocabulary"</span>, <span class="number">5</span>, <span class="number">5</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">generateCharBoard</span><span class="params">(String word, <span class="keyword">int</span> m, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 单词为空 直接返回</span></span><br><span class="line">        <span class="keyword">if</span> (word.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 单词长度大于棋盘 铺不下 直接返回</span></span><br><span class="line">        <span class="keyword">if</span> (word.length() &gt; m * n) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 初始化棋盘 全为*</span></span><br><span class="line">        initBoard(m, n);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">char</span>[] wordChar = word.toCharArray();</span><br><span class="line">        <span class="comment">// 随机选取一个位置开始</span></span><br><span class="line">        Random random = <span class="keyword">new</span> Random();</span><br><span class="line">        <span class="keyword">int</span> randomX = random.nextInt(m);</span><br><span class="line">        <span class="keyword">int</span> randomY = random.nextInt(n);</span><br><span class="line">        <span class="comment">// 开始从随机位置dfs铺单词 从index 0 开始</span></span><br><span class="line">        <span class="keyword">boolean</span> result = generateDfs(board, wordChar, randomX, randomY, <span class="number">0</span>);</span><br><span class="line">        <span class="comment">// 如果没有找到路线 那么从四个角开始 必能找到一条路</span></span><br><span class="line">        <span class="keyword">if</span> (!result) &#123;</span><br><span class="line">            List&lt;<span class="keyword">int</span>[]&gt; starts = Arrays.asList(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, <span class="number">0</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, n - <span class="number">1</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;m - <span class="number">1</span>, <span class="number">0</span>&#125;,</span><br><span class="line">                    <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;m - <span class="number">1</span>, n - <span class="number">1</span>&#125;);</span><br><span class="line">            <span class="comment">// 随机四个角的一个</span></span><br><span class="line">            Collections.shuffle(starts);</span><br><span class="line">            <span class="comment">// 初始化棋盘</span></span><br><span class="line">            initBoard(m, n);</span><br><span class="line">            <span class="comment">// dfs铺单词</span></span><br><span class="line">            generateDfs(board, wordChar, starts.get(<span class="number">0</span>)[<span class="number">0</span>], starts.get(<span class="number">0</span>)[<span class="number">1</span>], <span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 查看结果</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; board.length; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; board[<span class="number">0</span>].length; j++) &#123;</span><br><span class="line">                System.out.print(board[i][j] + <span class="string">"  "</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initBoard</span><span class="params">(<span class="keyword">int</span> m, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 初始化</span></span><br><span class="line">        board = <span class="keyword">new</span> <span class="keyword">char</span>[m][n];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; board.length; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; board[<span class="number">0</span>].length; j++) &#123;</span><br><span class="line">                board[i][j] = <span class="string">'*'</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 返回true则为找到一条路 返回false为死路</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">generateDfs</span><span class="params">(<span class="keyword">char</span>[][] board, <span class="keyword">char</span>[] wordChar, <span class="keyword">int</span> i, <span class="keyword">int</span> j, <span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 碰到边 或者碰到已经走过的位置 不能走了 死路</span></span><br><span class="line">        <span class="keyword">if</span> (i &gt;= board.length || i &lt; <span class="number">0</span> || j &gt;= board[<span class="number">0</span>].length || j &lt; <span class="number">0</span> || board[i][j] == <span class="string">'/'</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 摆放一个字母</span></span><br><span class="line">        board[i][j] = wordChar[index];</span><br><span class="line"></span><br><span class="line">        <span class="comment">//如果已经达到单词长度则直接返回 找到一条路</span></span><br><span class="line">        <span class="keyword">if</span> (index == wordChar.length - <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 记录当前矩阵元素</span></span><br><span class="line">        <span class="keyword">char</span> tmp = board[i][j];</span><br><span class="line">        <span class="comment">// 修改为/ 表示已经访问过</span></span><br><span class="line">        board[i][j] = <span class="string">'/'</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 向上下左右四个方向开启递归</span></span><br><span class="line">        <span class="comment">// 查看能走几个方向 随机选择一个</span></span><br><span class="line">        List&lt;<span class="keyword">int</span>[]&gt; directions = Arrays.asList(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;-<span class="number">1</span>, <span class="number">0</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">1</span>, <span class="number">0</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, -<span class="number">1</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, <span class="number">1</span>&#125;);</span><br><span class="line">        Collections.shuffle(directions);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> res = <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; directions.size(); k++) &#123;</span><br><span class="line">            <span class="keyword">int</span> di = i + directions.get(k)[<span class="number">0</span>], dj = j + directions.get(k)[<span class="number">1</span>];</span><br><span class="line">            <span class="keyword">boolean</span> partialRes = generateDfs(board, wordChar, di, dj, index + <span class="number">1</span>);</span><br><span class="line">            <span class="keyword">if</span> (k == <span class="number">0</span>) &#123;</span><br><span class="line">                res = partialRes;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                res = res || partialRes;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 如果res为true 说明找到一条路 就不再遍历了 还原后返回true</span></span><br><span class="line">            <span class="keyword">if</span> (res) &#123;</span><br><span class="line">                <span class="comment">// 还原矩阵元素</span></span><br><span class="line">                board[i][j] = tmp;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 还原矩阵元素</span></span><br><span class="line">        board[i][j] = <span class="string">'*'</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><div style="display: flex;flex-direction: row;justify-content: center;">
+
+<div style="width: 200px;height: 200px;"><img src="/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/result1.png" class="" title="result1"></div>
+
+<div style="width: 200px;height: 200px;"><img src="/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/result2.png" class="" title="result2"></div>
+
+<div style="width: 200px;height: 200px;"><img src="/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/result3.png" class="" title="result3"></div>
+
+<div style="width: 200px;height: 200px;"><img src="/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/result4.png" class="" title="result4"></div>
+
+</div>]]></content>
+  </entry>
+  <entry>
     <title>Java方向-基础知识体系及结构-网络基础-持续更新中</title>
     <url>/2020/09/02/Java%E6%96%B9%E5%90%91-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB%E5%8F%8A%E7%BB%93%E6%9E%84-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/</url>
     <content><![CDATA[<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>牛客网-java方向-基础知识体系及结构-网络基础-面试常考知识点</p>
@@ -902,30 +926,6 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 <p>（2） SNMP：简单网络管理协议，使用161号端口，是用来管理网络设备的。由于网络设备很多，无连接的服务就体现出其优势。</p>
 <p>（3） TFTP(Trivial File Transfer Protocal)，简单文件传输协议，该协议在熟知端口69上使用UDP服务。</p>
 ]]></content>
-  </entry>
-  <entry>
-    <title>Java编写单词小游戏</title>
-    <url>/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/</url>
-    <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>公司最近有一个竞技场项目，里面有一个单词小游戏。</p>
-<p>游戏大概就是随机生成一个5*5的棋盘，上面有单词的字母，通过滑动连出正确的单词。</p>
-<a id="more"></a>
-
-<h2 id="棋盘生成算法"><a href="#棋盘生成算法" class="headerlink" title="棋盘生成算法"></a>棋盘生成算法</h2><h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>首先随机选个一个起点，从这个点开始铺单词。</p>
-<p>分别选取上下左右四个方向作为下一个字母的摆放位置，不能触边也不能走重复路，直到平铺完所有的单词。</p>
-<p>如果在棋盘能平铺下单词的情况下，找不到路径，就从四个角作为起点，必能找到路径。</p>
-<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Wang Guolong</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@version</span> 1.0</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2020/7/31 5:50 下午</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GenerateWordBoard</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">char</span>[][] board;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        GenerateWordBoard g = <span class="keyword">new</span> GenerateWordBoard();</span><br><span class="line">        g.generateCharBoard(<span class="string">"vocabulary"</span>, <span class="number">5</span>, <span class="number">5</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">generateCharBoard</span><span class="params">(String word, <span class="keyword">int</span> m, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 单词为空 直接返回</span></span><br><span class="line">        <span class="keyword">if</span> (word.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 单词长度大于棋盘 铺不下 直接返回</span></span><br><span class="line">        <span class="keyword">if</span> (word.length() &gt; m * n) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 初始化棋盘 全为*</span></span><br><span class="line">        initBoard(m, n);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">char</span>[] wordChar = word.toCharArray();</span><br><span class="line">        <span class="comment">// 随机选取一个位置开始</span></span><br><span class="line">        Random random = <span class="keyword">new</span> Random();</span><br><span class="line">        <span class="keyword">int</span> randomX = random.nextInt(m);</span><br><span class="line">        <span class="keyword">int</span> randomY = random.nextInt(n);</span><br><span class="line">        <span class="comment">// 开始从随机位置dfs铺单词 从index 0 开始</span></span><br><span class="line">        <span class="keyword">boolean</span> result = generateDfs(board, wordChar, randomX, randomY, <span class="number">0</span>);</span><br><span class="line">        <span class="comment">// 如果没有找到路线 那么从四个角开始 必能找到一条路</span></span><br><span class="line">        <span class="keyword">if</span> (!result) &#123;</span><br><span class="line">            List&lt;<span class="keyword">int</span>[]&gt; starts = Arrays.asList(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, <span class="number">0</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, n - <span class="number">1</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;m - <span class="number">1</span>, <span class="number">0</span>&#125;,</span><br><span class="line">                    <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;m - <span class="number">1</span>, n - <span class="number">1</span>&#125;);</span><br><span class="line">            <span class="comment">// 随机四个角的一个</span></span><br><span class="line">            Collections.shuffle(starts);</span><br><span class="line">            <span class="comment">// 初始化棋盘</span></span><br><span class="line">            initBoard(m, n);</span><br><span class="line">            <span class="comment">// dfs铺单词</span></span><br><span class="line">            generateDfs(board, wordChar, starts.get(<span class="number">0</span>)[<span class="number">0</span>], starts.get(<span class="number">0</span>)[<span class="number">1</span>], <span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 查看结果</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; board.length; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; board[<span class="number">0</span>].length; j++) &#123;</span><br><span class="line">                System.out.print(board[i][j] + <span class="string">"  "</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initBoard</span><span class="params">(<span class="keyword">int</span> m, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 初始化</span></span><br><span class="line">        board = <span class="keyword">new</span> <span class="keyword">char</span>[m][n];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; board.length; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; board[<span class="number">0</span>].length; j++) &#123;</span><br><span class="line">                board[i][j] = <span class="string">'*'</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 返回true则为找到一条路 返回false为死路</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">generateDfs</span><span class="params">(<span class="keyword">char</span>[][] board, <span class="keyword">char</span>[] wordChar, <span class="keyword">int</span> i, <span class="keyword">int</span> j, <span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 碰到边 或者碰到已经走过的位置 不能走了 死路</span></span><br><span class="line">        <span class="keyword">if</span> (i &gt;= board.length || i &lt; <span class="number">0</span> || j &gt;= board[<span class="number">0</span>].length || j &lt; <span class="number">0</span> || board[i][j] == <span class="string">'/'</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 摆放一个字母</span></span><br><span class="line">        board[i][j] = wordChar[index];</span><br><span class="line"></span><br><span class="line">        <span class="comment">//如果已经达到单词长度则直接返回 找到一条路</span></span><br><span class="line">        <span class="keyword">if</span> (index == wordChar.length - <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 记录当前矩阵元素</span></span><br><span class="line">        <span class="keyword">char</span> tmp = board[i][j];</span><br><span class="line">        <span class="comment">// 修改为/ 表示已经访问过</span></span><br><span class="line">        board[i][j] = <span class="string">'/'</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 向上下左右四个方向开启递归</span></span><br><span class="line">        <span class="comment">// 查看能走几个方向 随机选择一个</span></span><br><span class="line">        List&lt;<span class="keyword">int</span>[]&gt; directions = Arrays.asList(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;-<span class="number">1</span>, <span class="number">0</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">1</span>, <span class="number">0</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, -<span class="number">1</span>&#125;, <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, <span class="number">1</span>&#125;);</span><br><span class="line">        Collections.shuffle(directions);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> res = <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; directions.size(); k++) &#123;</span><br><span class="line">            <span class="keyword">int</span> di = i + directions.get(k)[<span class="number">0</span>], dj = j + directions.get(k)[<span class="number">1</span>];</span><br><span class="line">            <span class="keyword">boolean</span> partialRes = generateDfs(board, wordChar, di, dj, index + <span class="number">1</span>);</span><br><span class="line">            <span class="keyword">if</span> (k == <span class="number">0</span>) &#123;</span><br><span class="line">                res = partialRes;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                res = res || partialRes;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 如果res为true 说明找到一条路 就不再遍历了 还原后返回true</span></span><br><span class="line">            <span class="keyword">if</span> (res) &#123;</span><br><span class="line">                <span class="comment">// 还原矩阵元素</span></span><br><span class="line">                board[i][j] = tmp;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 还原矩阵元素</span></span><br><span class="line">        board[i][j] = <span class="string">'*'</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><div style="display: flex;flex-direction: row;justify-content: center;">
-
-<div style="width: 200px;height: 200px;"><img src="/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/result1.png" class="" title="result1"></div>
-
-<div style="width: 200px;height: 200px;"><img src="/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/result2.png" class="" title="result2"></div>
-
-<div style="width: 200px;height: 200px;"><img src="/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/result3.png" class="" title="result3"></div>
-
-<div style="width: 200px;height: 200px;"><img src="/2020/08/03/Java%E7%BC%96%E5%86%99%E5%8D%95%E8%AF%8D%E5%B0%8F%E6%B8%B8%E6%88%8F/result4.png" class="" title="result4"></div>
-
-</div>]]></content>
   </entry>
   <entry>
     <title>Java面试题记录-1</title>
@@ -1432,6 +1432,20 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 ]]></content>
   </entry>
   <entry>
+    <title>SpringBoot实现通过url下载pdf到本地</title>
+    <url>/2020/06/06/SpringBoot%E5%AE%9E%E7%8E%B0%E9%80%9A%E8%BF%87url%E4%B8%8B%E8%BD%BDpdf%E5%88%B0%E6%9C%AC%E5%9C%B0/</url>
+    <content><![CDATA[<p>最近有需求是点击下载按钮后下载指定url的pdf文件到本地</p>
+<p>下面通过<strong>SpringBoot</strong>来实现一下：</p>
+<a id="more"></a>
+
+<h4 id="思路就是："><a href="#思路就是：" class="headerlink" title="思路就是："></a><strong>思路</strong>就是：</h4><ol>
+<li>解析url，建立连接获取输入流</li>
+<li>copy输入流到输出流中，进行相关设置并返回</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@GetMapping</span>(<span class="string">"/download"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">download</span><span class="params">(@RequestParam(<span class="string">"url"</span>)</span> String urlStr, HttpServletResponse response) <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        URL url = <span class="keyword">new</span> URL(urlStr);</span><br><span class="line">        HttpURLConnection conn = (HttpURLConnection)url.openConnection();</span><br><span class="line">        <span class="comment">//设置超时间为5秒</span></span><br><span class="line"><span class="comment">//        conn.setConnectTimeout(5*1000);</span></span><br><span class="line">        <span class="comment">//防止屏蔽程序抓取而返回403错误</span></span><br><span class="line">        conn.setRequestProperty(<span class="string">"User-Agent"</span>, <span class="string">"Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)"</span>);</span><br><span class="line">        <span class="keyword">try</span>(InputStream inputStream = conn.getInputStream();</span><br><span class="line">            OutputStream outputStream = response.getOutputStream();) &#123;</span><br><span class="line">            response.setContentType(<span class="string">"application/x-download"</span>);</span><br><span class="line">            response.addHeader(<span class="string">"Content-Disposition"</span>, <span class="string">"attachment;filename=test.pdf"</span>);</span><br><span class="line">            <span class="comment">// 将输入流拷贝到输出流中</span></span><br><span class="line">            IOUtils.copy(inputStream, outputStream);</span><br><span class="line">            outputStream.flush();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+  </entry>
+  <entry>
     <title>SpringBoot整合ELK实现日志收集</title>
     <url>/2020/10/01/SpringBoot%E6%95%B4%E5%90%88ELK%E5%AE%9E%E7%8E%B0%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/</url>
     <content><![CDATA[<h2 id="ELK简介"><a href="#ELK简介" class="headerlink" title="ELK简介"></a>ELK简介</h2><p>ELK是三个开源软件的缩写，分别表示：<strong>elasticsearch</strong>、<strong>logstash</strong>、<strong>kibana</strong></p>
@@ -1497,20 +1511,6 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>搭建了ELK日志系统后，我们就可以直接在kibana上看系统的日志了，还可以进行搜索</p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://juejin.im/post/6844903784632549390" target="_blank" rel="noopener">https://juejin.im/post/6844903784632549390</a></p>
 <p><a href="https://juejin.im/post/6844904008499331079" target="_blank" rel="noopener">https://juejin.im/post/6844904008499331079</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>SpringBoot实现通过url下载pdf到本地</title>
-    <url>/2020/06/06/SpringBoot%E5%AE%9E%E7%8E%B0%E9%80%9A%E8%BF%87url%E4%B8%8B%E8%BD%BDpdf%E5%88%B0%E6%9C%AC%E5%9C%B0/</url>
-    <content><![CDATA[<p>最近有需求是点击下载按钮后下载指定url的pdf文件到本地</p>
-<p>下面通过<strong>SpringBoot</strong>来实现一下：</p>
-<a id="more"></a>
-
-<h4 id="思路就是："><a href="#思路就是：" class="headerlink" title="思路就是："></a><strong>思路</strong>就是：</h4><ol>
-<li>解析url，建立连接获取输入流</li>
-<li>copy输入流到输出流中，进行相关设置并返回</li>
-</ol>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@GetMapping</span>(<span class="string">"/download"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">download</span><span class="params">(@RequestParam(<span class="string">"url"</span>)</span> String urlStr, HttpServletResponse response) <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        URL url = <span class="keyword">new</span> URL(urlStr);</span><br><span class="line">        HttpURLConnection conn = (HttpURLConnection)url.openConnection();</span><br><span class="line">        <span class="comment">//设置超时间为5秒</span></span><br><span class="line"><span class="comment">//        conn.setConnectTimeout(5*1000);</span></span><br><span class="line">        <span class="comment">//防止屏蔽程序抓取而返回403错误</span></span><br><span class="line">        conn.setRequestProperty(<span class="string">"User-Agent"</span>, <span class="string">"Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)"</span>);</span><br><span class="line">        <span class="keyword">try</span>(InputStream inputStream = conn.getInputStream();</span><br><span class="line">            OutputStream outputStream = response.getOutputStream();) &#123;</span><br><span class="line">            response.setContentType(<span class="string">"application/x-download"</span>);</span><br><span class="line">            response.addHeader(<span class="string">"Content-Disposition"</span>, <span class="string">"attachment;filename=test.pdf"</span>);</span><br><span class="line">            <span class="comment">// 将输入流拷贝到输出流中</span></span><br><span class="line">            IOUtils.copy(inputStream, outputStream);</span><br><span class="line">            outputStream.flush();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 ]]></content>
   </entry>
   <entry>
@@ -1798,6 +1798,25 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 ]]></content>
   </entry>
   <entry>
+    <title>cookie和session的区别</title>
+    <url>/2020/04/30/cookie%E5%92%8Csession%E7%9A%84%E5%8C%BA%E5%88%AB/</url>
+    <content><![CDATA[<h2 id="http无状态和session"><a href="#http无状态和session" class="headerlink" title="http无状态和session"></a>http无状态和session</h2><p>由于HTTP协议是<strong>无状态</strong>的协议，所以服务端需要记录用户的状态时，就需要用某种机制来识具体的用户，这个机制就是Session.</p>
+<a id="more"></a>
+
+<p>典型的场景比如购物车，当你点击下单按钮时，由于HTTP协议无状态，所以并不知道是哪个用户操作的，所以服务端要为特定的用户创建了特定的Session，用用于标识这个用户，并且跟踪用户，这样才知道购物车里面有几本书。</p>
+<p>这个Session是保存在服务端的，有一个唯一标识。在服务端保存Session的方法很多，内存、数据库、文件都有。</p>
+<p>集群的时候也要考虑Session的转移，在大型的网站，一般会有专门的Session服务器集群，用来保存用户会话，这个时候Session信息都是放在内存的，使用一些缓存服务比如Memcached之类的来放Session。</p>
+<h2 id="cookie"><a href="#cookie" class="headerlink" title="cookie"></a>cookie</h2><p>思考一下服务端如何识别特定的客户？这个时候Cookie就登场了。每次HTTP请求的时候，客户端都会发送相应的Cookie信息到服务端。</p>
+<p>实际上大多数的应用都是用 Cookie 来实现Session跟踪的，第一次创建Session的时候，服务端会在HTTP协议中告诉客户端，需要在 Cookie 里面记录一个Session ID，以后每次请求把这个会话ID发送到服务器，我就知道你是谁了。</p>
+<p>有人问，如果客户端的浏览器禁用了Cookie怎么办？一般这种情况下，会使用一种叫做URL重写的技术来进行会话跟踪，即每次HTTP交互，URL后面都会被附加上一个诸如 sid=xxxxx 这样的参数，服务端据此来识别用户。</p>
+<p>Cookie其实还可以用在一些方便用户的场景下，设想你某次登陆过一个网站，下次登录的时候不想再次输入账号了，怎么办？这个信息可以写到Cookie里面，访问网站的时候，网站页面的脚本可以读取这个信息，就自动帮你把用户名给填了，能够方便一下用户。这也是Cookie名称的由来，给用户的一点甜头。</p>
+<h2 id="cookie和session"><a href="#cookie和session" class="headerlink" title="cookie和session"></a>cookie和session</h2><p>所以，总结一下：<em>Session是在服务端保存的一个数据结构，用来跟踪用户的状态，这个数据可以保存在集群、数据库、文件中；Cookie是客户端保存用户信息的一种机制，用来记录用户的一些信息，也是实现Session的一种方式</em>。</p>
+<p>cookie和session的<strong>共同之处</strong>在于：cookie和session都是用来<strong>跟踪浏览器用户身份</strong>的会话方式。</p>
+<p>cookie 和session的<strong>区别</strong>是：cookie数据保存在<strong>客户端</strong>，session数据保存在<strong>服务器端</strong>。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://www.imooc.com/article/3369" target="_blank" rel="noopener">https://www.imooc.com/article/3369</a><br><a href="https://www.zhihu.com/question/19786827/answer/28752144" target="_blank" rel="noopener">https://www.zhihu.com/question/19786827/answer/28752144</a></p>
+]]></content>
+  </entry>
+  <entry>
     <title>ThreadLocal实践与详解</title>
     <url>/2020/08/26/ThreadLocal%E5%AE%9E%E8%B7%B5%E4%B8%8E%E8%AF%A6%E8%A7%A3/</url>
     <content><![CDATA[<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>ThreadLocal类是用来提供线程内部的局部变量。让这些变量在多线程环境下访问（get/set）时能保证各个线程里的变量相对独立于其他线程内的变量。</p>
@@ -1878,31 +1897,12 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 ]]></content>
   </entry>
   <entry>
-    <title>cookie和session的区别</title>
-    <url>/2020/04/30/cookie%E5%92%8Csession%E7%9A%84%E5%8C%BA%E5%88%AB/</url>
-    <content><![CDATA[<h2 id="http无状态和session"><a href="#http无状态和session" class="headerlink" title="http无状态和session"></a>http无状态和session</h2><p>由于HTTP协议是<strong>无状态</strong>的协议，所以服务端需要记录用户的状态时，就需要用某种机制来识具体的用户，这个机制就是Session.</p>
-<a id="more"></a>
-
-<p>典型的场景比如购物车，当你点击下单按钮时，由于HTTP协议无状态，所以并不知道是哪个用户操作的，所以服务端要为特定的用户创建了特定的Session，用用于标识这个用户，并且跟踪用户，这样才知道购物车里面有几本书。</p>
-<p>这个Session是保存在服务端的，有一个唯一标识。在服务端保存Session的方法很多，内存、数据库、文件都有。</p>
-<p>集群的时候也要考虑Session的转移，在大型的网站，一般会有专门的Session服务器集群，用来保存用户会话，这个时候Session信息都是放在内存的，使用一些缓存服务比如Memcached之类的来放Session。</p>
-<h2 id="cookie"><a href="#cookie" class="headerlink" title="cookie"></a>cookie</h2><p>思考一下服务端如何识别特定的客户？这个时候Cookie就登场了。每次HTTP请求的时候，客户端都会发送相应的Cookie信息到服务端。</p>
-<p>实际上大多数的应用都是用 Cookie 来实现Session跟踪的，第一次创建Session的时候，服务端会在HTTP协议中告诉客户端，需要在 Cookie 里面记录一个Session ID，以后每次请求把这个会话ID发送到服务器，我就知道你是谁了。</p>
-<p>有人问，如果客户端的浏览器禁用了Cookie怎么办？一般这种情况下，会使用一种叫做URL重写的技术来进行会话跟踪，即每次HTTP交互，URL后面都会被附加上一个诸如 sid=xxxxx 这样的参数，服务端据此来识别用户。</p>
-<p>Cookie其实还可以用在一些方便用户的场景下，设想你某次登陆过一个网站，下次登录的时候不想再次输入账号了，怎么办？这个信息可以写到Cookie里面，访问网站的时候，网站页面的脚本可以读取这个信息，就自动帮你把用户名给填了，能够方便一下用户。这也是Cookie名称的由来，给用户的一点甜头。</p>
-<h2 id="cookie和session"><a href="#cookie和session" class="headerlink" title="cookie和session"></a>cookie和session</h2><p>所以，总结一下：<em>Session是在服务端保存的一个数据结构，用来跟踪用户的状态，这个数据可以保存在集群、数据库、文件中；Cookie是客户端保存用户信息的一种机制，用来记录用户的一些信息，也是实现Session的一种方式</em>。</p>
-<p>cookie和session的<strong>共同之处</strong>在于：cookie和session都是用来<strong>跟踪浏览器用户身份</strong>的会话方式。</p>
-<p>cookie 和session的<strong>区别</strong>是：cookie数据保存在<strong>客户端</strong>，session数据保存在<strong>服务器端</strong>。</p>
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://www.imooc.com/article/3369" target="_blank" rel="noopener">https://www.imooc.com/article/3369</a><br><a href="https://www.zhihu.com/question/19786827/answer/28752144" target="_blank" rel="noopener">https://www.zhihu.com/question/19786827/answer/28752144</a></p>
-]]></content>
-  </entry>
-  <entry>
     <title>一篇看懂ConcurrentHashMap中put方法的逻辑</title>
     <url>/2021/02/01/%E4%B8%80%E7%AF%87%E7%9C%8B%E6%87%82ConcurrentHashMap%E4%B8%ADput%E6%96%B9%E6%B3%95%E7%9A%84%E9%80%BB%E8%BE%91/</url>
     <content><![CDATA[<h3 id="ConcurrentHashMap的put方法"><a href="#ConcurrentHashMap的put方法" class="headerlink" title="ConcurrentHashMap的put方法"></a>ConcurrentHashMap的put方法</h3><p>源码及注释如下：</p>
 <a id="more"></a>
 
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> V <span class="title">put</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> putVal(key, value, <span class="keyword">false</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">final</span> V <span class="title">putVal</span><span class="params">(K key, V value, <span class="keyword">boolean</span> onlyIfAbsent)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (key == <span class="keyword">null</span> || value == <span class="keyword">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">  			<span class="comment">// hash 对hashcode再散列</span></span><br><span class="line">        <span class="keyword">int</span> hash = spread(key.hashCode());</span><br><span class="line">        <span class="keyword">int</span> binCount = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 遍历bucket数组，自旋</span></span><br><span class="line">        <span class="keyword">for</span> (Node&lt;K,V&gt;[] tab = table;;) &#123;</span><br><span class="line">            Node&lt;K,V&gt; f; <span class="keyword">int</span> n, i, fh;</span><br><span class="line">          	<span class="comment">// 懒加载 延迟构建</span></span><br><span class="line">            <span class="keyword">if</span> (tab == <span class="keyword">null</span> || (n = tab.length) == <span class="number">0</span>)</span><br><span class="line">                tab = initTable();</span><br><span class="line">            <span class="comment">// 拿到对应bucket的头节点为空</span></span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> ((f = tabAt(tab, i = (n - <span class="number">1</span>) &amp; hash)) == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// 通过CAS插入头节点 失败就从头开始循环</span></span><br><span class="line">                <span class="keyword">if</span> (casTabAt(tab, i, <span class="keyword">null</span>,</span><br><span class="line">                             <span class="keyword">new</span> Node&lt;K,V&gt;(hash, key, value, <span class="keyword">null</span>)))</span><br><span class="line">                    <span class="keyword">break</span>;                   <span class="comment">// no lock when adding to empty bin</span></span><br><span class="line">            &#125;</span><br><span class="line">          	<span class="comment">// 如果正在扩容，当前线程帮助进行扩容</span></span><br><span class="line">            <span class="comment">// 每个线程只能同时负责一个bucket上的数据迁移，但是并不影响其他桶的put和get操作</span></span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> ((fh = f.hash) == MOVED)</span><br><span class="line">                tab = helpTransfer(tab, f);</span><br><span class="line">            <span class="comment">// 存在hash碰撞，获取头节点的锁再进行操作</span></span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                V oldVal = <span class="keyword">null</span>;</span><br><span class="line">                <span class="keyword">synchronized</span> (f) &#123;</span><br><span class="line">                    <span class="comment">// 再次检查头节点是否有变化，有变化进入下一轮自旋</span></span><br><span class="line">                    <span class="keyword">if</span> (tabAt(tab, i) == f) &#123;</span><br><span class="line">                        <span class="comment">// 当前bucket是链表</span></span><br><span class="line">                        <span class="keyword">if</span> (fh &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">                            binCount = <span class="number">1</span>;</span><br><span class="line">                            <span class="comment">// 遍历链表</span></span><br><span class="line">                            <span class="keyword">for</span> (Node&lt;K,V&gt; e = f;; ++binCount) &#123;</span><br><span class="line">                                K ek;</span><br><span class="line">                                <span class="comment">// key相同，覆盖</span></span><br><span class="line">                                <span class="keyword">if</span> (e.hash == hash &amp;&amp;</span><br><span class="line">                                    ((ek = e.key) == key ||</span><br><span class="line">                                     (ek != <span class="keyword">null</span> &amp;&amp; key.equals(ek)))) &#123;</span><br><span class="line">                                    oldVal = e.val;</span><br><span class="line">                                    <span class="keyword">if</span> (!onlyIfAbsent)</span><br><span class="line">                                        e.val = value;</span><br><span class="line">                                    <span class="keyword">break</span>;</span><br><span class="line">                                &#125;</span><br><span class="line">                                Node&lt;K,V&gt; pred = e;</span><br><span class="line">                                <span class="comment">// 下一个位置为空 直接插入</span></span><br><span class="line">                                <span class="keyword">if</span> ((e = e.next) == <span class="keyword">null</span>) &#123;</span><br><span class="line">                                    pred.next = <span class="keyword">new</span> Node&lt;K,V&gt;(hash, key,</span><br><span class="line">                                                              value, <span class="keyword">null</span>);</span><br><span class="line">                                    <span class="keyword">break</span>;</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                      	<span class="comment">// 当前bucket是红黑树</span></span><br><span class="line">                        <span class="keyword">else</span> <span class="keyword">if</span> (f <span class="keyword">instanceof</span> TreeBin) &#123;</span><br><span class="line">                            Node&lt;K,V&gt; p;</span><br><span class="line">                            binCount = <span class="number">2</span>;</span><br><span class="line">                            <span class="comment">// 在树上插入新节点</span></span><br><span class="line">                            <span class="keyword">if</span> ((p = ((TreeBin&lt;K,V&gt;)f).putTreeVal(hash, key,</span><br><span class="line">                                                           value)) != <span class="keyword">null</span>) &#123;</span><br><span class="line">                                oldVal = p.val;</span><br><span class="line">                                <span class="keyword">if</span> (!onlyIfAbsent)</span><br><span class="line">                                    p.val = value;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (binCount != <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="comment">// 树化</span></span><br><span class="line">                    <span class="keyword">if</span> (binCount &gt;= TREEIFY_THRESHOLD)</span><br><span class="line">                        treeifyBin(tab, i);</span><br><span class="line">                    <span class="keyword">if</span> (oldVal != <span class="keyword">null</span>)</span><br><span class="line">                        <span class="keyword">return</span> oldVal;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">  			<span class="comment">// 判断是不是需要进行扩容操作</span></span><br><span class="line">        addCount(<span class="number">1L</span>, binCount);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> V <span class="title">put</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> putVal(key, value, <span class="keyword">false</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">final</span> V <span class="title">putVal</span><span class="params">(K key, V value, <span class="keyword">boolean</span> onlyIfAbsent)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (key == <span class="keyword">null</span> || value == <span class="keyword">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">        <span class="comment">// hash 对hashcode再散列</span></span><br><span class="line">        <span class="keyword">int</span> hash = spread(key.hashCode());</span><br><span class="line">        <span class="keyword">int</span> binCount = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 遍历bucket数组，自旋</span></span><br><span class="line">        <span class="keyword">for</span> (Node&lt;K,V&gt;[] tab = table;;) &#123;</span><br><span class="line">            Node&lt;K,V&gt; f; <span class="keyword">int</span> n, i, fh;</span><br><span class="line">            <span class="comment">// 懒加载 延迟构建</span></span><br><span class="line">            <span class="keyword">if</span> (tab == <span class="keyword">null</span> || (n = tab.length) == <span class="number">0</span>)</span><br><span class="line">                tab = initTable();</span><br><span class="line">            <span class="comment">// 拿到对应bucket的头节点为空</span></span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> ((f = tabAt(tab, i = (n - <span class="number">1</span>) &amp; hash)) == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// 通过CAS插入头节点 失败就从头开始循环</span></span><br><span class="line">                <span class="keyword">if</span> (casTabAt(tab, i, <span class="keyword">null</span>,</span><br><span class="line">                             <span class="keyword">new</span> Node&lt;K,V&gt;(hash, key, value, <span class="keyword">null</span>)))</span><br><span class="line">                    <span class="keyword">break</span>;                   <span class="comment">// no lock when adding to empty bin</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 如果正在扩容，当前线程帮助进行扩容</span></span><br><span class="line">            <span class="comment">// 每个线程只能同时负责一个bucket上的数据迁移，但是并不影响其他桶的put和get操作</span></span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> ((fh = f.hash) == MOVED)</span><br><span class="line">                tab = helpTransfer(tab, f);</span><br><span class="line">            <span class="comment">// 存在hash碰撞，获取头节点的锁再进行操作</span></span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                V oldVal = <span class="keyword">null</span>;</span><br><span class="line">                <span class="keyword">synchronized</span> (f) &#123;</span><br><span class="line">                    <span class="comment">// 再次检查头节点是否有变化，有变化进入下一轮自旋</span></span><br><span class="line">                    <span class="keyword">if</span> (tabAt(tab, i) == f) &#123;</span><br><span class="line">                        <span class="comment">// 当前bucket是链表</span></span><br><span class="line">                        <span class="keyword">if</span> (fh &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">                            binCount = <span class="number">1</span>;</span><br><span class="line">                            <span class="comment">// 遍历链表</span></span><br><span class="line">                            <span class="keyword">for</span> (Node&lt;K,V&gt; e = f;; ++binCount) &#123;</span><br><span class="line">                                K ek;</span><br><span class="line">                                <span class="comment">// key相同，覆盖</span></span><br><span class="line">                                <span class="keyword">if</span> (e.hash == hash &amp;&amp;</span><br><span class="line">                                    ((ek = e.key) == key ||</span><br><span class="line">                                     (ek != <span class="keyword">null</span> &amp;&amp; key.equals(ek)))) &#123;</span><br><span class="line">                                    oldVal = e.val;</span><br><span class="line">                                    <span class="keyword">if</span> (!onlyIfAbsent)</span><br><span class="line">                                        e.val = value;</span><br><span class="line">                                    <span class="keyword">break</span>;</span><br><span class="line">                                &#125;</span><br><span class="line">                                Node&lt;K,V&gt; pred = e;</span><br><span class="line">                                <span class="comment">// 下一个位置为空 直接插入</span></span><br><span class="line">                                <span class="keyword">if</span> ((e = e.next) == <span class="keyword">null</span>) &#123;</span><br><span class="line">                                    pred.next = <span class="keyword">new</span> Node&lt;K,V&gt;(hash, key,</span><br><span class="line">                                                              value, <span class="keyword">null</span>);</span><br><span class="line">                                    <span class="keyword">break</span>;</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                      	<span class="comment">// 当前bucket是红黑树</span></span><br><span class="line">                        <span class="keyword">else</span> <span class="keyword">if</span> (f <span class="keyword">instanceof</span> TreeBin) &#123;</span><br><span class="line">                            Node&lt;K,V&gt; p;</span><br><span class="line">                            binCount = <span class="number">2</span>;</span><br><span class="line">                            <span class="comment">// 在树上插入新节点</span></span><br><span class="line">                            <span class="keyword">if</span> ((p = ((TreeBin&lt;K,V&gt;)f).putTreeVal(hash, key,</span><br><span class="line">                                                           value)) != <span class="keyword">null</span>) &#123;</span><br><span class="line">                                oldVal = p.val;</span><br><span class="line">                                <span class="keyword">if</span> (!onlyIfAbsent)</span><br><span class="line">                                    p.val = value;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (binCount != <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="comment">// 树化</span></span><br><span class="line">                    <span class="keyword">if</span> (binCount &gt;= TREEIFY_THRESHOLD)</span><br><span class="line">                        treeifyBin(tab, i);</span><br><span class="line">                    <span class="keyword">if</span> (oldVal != <span class="keyword">null</span>)</span><br><span class="line">                        <span class="keyword">return</span> oldVal;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 判断是不是需要进行扩容操作</span></span><br><span class="line">        addCount(<span class="number">1L</span>, binCount);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 ]]></content>
       <categories>
@@ -1910,6 +1910,22 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
       </categories>
       <tags>
         <tag>ConcurrentHashMap</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>一篇看懂HashMap中put方法的逻辑</title>
+    <url>/2021/02/01/%E4%B8%80%E7%AF%87%E7%9C%8B%E6%87%82HashMap%E4%B8%ADput%E6%96%B9%E6%B3%95%E7%9A%84%E9%80%BB%E8%BE%91/</url>
+    <content><![CDATA[<h3 id="HashMap的put方法"><a href="#HashMap的put方法" class="headerlink" title="HashMap的put方法"></a>HashMap的put方法</h3><p>下面来看一下put方法的源码(详细注释):</p>
+<a id="more"></a>
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> V <span class="title">put</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> putVal(hash(key), key, value, <span class="keyword">false</span>, <span class="keyword">true</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">final</span> V <span class="title">putVal</span><span class="params">(<span class="keyword">int</span> hash, K key, V value, <span class="keyword">boolean</span> onlyIfAbsent,</span></span></span><br><span class="line"><span class="function"><span class="params">                   <span class="keyword">boolean</span> evict)</span> </span>&#123;</span><br><span class="line">        Node&lt;K,V&gt;[] tab; Node&lt;K,V&gt; p; <span class="keyword">int</span> n, i;</span><br><span class="line">        <span class="comment">// hashmap是延迟构建，第一次put才进行初始化</span></span><br><span class="line">        <span class="keyword">if</span> ((tab = table) == <span class="keyword">null</span> || (n = tab.length) == <span class="number">0</span>)</span><br><span class="line">            n = (tab = resize()).length;</span><br><span class="line">        <span class="comment">// 如果当前bucket没有元素，直接新建一个node</span></span><br><span class="line">        <span class="keyword">if</span> ((p = tab[i = (n - <span class="number">1</span>) &amp; hash]) == <span class="keyword">null</span>)</span><br><span class="line">            tab[i] = newNode(hash, key, value, <span class="keyword">null</span>);</span><br><span class="line">        <span class="comment">// 如果当前bucket有元素</span></span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            Node&lt;K,V&gt; e; K k;</span><br><span class="line">            <span class="comment">// key相同直接替换</span></span><br><span class="line">            <span class="keyword">if</span> (p.hash == hash &amp;&amp;</span><br><span class="line">                ((k = p.key) == key || (key != <span class="keyword">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">                e = p;</span><br><span class="line">            <span class="comment">// 如果是TreeNode，直接在红黑树上插入</span></span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (p <span class="keyword">instanceof</span> TreeNode)</span><br><span class="line">                e = ((TreeNode&lt;K,V&gt;)p).putTreeVal(<span class="keyword">this</span>, tab, hash, key, value);</span><br><span class="line">            <span class="comment">// 遍历链表</span></span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> binCount = <span class="number">0</span>; ; ++binCount) &#123;</span><br><span class="line">                    <span class="comment">// 如果下一个node是空就直接插入</span></span><br><span class="line">                    <span class="keyword">if</span> ((e = p.next) == <span class="keyword">null</span>) &#123;</span><br><span class="line">                        p.next = newNode(hash, key, value, <span class="keyword">null</span>);</span><br><span class="line">                      <span class="comment">// 超过阈值就树化  </span></span><br><span class="line">                      <span class="keyword">if</span> (binCount &gt;= TREEIFY_THRESHOLD - <span class="number">1</span>) <span class="comment">// -1 for 1st</span></span><br><span class="line">                            treeifyBin(tab, hash);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">// 如果key相同就替换</span></span><br><span class="line">                    <span class="keyword">if</span> (e.hash == hash &amp;&amp;</span><br><span class="line">                        ((k = e.key) == key || (key != <span class="keyword">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    p = e;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (e != <span class="keyword">null</span>) &#123; <span class="comment">// existing mapping for key</span></span><br><span class="line">                V oldValue = e.value;</span><br><span class="line">                <span class="keyword">if</span> (!onlyIfAbsent || oldValue == <span class="keyword">null</span>)</span><br><span class="line">                    e.value = value;</span><br><span class="line">                afterNodeAccess(e);</span><br><span class="line">                <span class="keyword">return</span> oldValue;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// size + 1 并判断是否需要扩容</span></span><br><span class="line">        ++modCount;</span><br><span class="line">        <span class="keyword">if</span> (++size &gt; threshold)</span><br><span class="line">            resize();</span><br><span class="line">        afterNodeInsertion(evict);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>Java集合</category>
+      </categories>
+      <tags>
+        <tag>HashMap</tag>
       </tags>
   </entry>
   <entry>
@@ -1928,62 +1944,6 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 <p>用单例和多例的标准只有一个： <strong>当对象含有可改变的状态时（更精确的说就是在实际应用中该状态会改变），则多例，否则单例</strong>；</p>
 <h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><p><a href="https://blog.csdn.net/zhang_dianliang/article/details/76850906" target="_blank" rel="noopener">https://blog.csdn.net/zhang_dianliang/article/details/76850906</a></p>
 <p><a href="https://www.imooc.com/wenda/detail/385159" target="_blank" rel="noopener">https://www.imooc.com/wenda/detail/385159</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>三句话搞懂Redis-缓存穿透、击穿、雪崩</title>
-    <url>/2020/08/28/%E4%B8%89%E5%8F%A5%E8%AF%9D%E6%90%9E%E6%87%82Redis-%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E3%80%81%E5%87%BB%E7%A9%BF%E3%80%81%E9%9B%AA%E5%B4%A9/</url>
-    <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>如何有效的理解并且区分 Redis <strong>穿透、击穿和雪崩</strong>之间的区别，一直以来都挺困扰我的。特别是穿透和击穿，过一段时间就稀里糊涂的分不清了。</p>
-<p>为了有效的帮助自己，以及拥有同样烦恼的朋友们区分这三种场景。我总结了一些关键词，希望大家可以和我一样通过联想的方式来区分并理解这三种场景的区别！</p>
-<a id="more"></a>
-
-<h3 id="一-缓存穿透"><a href="#一-缓存穿透" class="headerlink" title="一. 缓存穿透"></a>一. 缓存穿透</h3><h4 id="关键词：穿过-Redis-和数据库"><a href="#关键词：穿过-Redis-和数据库" class="headerlink" title="关键词：穿过 Redis 和数据库"></a>关键词：穿过 Redis 和数据库</h4><p>当 Redis 和数据库中都没有我们想要的数据时，就需要考虑缓存穿透的问题了。下面这段逻辑大家用的会比较多：先去 Redis 中查找某资源，Redis 中查不到就去 DB 中查，DB 中查到后回写一份数据到 Redis 中。</p>
-<img src="/2020/08/28/%E4%B8%89%E5%8F%A5%E8%AF%9D%E6%90%9E%E6%87%82Redis-%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E3%80%81%E5%87%BB%E7%A9%BF%E3%80%81%E9%9B%AA%E5%B4%A9/chuantou.png" class="" title="缓存穿透">
-
-<p>这段逻辑正常情况下问题并不大，但是如果用户恶意重复请求资源 X，该资源在 Redis 和 DB 中都不存在。那么每次请求都会直接打到 DB 上，甚至导致物理 DB 宕机。</p>
-<h4 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h4><ol>
-<li><strong>缓存空结果</strong></li>
-</ol>
-<p>如果系统发现 Redis 及 DB 中都不存在该资源，就缓存空结果一段时间。需要注意哈，这次的失效时间不能设置的太长，否则数据的实效性会产生很大的问题。</p>
-<ol start="2">
-<li><strong>用户合法性校验</strong></li>
-</ol>
-<p>对用户的请求合法性进行校验，拦截恶意重复请求。</p>
-<ol start="3">
-<li><strong>布隆过滤器</strong></li>
-</ol>
-<p>看到这个名词不要慌。简单来说布隆过滤器的用途就是帮助你判断某个值是否存在。</p>
-<p>布隆过滤器（英语：Bloom Filter）是1970年由布隆提出的。它实际上是一个很长的二进制向量和一系列随机映射函数。布隆过滤器可以用于检索一个元素是否在一个集合中。它的优点是空间效率和查询时间都远远超过一般的算法，缺点是有一定的误识别率和删除困难。</p>
-<p>把数据库中的数据的key都在布隆过滤器中过一遍，能帮助我们挡掉大部分不存在的key的请求</p>
-<h3 id="二-缓存击穿"><a href="#二-缓存击穿" class="headerlink" title="二. 缓存击穿"></a>二. 缓存击穿</h3><h4 id="关键词：定点打击"><a href="#关键词：定点打击" class="headerlink" title="关键词：定点打击"></a>关键词：定点打击</h4><p>试想如果所有请求对着一个 key 照死里搞，这是不是就是一种定点打击呢？</p>
-<p>怎么理解呢？举个极端的例子：比如某某明星爆出一个惊天狠料，海量吃瓜群众同时访问微博去查看该八卦新闻，而微博 Redis 集群中数据在此刻正好过期了，那么无数的请求则直接打到了微博系统的物理 DB 上，DB 瞬间挂了。</p>
-<h4 id="解决方案-1"><a href="#解决方案-1" class="headerlink" title="解决方案"></a>解决方案</h4><ol>
-<li><strong>热点数据永远不过期</strong></li>
-</ol>
-<p>比如我们可以将某个 key 的缓存时间设置为 25 小时，然后后台有个 JOB 每隔 24 小时就去批量刷新一下热点数据。就可以解决这个问题了。</p>
-<ol start="2">
-<li><strong>使用互斥锁</strong></li>
-</ol>
-<p>容易影响吞吐量，大部分项目设置热点 key 永不过期就妥妥的了。</p>
-<h3 id="三-缓存雪崩"><a href="#三-缓存雪崩" class="headerlink" title="三. 缓存雪崩"></a>三. 缓存雪崩</h3><h4 id="关键词：Redis-崩了，没有数据了"><a href="#关键词：Redis-崩了，没有数据了" class="headerlink" title="关键词：Redis 崩了，没有数据了"></a>关键词：Redis 崩了，没有数据了</h4><p>这里的 Redis 崩了指的并不是 Redis 集群宕机了。而是说在某个时刻 Redis 集群中的热点 key 都失效了。如果集群中的热点 key 在某一时刻同时失效了的话，试想海量的请求都将直接打到 DB 上，DB 可能在瞬间就被打爆了。</p>
-<h4 id="解决方案-2"><a href="#解决方案-2" class="headerlink" title="解决方案"></a>解决方案</h4><ol>
-<li><strong>Redis 失效时间加上随机数</strong></li>
-</ol>
-<p>Redis 失效时间加上随机数，是一种比较取巧的解决方案。在一定程度上减轻了 DB 的瞬时压力，但是这种方案也在一定程度上增加了维护的成本。</p>
-<ol start="2">
-<li><strong>Redis 永不过期</strong></li>
-</ol>
-<p>实现方案在上文中简单提过了。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>最后我们再回归到主题！如何轻松的通过联想的方式来区分 Redis 缓存穿透、击穿、雪崩的区别？</p>
-<ul>
-<li><p><strong>缓存穿透</strong>—穿过（绕过） Redis 和 DB 来搞你</p>
-</li>
-<li><p><strong>缓存击穿</strong>—定点打击来搞你</p>
-</li>
-<li><p><strong>缓存雪崩</strong>—热点 key 在某一个时刻同时失效</p>
-</li>
-</ul>
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://mp.weixin.qq.com/s/AmxDAhbUpO0awG5mieyAjQ" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/AmxDAhbUpO0awG5mieyAjQ</a></p>
 ]]></content>
   </entry>
   <entry>
@@ -2144,20 +2104,60 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
       </tags>
   </entry>
   <entry>
-    <title>一篇看懂HashMap中put方法的逻辑</title>
-    <url>/2021/02/01/%E4%B8%80%E7%AF%87%E7%9C%8B%E6%87%82HashMap%E4%B8%ADput%E6%96%B9%E6%B3%95%E7%9A%84%E9%80%BB%E8%BE%91/</url>
-    <content><![CDATA[<h3 id="HashMap的put方法"><a href="#HashMap的put方法" class="headerlink" title="HashMap的put方法"></a>HashMap的put方法</h3><p>下面来看一下put方法的源码(详细注释):</p>
+    <title>三句话搞懂Redis-缓存穿透、击穿、雪崩</title>
+    <url>/2020/08/28/%E4%B8%89%E5%8F%A5%E8%AF%9D%E6%90%9E%E6%87%82Redis-%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E3%80%81%E5%87%BB%E7%A9%BF%E3%80%81%E9%9B%AA%E5%B4%A9/</url>
+    <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>如何有效的理解并且区分 Redis <strong>穿透、击穿和雪崩</strong>之间的区别，一直以来都挺困扰我的。特别是穿透和击穿，过一段时间就稀里糊涂的分不清了。</p>
+<p>为了有效的帮助自己，以及拥有同样烦恼的朋友们区分这三种场景。我总结了一些关键词，希望大家可以和我一样通过联想的方式来区分并理解这三种场景的区别！</p>
 <a id="more"></a>
 
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> V <span class="title">put</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> putVal(hash(key), key, value, <span class="keyword">false</span>, <span class="keyword">true</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">final</span> V <span class="title">putVal</span><span class="params">(<span class="keyword">int</span> hash, K key, V value, <span class="keyword">boolean</span> onlyIfAbsent,</span></span></span><br><span class="line"><span class="function"><span class="params">                   <span class="keyword">boolean</span> evict)</span> </span>&#123;</span><br><span class="line">        Node&lt;K,V&gt;[] tab; Node&lt;K,V&gt; p; <span class="keyword">int</span> n, i;</span><br><span class="line">        <span class="comment">// hashmap是延迟构建，第一次put才进行初始化</span></span><br><span class="line">        <span class="keyword">if</span> ((tab = table) == <span class="keyword">null</span> || (n = tab.length) == <span class="number">0</span>)</span><br><span class="line">            n = (tab = resize()).length;</span><br><span class="line">        <span class="comment">// 如果当前bucket没有元素，直接新建一个node</span></span><br><span class="line">        <span class="keyword">if</span> ((p = tab[i = (n - <span class="number">1</span>) &amp; hash]) == <span class="keyword">null</span>)</span><br><span class="line">            tab[i] = newNode(hash, key, value, <span class="keyword">null</span>);</span><br><span class="line">        <span class="comment">// 如果当前bucket有元素</span></span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            Node&lt;K,V&gt; e; K k;</span><br><span class="line">            <span class="comment">// key相同直接替换</span></span><br><span class="line">            <span class="keyword">if</span> (p.hash == hash &amp;&amp;</span><br><span class="line">                ((k = p.key) == key || (key != <span class="keyword">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">                e = p;</span><br><span class="line">            <span class="comment">// 如果是TreeNode，直接在红黑树上插入</span></span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (p <span class="keyword">instanceof</span> TreeNode)</span><br><span class="line">                e = ((TreeNode&lt;K,V&gt;)p).putTreeVal(<span class="keyword">this</span>, tab, hash, key, value);</span><br><span class="line">            <span class="comment">// 遍历链表</span></span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> binCount = <span class="number">0</span>; ; ++binCount) &#123;</span><br><span class="line">                    <span class="comment">// 如果下一个node是空就直接插入</span></span><br><span class="line">                    <span class="keyword">if</span> ((e = p.next) == <span class="keyword">null</span>) &#123;</span><br><span class="line">                        p.next = newNode(hash, key, value, <span class="keyword">null</span>);</span><br><span class="line">                      <span class="comment">// 超过阈值就树化  </span></span><br><span class="line">                      <span class="keyword">if</span> (binCount &gt;= TREEIFY_THRESHOLD - <span class="number">1</span>) <span class="comment">// -1 for 1st</span></span><br><span class="line">                            treeifyBin(tab, hash);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">// 如果key相同就替换</span></span><br><span class="line">                    <span class="keyword">if</span> (e.hash == hash &amp;&amp;</span><br><span class="line">                        ((k = e.key) == key || (key != <span class="keyword">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    p = e;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (e != <span class="keyword">null</span>) &#123; <span class="comment">// existing mapping for key</span></span><br><span class="line">                V oldValue = e.value;</span><br><span class="line">                <span class="keyword">if</span> (!onlyIfAbsent || oldValue == <span class="keyword">null</span>)</span><br><span class="line">                    e.value = value;</span><br><span class="line">                afterNodeAccess(e);</span><br><span class="line">                <span class="keyword">return</span> oldValue;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// size + 1 并判断是否需要扩容</span></span><br><span class="line">        ++modCount;</span><br><span class="line">        <span class="keyword">if</span> (++size &gt; threshold)</span><br><span class="line">            resize();</span><br><span class="line">        afterNodeInsertion(evict);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="一-缓存穿透"><a href="#一-缓存穿透" class="headerlink" title="一. 缓存穿透"></a>一. 缓存穿透</h3><h4 id="关键词：穿过-Redis-和数据库"><a href="#关键词：穿过-Redis-和数据库" class="headerlink" title="关键词：穿过 Redis 和数据库"></a>关键词：穿过 Redis 和数据库</h4><p>当 Redis 和数据库中都没有我们想要的数据时，就需要考虑缓存穿透的问题了。下面这段逻辑大家用的会比较多：先去 Redis 中查找某资源，Redis 中查不到就去 DB 中查，DB 中查到后回写一份数据到 Redis 中。</p>
+<img src="/2020/08/28/%E4%B8%89%E5%8F%A5%E8%AF%9D%E6%90%9E%E6%87%82Redis-%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E3%80%81%E5%87%BB%E7%A9%BF%E3%80%81%E9%9B%AA%E5%B4%A9/chuantou.png" class="" title="缓存穿透">
 
+<p>这段逻辑正常情况下问题并不大，但是如果用户恶意重复请求资源 X，该资源在 Redis 和 DB 中都不存在。那么每次请求都会直接打到 DB 上，甚至导致物理 DB 宕机。</p>
+<h4 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h4><ol>
+<li><strong>缓存空结果</strong></li>
+</ol>
+<p>如果系统发现 Redis 及 DB 中都不存在该资源，就缓存空结果一段时间。需要注意哈，这次的失效时间不能设置的太长，否则数据的实效性会产生很大的问题。</p>
+<ol start="2">
+<li><strong>用户合法性校验</strong></li>
+</ol>
+<p>对用户的请求合法性进行校验，拦截恶意重复请求。</p>
+<ol start="3">
+<li><strong>布隆过滤器</strong></li>
+</ol>
+<p>看到这个名词不要慌。简单来说布隆过滤器的用途就是帮助你判断某个值是否存在。</p>
+<p>布隆过滤器（英语：Bloom Filter）是1970年由布隆提出的。它实际上是一个很长的二进制向量和一系列随机映射函数。布隆过滤器可以用于检索一个元素是否在一个集合中。它的优点是空间效率和查询时间都远远超过一般的算法，缺点是有一定的误识别率和删除困难。</p>
+<p>把数据库中的数据的key都在布隆过滤器中过一遍，能帮助我们挡掉大部分不存在的key的请求</p>
+<h3 id="二-缓存击穿"><a href="#二-缓存击穿" class="headerlink" title="二. 缓存击穿"></a>二. 缓存击穿</h3><h4 id="关键词：定点打击"><a href="#关键词：定点打击" class="headerlink" title="关键词：定点打击"></a>关键词：定点打击</h4><p>试想如果所有请求对着一个 key 照死里搞，这是不是就是一种定点打击呢？</p>
+<p>怎么理解呢？举个极端的例子：比如某某明星爆出一个惊天狠料，海量吃瓜群众同时访问微博去查看该八卦新闻，而微博 Redis 集群中数据在此刻正好过期了，那么无数的请求则直接打到了微博系统的物理 DB 上，DB 瞬间挂了。</p>
+<h4 id="解决方案-1"><a href="#解决方案-1" class="headerlink" title="解决方案"></a>解决方案</h4><ol>
+<li><strong>热点数据永远不过期</strong></li>
+</ol>
+<p>比如我们可以将某个 key 的缓存时间设置为 25 小时，然后后台有个 JOB 每隔 24 小时就去批量刷新一下热点数据。就可以解决这个问题了。</p>
+<ol start="2">
+<li><strong>使用互斥锁</strong></li>
+</ol>
+<p>容易影响吞吐量，大部分项目设置热点 key 永不过期就妥妥的了。</p>
+<h3 id="三-缓存雪崩"><a href="#三-缓存雪崩" class="headerlink" title="三. 缓存雪崩"></a>三. 缓存雪崩</h3><h4 id="关键词：Redis-崩了，没有数据了"><a href="#关键词：Redis-崩了，没有数据了" class="headerlink" title="关键词：Redis 崩了，没有数据了"></a>关键词：Redis 崩了，没有数据了</h4><p>这里的 Redis 崩了指的并不是 Redis 集群宕机了。而是说在某个时刻 Redis 集群中的热点 key 都失效了。如果集群中的热点 key 在某一时刻同时失效了的话，试想海量的请求都将直接打到 DB 上，DB 可能在瞬间就被打爆了。</p>
+<h4 id="解决方案-2"><a href="#解决方案-2" class="headerlink" title="解决方案"></a>解决方案</h4><ol>
+<li><strong>Redis 失效时间加上随机数</strong></li>
+</ol>
+<p>Redis 失效时间加上随机数，是一种比较取巧的解决方案。在一定程度上减轻了 DB 的瞬时压力，但是这种方案也在一定程度上增加了维护的成本。</p>
+<ol start="2">
+<li><strong>Redis 永不过期</strong></li>
+</ol>
+<p>实现方案在上文中简单提过了。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>最后我们再回归到主题！如何轻松的通过联想的方式来区分 Redis 缓存穿透、击穿、雪崩的区别？</p>
+<ul>
+<li><p><strong>缓存穿透</strong>—穿过（绕过） Redis 和 DB 来搞你</p>
+</li>
+<li><p><strong>缓存击穿</strong>—定点打击来搞你</p>
+</li>
+<li><p><strong>缓存雪崩</strong>—热点 key 在某一个时刻同时失效</p>
+</li>
+</ul>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://mp.weixin.qq.com/s/AmxDAhbUpO0awG5mieyAjQ" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/AmxDAhbUpO0awG5mieyAjQ</a></p>
 ]]></content>
-      <categories>
-        <category>Java集合</category>
-      </categories>
-      <tags>
-        <tag>HashMap</tag>
-      </tags>
   </entry>
   <entry>
     <title>分布式事务，这一篇就够了</title>
@@ -2296,6 +2296,52 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
       </tags>
   </entry>
   <entry>
+    <title>如何通俗易懂的理解翻墙</title>
+    <url>/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/</url>
+    <content><![CDATA[<p><strong>为了更好的理解翻墙，首先先了解一下互联网是怎么工作的：</strong></p>
+<a id="more"></a>
+
+<h2 id="互联网怎么工作的"><a href="#互联网怎么工作的" class="headerlink" title="互联网怎么工作的"></a>互联网怎么工作的</h2><p>假如没有互联网，我们家里有两台电脑，这两台电脑需要互相发送文件，那我们需要用网线把他们连起来，就可以互相传输文件了</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/two_computers.png" class="" title="two computers">
+
+<p>假如我们又增加了三台电脑，一共有五台电脑，那么我们就把他们一对一的连接起来，每台电脑都需要4个网线接口，就组成了一个局域网。</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/five_computers.png" class="" title="five computers">
+
+<p>但是如果我们继续增加电脑，就会发现这种一对一的连接方式就会非常复杂了，所以这个时候就增加了一个控制中心，这个控制中心就是我们熟悉的<strong>路由器</strong>。</p>
+<p>每台电脑只需要连接路由器，然后路由器统一协调这些电脑之前的传输问题</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/router.png" class="" title="router">
+
+<p>然后我们再往大了想，如果我们想给同学家发文件，也就是一个局域网向另外一个局域网发送文件，我们就只需要把两家的路由器连上就可以发送文件了。</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/two_routers.png" class="" title="two routers">
+
+<p>继续往下想就会发现开始的问题，各个局域网的路由器进行一对一的连接变得异常复杂。</p>
+<p>所以我们就新增了一个控制中心<strong>ISP</strong>，也就是我们说的互联网服务供应商，我们可以把它想象成更大号的路由器。</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/ISP.png" class="" title="two ISP">
+
+<p>这里家里的路由器只需要连接我们这个区域的ISP。</p>
+<p>各个区域的ISP进行连接，这样我们的互联网就形成了。</p>
+<h2 id="翻墙的原理"><a href="#翻墙的原理" class="headerlink" title="翻墙的原理"></a>翻墙的原理</h2><p>先说一下现象，我们访问部分网站，比如google的时候就会出现下面的现象：</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/page_not_found.png" class="" title="page not found">
+
+<p>我们输入一个网址访问一个网站，其实就是通过DNS找到网址对应的IP地址，然后访问网站的服务器，从网站服务器获取相应信息</p>
+<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/DNS.png" class="" title="DNS">
+
+<p>举个例子：</p>
+<p>比如小明通过百度经常访问大姐姐小姐姐的视频网站，然后百度就把这个情况向爸爸反映了，小明的爸爸为了小明的健康，就<strong>让DNS服务器不再查询大姐姐小姐姐网站的IP地址</strong>，这样小明就打不开网站了。</p>
+<p>但是小明通过<strong>修改电脑host</strong>的方式，再一次成功的访问了网站，小明爸爸一气之下在网络传输中增加了一个关卡，告诉关卡看见数据包有大姐姐小姐姐字样的都不能通过，小明就又打不开网站了。</p>
+<p>然后网站就给<strong>数据包加密</strong>，本来数据包上写的是大姐姐小姐姐，加密之后写的是办公用品，小明又一次打开了网站。小明爸爸又告诉关卡，只要是这个网站的IP地址都不能通过，所以小明又打不开网站了。</p>
+<p>然后小明想了一个办法，<strong>把发送出去的数据包先进行完全的加密，通过关卡之后先传到另外一个服务器上，让这个服务器把数据包解密，然后让这个服务器去访问大姐姐小姐姐的网站，收到网站的数据包之后，服务器再进行完全的加密，通过关卡之后再解密，</strong>这样小明就再一次打开了网站。</p>
+<h2 id="VPN翻墙原理"><a href="#VPN翻墙原理" class="headerlink" title="VPN翻墙原理"></a>VPN翻墙原理</h2><p>有些网站我们是没有办法打开的，这个是因为这中间有一个<strong>长城防火墙</strong>(GFW)，这个防火墙的作用就是检查这些数据包。</p>
+<p>比如我们打开一个网站，DNS服务器就会告诉我们电脑，没有查到这个网址所对应的IP地址或者是长城防火墙发现这些数据包是被屏蔽网站的IP地址，就会把数据包拦下，这个就是我们没办法访问被屏蔽网站的原因。</p>
+<p>为了能访问这些被屏蔽的网站，我们就用到了VPN。</p>
+<p>当我们打开VPN之后，VPN就会在电脑上<strong>虚拟出一个IP地址</strong>。当电脑要传输数据包的时候，这个即将传输的数据包和没有开VPN的时候一样，先用盒子装好，然后写上寄件人和收件人的IP地址。</p>
+<p>之后这个数据包会交给电脑的VPN，VPN就会对这个数据包进行加密，相当于又给数据包套了一个盒子，然后这个盒子的寄件人地址写的是刚才虚拟出来的IP地址，收件人地址写的是VPN服务器的IP地址，然后这个数据包就可以发送出去了。</p>
+<p>因为<strong>这个数据包的目的地并不是被屏蔽网站的IP地址，而且数据包也加过密</strong>，防火墙自然也检测不出什么问题。</p>
+<p>当数据包到了VPN的服务器之后，就会对数据包解密，再把里面的数据传给网站的服务器，网站服务器再传数据包给VPN服务器，VPN服务器把数据加密之后，又传回给我们，这个就是VPN的工作原理。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://www.youtube.com/watch?v=EUKmF_IKttc" target="_blank" rel="noopener">https://www.youtube.com/watch?v=EUKmF_IKttc</a><br><a href="https://www.youtube.com/watch?v=ZT-q6mJ-e3g" target="_blank" rel="noopener">https://www.youtube.com/watch?v=ZT-q6mJ-e3g</a></p>
+]]></content>
+  </entry>
+  <entry>
     <title>如何记忆Spring-Bean的生命周期</title>
     <url>/2020/06/23/%E5%A6%82%E4%BD%95%E8%AE%B0%E5%BF%86Spring-Bean%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/</url>
     <content><![CDATA[<h2 id="1-引言"><a href="#1-引言" class="headerlink" title="1. 引言"></a>1. 引言</h2><p>“请你描述下 Spring Bean 的生命周期？”，这是面试官考察 Spring 的常用问题，可见是 Spring 中很重要的知识点。</p>
@@ -2395,52 +2441,6 @@ g  :是行内进行全局替换</code></pre><h3 id="32-如果系统的umask设�
 </li>
 </ul>
 <h2 id="5-参考"><a href="#5-参考" class="headerlink" title="5. 参考"></a>5. 参考</h2><p><a href="https://juejin.im/post/5e4791a7f265da5715630629" target="_blank" rel="noopener">https://juejin.im/post/5e4791a7f265da5715630629</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>如何通俗易懂的理解翻墙</title>
-    <url>/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/</url>
-    <content><![CDATA[<p><strong>为了更好的理解翻墙，首先先了解一下互联网是怎么工作的：</strong></p>
-<a id="more"></a>
-
-<h2 id="互联网怎么工作的"><a href="#互联网怎么工作的" class="headerlink" title="互联网怎么工作的"></a>互联网怎么工作的</h2><p>假如没有互联网，我们家里有两台电脑，这两台电脑需要互相发送文件，那我们需要用网线把他们连起来，就可以互相传输文件了</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/two_computers.png" class="" title="two computers">
-
-<p>假如我们又增加了三台电脑，一共有五台电脑，那么我们就把他们一对一的连接起来，每台电脑都需要4个网线接口，就组成了一个局域网。</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/five_computers.png" class="" title="five computers">
-
-<p>但是如果我们继续增加电脑，就会发现这种一对一的连接方式就会非常复杂了，所以这个时候就增加了一个控制中心，这个控制中心就是我们熟悉的<strong>路由器</strong>。</p>
-<p>每台电脑只需要连接路由器，然后路由器统一协调这些电脑之前的传输问题</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/router.png" class="" title="router">
-
-<p>然后我们再往大了想，如果我们想给同学家发文件，也就是一个局域网向另外一个局域网发送文件，我们就只需要把两家的路由器连上就可以发送文件了。</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/two_routers.png" class="" title="two routers">
-
-<p>继续往下想就会发现开始的问题，各个局域网的路由器进行一对一的连接变得异常复杂。</p>
-<p>所以我们就新增了一个控制中心<strong>ISP</strong>，也就是我们说的互联网服务供应商，我们可以把它想象成更大号的路由器。</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/ISP.png" class="" title="two ISP">
-
-<p>这里家里的路由器只需要连接我们这个区域的ISP。</p>
-<p>各个区域的ISP进行连接，这样我们的互联网就形成了。</p>
-<h2 id="翻墙的原理"><a href="#翻墙的原理" class="headerlink" title="翻墙的原理"></a>翻墙的原理</h2><p>先说一下现象，我们访问部分网站，比如google的时候就会出现下面的现象：</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/page_not_found.png" class="" title="page not found">
-
-<p>我们输入一个网址访问一个网站，其实就是通过DNS找到网址对应的IP地址，然后访问网站的服务器，从网站服务器获取相应信息</p>
-<img src="/2020/04/29/%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84%E7%90%86%E8%A7%A3%E7%BF%BB%E5%A2%99/DNS.png" class="" title="DNS">
-
-<p>举个例子：</p>
-<p>比如小明通过百度经常访问大姐姐小姐姐的视频网站，然后百度就把这个情况向爸爸反映了，小明的爸爸为了小明的健康，就<strong>让DNS服务器不再查询大姐姐小姐姐网站的IP地址</strong>，这样小明就打不开网站了。</p>
-<p>但是小明通过<strong>修改电脑host</strong>的方式，再一次成功的访问了网站，小明爸爸一气之下在网络传输中增加了一个关卡，告诉关卡看见数据包有大姐姐小姐姐字样的都不能通过，小明就又打不开网站了。</p>
-<p>然后网站就给<strong>数据包加密</strong>，本来数据包上写的是大姐姐小姐姐，加密之后写的是办公用品，小明又一次打开了网站。小明爸爸又告诉关卡，只要是这个网站的IP地址都不能通过，所以小明又打不开网站了。</p>
-<p>然后小明想了一个办法，<strong>把发送出去的数据包先进行完全的加密，通过关卡之后先传到另外一个服务器上，让这个服务器把数据包解密，然后让这个服务器去访问大姐姐小姐姐的网站，收到网站的数据包之后，服务器再进行完全的加密，通过关卡之后再解密，</strong>这样小明就再一次打开了网站。</p>
-<h2 id="VPN翻墙原理"><a href="#VPN翻墙原理" class="headerlink" title="VPN翻墙原理"></a>VPN翻墙原理</h2><p>有些网站我们是没有办法打开的，这个是因为这中间有一个<strong>长城防火墙</strong>(GFW)，这个防火墙的作用就是检查这些数据包。</p>
-<p>比如我们打开一个网站，DNS服务器就会告诉我们电脑，没有查到这个网址所对应的IP地址或者是长城防火墙发现这些数据包是被屏蔽网站的IP地址，就会把数据包拦下，这个就是我们没办法访问被屏蔽网站的原因。</p>
-<p>为了能访问这些被屏蔽的网站，我们就用到了VPN。</p>
-<p>当我们打开VPN之后，VPN就会在电脑上<strong>虚拟出一个IP地址</strong>。当电脑要传输数据包的时候，这个即将传输的数据包和没有开VPN的时候一样，先用盒子装好，然后写上寄件人和收件人的IP地址。</p>
-<p>之后这个数据包会交给电脑的VPN，VPN就会对这个数据包进行加密，相当于又给数据包套了一个盒子，然后这个盒子的寄件人地址写的是刚才虚拟出来的IP地址，收件人地址写的是VPN服务器的IP地址，然后这个数据包就可以发送出去了。</p>
-<p>因为<strong>这个数据包的目的地并不是被屏蔽网站的IP地址，而且数据包也加过密</strong>，防火墙自然也检测不出什么问题。</p>
-<p>当数据包到了VPN的服务器之后，就会对数据包解密，再把里面的数据传给网站的服务器，网站服务器再传数据包给VPN服务器，VPN服务器把数据加密之后，又传回给我们，这个就是VPN的工作原理。</p>
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://www.youtube.com/watch?v=EUKmF_IKttc" target="_blank" rel="noopener">https://www.youtube.com/watch?v=EUKmF_IKttc</a><br><a href="https://www.youtube.com/watch?v=ZT-q6mJ-e3g" target="_blank" rel="noopener">https://www.youtube.com/watch?v=ZT-q6mJ-e3g</a></p>
 ]]></content>
   </entry>
   <entry>
